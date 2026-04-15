@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NOISE — Checkout</title>
+<style>
+html { overflow-y: scroll; }
+div { background-color: #fff; }
+body {
+    background-color: #f2f2f2;
+    margin: 0;
+    padding: 0;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+/* ── Nav ── */
+nav ul { list-style-type: none; margin: 0; padding: 0; overflow: hidden; }
+nav li { float: right; }
+nav img { position: absolute; float: left; margin: -50%, -50%; overflow: hidden; width: 225px; }
+li a {
+    display: block; padding: 9px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-weight: 600; text-decoration: none; color: black;
+}
+li a:hover:not(.active) { background-color: lightgray; }
+.active { opacity: 75%; }
+
+/* ── Page wrapper ── */
+.checkout-wrap {
+    background-color: #f2f2f2;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 36px 24px 60px;
+}
+
+/* ── Page title ── */
+.page-title {
+    background-color: transparent;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #000;
+    margin: 0 0 28px 0;
+    border-bottom: 2px solid #000;
+    padding-bottom: 14px;
+	text-align: center;
+}
+
+/* ── Section headings ── */
+.section-label {
+    background-color: transparent;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #000;
+    border-bottom: 2px solid #000;
+    padding-bottom: 10px;
+    margin: 0 0 22px 0;
+}
+
+/* ── Cards ── */
+.form-card {
+    background-color: #fff;
+    padding: 28px 28px 20px;
+    margin-bottom: 16px;
+}
+
+/* ── Order Summary ── */
+.summary-item {
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+.summary-item:last-of-type { border-bottom: none; }
+.summary-thumb {
+    background-color: #f0f0f0;
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+.summary-item-left {
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+}
+.summary-item-name {
+    background-color: #fff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #000;
+    margin: 0;
+}
+.summary-item-meta {
+    background-color: #fff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    color: #888;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+.summary-item-price {
+    background-color: #fff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #000;
+}
+.summary-empty {
+    background-color: #fff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #bbb;
+    text-align: center;
+    padding: 24px 0 10px;
+}
+
+/* ── Input Groups ── */
+.input-group {
+    background-color: #fff;
+    margin-bottom: 14px;
+}
+.input-group label {
+    background-color: #fff;
+    display: block;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #888;
+    margin-bottom: 6px;
+}
+.input-group input,
+.input-group select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 12px;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 13px;
+    color: #000;
+    background-color: #fff;
+    outline: none;
+    transition: border-color 0.15s;
+    appearance: none;
+    -webkit-appearance: none;
+}
+.input-group input:focus,
+.input-group select:focus { border-color: #000; }
+.input-group input::placeholder { color: #bbb; font-size: 12px; }
+.input-group select { cursor: pointer; }
+
+.input-row {
+    background-color: #fff;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+.input-row-3 {
+    background-color: #fff;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 12px;
+}
+
+/* ── Card number wrap ── */
+.card-input-wrap { background-color: #fff; position: relative; }
+.card-input-wrap input { padding-right: 60px; }
+.card-icons {
+    background-color: transparent;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: #aaa;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+/* ── Billing toggle ── */
+.billing-toggle-row {
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+}
+.billing-checkbox {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #000;
+    background-color: #fff;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s;
+}
+.billing-checkbox.checked { background-color: #000; }
+.billing-checkbox.checked::after {
+    content: '';
+    width: 5px;
+    height: 9px;
+    border: 2px solid #fff;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg) translateY(-1px);
+    background: transparent;
+}
+.billing-toggle-label {
+    background-color: #fff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #000;
+    user-select: none;
+}
+.billing-fields.hidden { display: none; }
+
+/* ── Other country input ── */
+.other-country-input {
+    display: none;
+    margin-top: 8px;
+}
+.other-country-input.visible { display: block; }
+.other-country-input input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 12px;
+    border: 1px solid #ccc;
+    border-radius: 0;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 13px;
+    color: #000;
+    background-color: #fff;
+    outline: none;
+    transition: border-color 0.15s;
+}
+.other-country-input input:focus { border-color: #000; }
+.other-country-input input::placeholder { color: #bbb; font-size: 12px; }
+
+/* ── Shipping method box ── */
+.shipping-method {
+    background-color: #f8f8f8;
+    border: 1px solid #e0e0e0;
+    padding: 14px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 6px;
+    display: none;
+}
+.shipping-method.visible { display: flex; }
+.shipping-method-label {
+    background-color: transparent;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #000;
+}
+.shipping-method-cost {
+    background-color: transparent;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #000;
+}
+
+/* ── Totals & Place Order ── */
+.checkout-footer {
+    background-color: #fff;
+    padding: 28px 28px 28px;
+    margin-top: 0;
+}
+.total-row {
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+.total-row:last-of-type { border-bottom: none; }
+.total-label {
+    background-color: #fff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #888;
+}
+.total-label.grand { color: #000; font-size: 11px; }
+.total-amount {
+    background-color: #fff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #000;
+}
+.place-order-btn {
+    width: 100%;
+    padding: 16px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 22px;
+    transition: background-color 0.2s;
+}
+.place-order-btn:hover { background-color: #333; }
+
+
+/* ── Expandable Price Breakdown ── */
+.price-breakdown-toggle {
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    padding: 14px 0 10px;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 8px;
+    user-select: none;
+}
+.price-breakdown-label {
+    background-color: #fff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #555;
+}
+.price-breakdown-chevron {
+    background-color: #fff;
+    font-size: 13px;
+    color: #555;
+    transition: transform 0.2s;
+    display: inline-block;
+}
+.price-breakdown-chevron.open { transform: rotate(180deg); }
+.price-breakdown-details {
+    background-color: #fff;
+    display: none;
+    padding: 6px 0 4px;
+}
+.price-breakdown-details.open { display: block; }
+.breakdown-line {
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    color: #777;
+    letter-spacing: 0.5px;
+}
+
+/* ── Mobile / Hamburger ── */
+.hamburger-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: black;
+    font-size: 30px;
+    cursor: pointer;
+    position: fixed;
+    top: 6px;
+    left: 10px;
+    z-index: 1100;
+    padding: 2px 8px;
+    line-height: 1;
+    font-family: Arial, sans-serif;
+}
+.mobile-nav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5) !important;
+    z-index: 1050;
+}
+.mobile-nav-overlay.open { display: block; }
+.mobile-nav-menu {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 230px;
+    height: 100%;
+    background-color: #111 !important;
+    z-index: 1080;
+    padding: 64px 0 20px;
+    flex-direction: column;
+    border-right: 1px solid #333;
+    box-sizing: border-box;
+}
+.mobile-nav-menu.open { display: flex; }
+.mobile-nav-menu a {
+    color: white;
+    text-decoration: none;
+    padding: 16px 28px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #222;
+    display: block;
+    background-color: transparent !important;
+}
+.mobile-nav-menu a:hover { background-color: #222 !important; }
+
+@media (max-width: 768px) {
+    .hamburger-btn { display: block; }
+    nav ul { display: none; }
+    nav img { height: 34px; width: auto; position: absolute; left: 50%; transform: translateX(-50%); top: 7px; }
+    nav { height: 48px; position: relative; background-color: #fff; display: flex; align-items: center; justify-content: center; }
+    body { overflow-y: auto; }
+    .checkout-wrap { padding: 20px 12px 60px; }
+    .input-row { grid-template-columns: 1fr; }
+    .input-row-3 { grid-template-columns: 1fr 1fr; }
+    .input-row-3 .input-group:first-child { grid-column: 1 / -1; }
+    .form-card, .checkout-footer { padding: 18px 14px; }
+    .page-title { font-size: 10px; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+    .input-row { grid-template-columns: 1fr; }
+    .input-row-3 { grid-template-columns: 1fr 1fr; }
+    .input-row-3 .input-group:first-child { grid-column: 1 / -1; }
+    .form-card, .checkout-footer { padding: 22px 18px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Mobile Nav -->
+<button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">&#9776;</button>
+<div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+<div class="mobile-nav-menu" id="mobileNavMenu">
+    <a href="index.html">HOME</a>
+    <a href="Shop.html">SHOP</a>
+    <a href="Gallery.html">GALLERY</a>
+    <a href="About.html">ABOUT</a>
+</div>
+
+<!-- ── Nav ── -->
+<nav>
+    <img src="png-logo.png" alt="">
+    <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="Shop.html">Shop</a></li>
+        <li><a href="Gallery.html">Gallery</a></li>
+        <li><a href="About.html">About</a></li>
+    </ul>
+</nav>
+
+<div style="background-color: black; height: 21px; width: 100%;"></div>
+
+<div class="checkout-wrap">
+
+    <p class="page-title">Checkout</p>
+
+    <!-- ── Order Summary ── -->
+    <div class="form-card">
+        <p class="section-label">Order Summary</p>
+        <div id="summaryItems">
+            <div class="summary-empty" id="summaryEmpty">Your bag is empty.</div>
+        </div>
+    </div>
+
+    <!-- ── Delivery Address ── -->
+    <div class="form-card">
+        <p class="section-label">Delivery Address</p>
+
+        <div class="input-row">
+            <div class="input-group">
+                <label>First Name</label>
+                <input type="text" placeholder="First">
+            </div>
+            <div class="input-group">
+                <label>Last Name</label>
+                <input type="text" placeholder="Last">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Address</label>
+            <input type="text" placeholder="Street address">
+        </div>
+
+        <div class="input-group">
+            <label>Apt, Suite, etc. (optional)</label>
+            <input type="text" placeholder="">
+        </div>
+
+        <div class="input-row">
+            <div class="input-group">
+                <label>City</label>
+                <input type="text" placeholder="City">
+            </div>
+            <div class="input-group">
+                <label>State / Province</label>
+                <input type="text" placeholder="State">
+            </div>
+        </div>
+
+        <div class="input-row">
+            <div class="input-group">
+                <label>ZIP / Postal Code</label>
+                <input type="text" placeholder="00000">
+            </div>
+            <div class="input-group">
+                <label>Country</label>
+                <select id="countrySelect">
+                    <option value="">Select Country</option>
+                    <option value="US">United States</option>
+                    <option value="INTL">Canada</option>
+                    <option value="INTL">United Kingdom</option>
+                    <option value="INTL">Australia</option>
+                    <option value="INTL">France</option>
+                    <option value="INTL">Germany</option>
+                    <option value="INTL">Japan</option>
+                    <option value="INTL">Mexico</option>
+                    <option value="INTL">Brazil</option>
+                    <option value="OTHER">Other</option>
+                </select>
+                <div class="other-country-input" id="otherCountryWrap">
+                    <input type="text" id="otherCountryInput" placeholder="Type your country">
+                </div>
+            </div>
+        </div>
+
+        <!-- Shipping method — revealed after country selection -->
+        <div class="input-group" id="shippingMethodWrap">
+            <label>Shipping Method</label>
+            <div class="shipping-method" id="shippingMethodBox">
+                <span class="shipping-method-label" id="shippingMethodLabel">Standard Shipping</span>
+                <span class="shipping-method-cost" id="shippingMethodCost">—</span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Phone Number</label>
+            <input type="tel" placeholder="+1 (000) 000-0000">
+        </div>
+
+        <div class="input-group">
+            <label>Email Address</label>
+            <input type="email" placeholder="you@email.com">
+        </div>
+    </div>
+
+    <!-- ── Payment ── -->
+    <div class="form-card">
+        <p class="section-label">Payment</p>
+
+        <div class="input-group">
+            <label>Name on Card</label>
+            <input type="text" placeholder="Full name as it appears on card">
+        </div>
+
+        <div class="input-group">
+            <label>Card Number</label>
+            <div class="card-input-wrap">
+                <input type="text" placeholder="0000  0000  0000  0000" maxlength="19" id="cardNumber">
+                <div class="card-icons">VISA · MC</div>
+            </div>
+        </div>
+
+        <div class="input-row-3">
+            <div class="input-group">
+                <label>Expiration Date</label>
+                <input type="text" placeholder="MM / YY" maxlength="7" id="cardExpiry">
+            </div>
+            <div class="input-group">
+                <label>CVV</label>
+                <input type="text" placeholder="000" maxlength="4" id="cardCvv">
+            </div>
+            <div class="input-group">
+                <label>ZIP on Card</label>
+                <input type="text" placeholder="00000" maxlength="5">
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Billing Address ── -->
+    <div class="form-card">
+        <p class="section-label">Billing Address</p>
+
+        <div class="billing-toggle-row" id="billingToggleRow">
+            <div class="billing-checkbox checked" id="billingCheckbox"></div>
+            <span class="billing-toggle-label">Same as Delivery Address</span>
+        </div>
+
+        <div class="billing-fields hidden" id="billingFields">
+            <div class="input-row">
+                <div class="input-group">
+                    <label>First Name</label>
+                    <input type="text" placeholder="First">
+                </div>
+                <div class="input-group">
+                    <label>Last Name</label>
+                    <input type="text" placeholder="Last">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Address</label>
+                <input type="text" placeholder="Street address">
+            </div>
+
+            <div class="input-group">
+                <label>Apt, Suite, etc. (optional)</label>
+                <input type="text" placeholder="">
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label>City</label>
+                    <input type="text" placeholder="City">
+                </div>
+                <div class="input-group">
+                    <label>State / Province</label>
+                    <input type="text" placeholder="State">
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label>ZIP / Postal Code</label>
+                    <input type="text" placeholder="00000">
+                </div>
+                <div class="input-group">
+                    <label>Country</label>
+                    <select>
+                        <option value="">Select Country</option>
+                        <option value="US">United States</option>
+                        <option value="INTL">Canada</option>
+                        <option value="INTL">United Kingdom</option>
+                        <option value="INTL">Australia</option>
+                        <option value="INTL">France</option>
+                        <option value="INTL">Germany</option>
+                        <option value="INTL">Japan</option>
+                        <option value="INTL">Mexico</option>
+                        <option value="INTL">Brazil</option>
+                        <option value="INTL">Other</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Totals + Place Order ── -->
+    <div class="checkout-footer">
+
+        <!-- Expandable Price Breakdown -->
+        <div class="price-breakdown-toggle" id="breakdownToggle">
+            <span class="price-breakdown-label">View Price Breakdown</span>
+            <span class="price-breakdown-chevron" id="breakdownChevron">&#9660;</span>
+        </div>
+        <div class="price-breakdown-details" id="breakdownDetails">
+            <div class="breakdown-line"><span>Subtotal</span><span id="bdSubtotal">$0</span></div>
+            <div class="breakdown-line"><span>Shipping</span><span id="bdShipping">—</span></div>
+            <div class="breakdown-line"><span>Estimated Tax</span><span>—</span></div>
+            <div class="breakdown-line" style="font-weight:700;color:#000;border-top:1px solid #eee;padding-top:8px;margin-top:4px;">
+                <span>Grand Total</span><span id="bdTotal">$0</span>
+            </div>
+        </div>
+
+        <div class="total-row">
+            <span class="total-label">Subtotal</span>
+            <span class="total-amount" id="footerSubtotal">$0</span>
+        </div>
+        <div class="total-row">
+            <span class="total-label">Shipping</span>
+            <span class="total-amount" id="footerShipping">—</span>
+        </div>
+        <div class="total-row">
+            <span class="total-label grand">Total</span>
+            <span class="total-amount" id="footerTotal">$0</span>
+        </div>
+        <button class="place-order-btn">Place Order</button>
+    </div>
+
+</div><!-- /checkout-wrap -->
+
+<script>
+// ── Load cart from sessionStorage ──
+let subtotal = 0;
+let shippingCost = null;
+
+try {
+    const stored = sessionStorage.getItem('noiseCart');
+    if (stored) {
+        const cart = JSON.parse(stored);
+        const summaryItems = document.getElementById('summaryItems');
+        const summaryEmpty = document.getElementById('summaryEmpty');
+
+        if (cart.length > 0) {
+            summaryEmpty.style.display = 'none';
+
+            // Group by name + size
+            const grouped = {};
+            cart.forEach(item => {
+                const key = item.name + '||' + item.size;
+                if (!grouped[key]) grouped[key] = { name: item.name, size: item.size, price: item.price, front: item.front, qty: 0 };
+                grouped[key].qty++;
+                subtotal += item.price;
+            });
+
+            Object.values(grouped).forEach(g => {
+                const row = document.createElement('div');
+                row.className = 'summary-item';
+                row.innerHTML = `
+                    <img class="summary-thumb" src="${g.front}" alt="${g.name}">
+                    <div class="summary-item-left">
+                        <p class="summary-item-name">${g.name}</p>
+                        <p class="summary-item-meta">Size: ${g.size} &nbsp;·&nbsp; Qty: ${g.qty}</p>
+                    </div>
+                    <span class="summary-item-price">$${g.price * g.qty}</span>`;
+                summaryItems.insertBefore(row, summaryEmpty);
+            });
+        }
+    }
+} catch(e) {}
+
+// Initialise totals display
+document.getElementById('footerSubtotal').textContent = `$${subtotal}`;
+document.getElementById('footerTotal').textContent    = `$${subtotal}`;
+
+// ── Shipping logic ──
+function updateShipping(cost, label) {
+    shippingCost = cost;
+    document.getElementById('shippingMethodBox').classList.add('visible');
+    document.getElementById('shippingMethodLabel').textContent = label;
+    document.getElementById('shippingMethodCost').textContent  = `$${cost.toFixed(2)}`;
+    document.getElementById('footerShipping').textContent      = `$${cost.toFixed(2)}`;
+    document.getElementById('footerTotal').textContent         = `$${(subtotal + cost).toFixed(2)}`;
+}
+
+document.getElementById('countrySelect').addEventListener('change', function () {
+    const val = this.value;
+    const otherWrap = document.getElementById('otherCountryWrap');
+
+    // Show/hide "Other" text input
+    if (val === 'OTHER') {
+        otherWrap.classList.add('visible');
+    } else {
+        otherWrap.classList.remove('visible');
+        document.getElementById('otherCountryInput').value = '';
+    }
+
+    if (!val) return;
+    if (val === 'US') {
+        updateShipping(2.50, 'Standard Shipping — United States');
+    } else {
+        updateShipping(15.00, 'Standard Shipping — International');
+    }
+});
+
+// ── Billing toggle ──
+document.getElementById('billingToggleRow').addEventListener('click', () => {
+    const box = document.getElementById('billingCheckbox');
+    const fields = document.getElementById('billingFields');
+    const isSame = box.classList.contains('checked');
+    box.classList.toggle('checked', !isSame);
+    fields.classList.toggle('hidden', !isSame);
+});
+// ── Card number formatting ──
+document.getElementById('cardNumber').addEventListener('input', function () {
+    let v = this.value.replace(/\D/g, '').slice(0, 16);
+    this.value = v.replace(/(.{4})/g, '$1  ').trim();
+});
+document.getElementById('cardExpiry').addEventListener('input', function () {
+    let v = this.value.replace(/\D/g, '').slice(0, 4);
+    if (v.length >= 3) v = v.slice(0,2) + ' / ' + v.slice(2);
+    this.value = v;
+});
+document.getElementById('cardCvv').addEventListener('input', function () {
+    this.value = this.value.replace(/\D/g, '').slice(0, 4);
+});
+</script>
+
+</div><!-- /checkout-wrap -->
+
+<script>
+(function(){
+    var btn = document.getElementById('hamburgerBtn');
+    var menu = document.getElementById('mobileNavMenu');
+    var overlay = document.getElementById('mobileNavOverlay');
+    if (!btn || !menu || !overlay) return;
+    function toggleNav() {
+        menu.classList.toggle('open');
+        overlay.classList.toggle('open');
+    }
+    btn.addEventListener('click', toggleNav);
+    overlay.addEventListener('click', toggleNav);
+})();
+</script>
+
+</body>
+</html>

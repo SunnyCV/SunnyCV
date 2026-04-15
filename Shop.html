@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NOISE — Shop</title>
+<style>
+html {overflow-y: scroll;}
+div {background-color: black;}
+body {background-color: #F2F2F2; background-size: cover; background-position: center; overflow: hidden; padding-bottom: 0;}
+p {font-size: 18px; text-align: center; font-weight: bold; color: white;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;}
+h1 {text-align: center; font-size: 115px; font-weight: 900;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;}
+h2 {text-align: center; font-size: 36px; font-weight: 900; color: white;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;}
+nav ul {list-style-type: none; margin: 0; padding: 0; overflow: hidden;}
+nav li {float: right;}
+nav img {position: absolute; float: left; margin: -50%, -50%; overflow: hidden; width: 225px;}
+li a {display: block; padding: 9px; background-color: rgb(from color r g b);
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; font-weight: 600; text-decoration: none; color: black;}
+li a:hover:not(.active) {background-color: lightgray;}
+.active {opacity: 75%;}
+.header {text-align: center; font-size: 52px; font-weight: 900; color: black; font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;}
+
+/* ── Filter Bar ── */
+.filter-bar {
+    background-color: #F2F2F2;
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    padding: 18px 0 0 0;
+    border-bottom: 2px solid #000;
+    margin-bottom: 36px;
+}
+.filter-btn {
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #888;
+    padding: 10px 28px 14px 28px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    margin-bottom: -2px;
+}
+.filter-btn:hover { color: #000; }
+.filter-btn.active-filter { color: #000; border-bottom: 3px solid #000; }
+
+/* ── Product Grid ── */
+.shop-grid {
+    background-color: #F2F2F2;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    padding: 0 2px 60px 2px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.product-card {
+    background-color: #F2F2F2;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.product-card:hover { opacity: 0.82; }
+.product-card.hidden { display: none; }
+.product-thumb {
+    background-color: #ebebeb;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.product-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+.product-meta { background-color: #F2F2F2; padding: 10px 4px 18px 4px; }
+.product-name {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #000;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 0 0 4px 0;
+    text-align: left;
+}
+.product-price {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    color: #555;
+    margin: 0;
+    text-align: left;
+}
+.no-results {
+    background-color: #F2F2F2;
+    grid-column: 1 / -1;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: #aaa;
+    text-transform: uppercase;
+    padding: 60px 0;
+    display: none;
+}
+
+/* ── Product Detail Modal ── */
+.pdp-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0,0,0,0.6);
+    z-index: 500;
+    overflow-y: auto;
+}
+.pdp-overlay.open { display: flex; align-items: flex-start; justify-content: center; padding: 40px 20px 80px; }
+.pdp-modal {
+    background-color: #fff;
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    gap: 0;
+    position: relative;
+}
+.pdp-close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 28px;
+    font-weight: 300;
+    cursor: pointer;
+    color: #000;
+    line-height: 1;
+    z-index: 10;
+    font-family: Arial, sans-serif;
+}
+
+/* Left: images */
+.pdp-images {
+    background-color: #f5f5f5;
+    width: 58%;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 30px 30px;
+}
+.pdp-main-img {
+    width: 100%;
+    max-height: 620px;
+    object-fit: contain;
+    display: block;
+}
+.pdp-view-toggle {
+    background-color: #fff;
+    display: flex;
+    gap: 2px;
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+.view-btn {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 13px;
+    cursor: pointer;
+    color: #888;
+    transition: all 0.15s;
+}
+.view-btn.active-view { background-color: #000; color: #fff; border-color: #000; }
+
+/* Right: info */
+.pdp-info {
+    background-color: #fff;
+    width: 42%;
+    padding: 48px 40px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+.pdp-title {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #000;
+    margin: 0 0 10px 0;
+    background-color: #fff;
+}
+.pdp-price {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #000;
+    margin: 0 0 28px 0;
+    background-color: #fff;
+}
+.pdp-divider {
+    background-color: #e0e0e0;
+    height: 1px;
+    width: 100%;
+    margin: 0 0 24px 0;
+}
+.pdp-desc {
+    background-color: #fff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    color: #444;
+    line-height: 1.7;
+    letter-spacing: 0.5px;
+    margin: 0 0 28px 0;
+}
+.pdp-desc strong {
+    background-color: #fff;
+    font-weight: 700;
+    color: #000;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 10px;
+    display: block;
+    margin-bottom: 6px;
+}
+
+/* Size Chart Link */
+.size-chart-link {
+    background: none;
+    border: none;
+    border-bottom: 1px solid #000;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #000;
+    padding: 0 0 5px 0;
+    cursor: pointer;
+    text-align: left;
+    display: inline-block;
+    background-color: #fff;
+    transition: opacity 0.15s;
+}
+.size-chart-link:hover { opacity: 0.55; }
+
+/* Size Chart Lightbox */
+.sc-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0,0,0,0.75);
+    z-index: 900;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 20px;
+}
+.sc-overlay.open { display: flex; }
+.sc-box {
+    background-color: #fff;
+    width: 100%;
+    max-width: 780px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+.sc-header {
+    background-color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0;
+    flex-shrink: 0;
+}
+.sc-tabs {
+    background-color: #000;
+    display: flex;
+}
+.sc-tab {
+    background-color: #000;
+    border: none;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #555;
+    padding: 14px 24px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+}
+.sc-tab.active-tab { color: #fff; border-bottom: 3px solid #fff; }
+.sc-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 300;
+    cursor: pointer;
+    padding: 10px 18px;
+    line-height: 1;
+    font-family: Arial, sans-serif;
+    background-color: #000;
+    transition: opacity 0.15s;
+}
+.sc-close:hover { opacity: 0.6; }
+.sc-img-wrap {
+    background-color: #fff;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px;
+}
+.sc-chart-img {
+    background-color: #fff;
+    width: 100%;
+    max-width: 720px;
+    display: block;
+    object-fit: contain;
+}
+
+/* ── Cart Icon in Nav ── */
+.cart-nav-btn {
+    background: none;
+    border: none;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0px;
+    color: #000;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 9px;
+    margin: 0;
+    line-height: 1.5;
+    text-decoration: none;
+}
+.cart-nav-btn:hover { background-color: lightgray; }
+.cart-badge {
+    background-color: #000;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    border-radius: 50%;
+    min-width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+    line-height: 1;
+    display: none;
+}
+.cart-badge.visible { display: inline-flex; }
+
+/* ── Size Dropdown ── */
+.size-select {
+    width: 100%;
+    padding: 11px 14px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #000;
+    background-color: #fff;
+    border: 1px solid #000;
+    border-radius: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+    margin-bottom: 10px;
+}
+.size-select:focus { outline: none; border-color: #000; }
+.size-select option:disabled { color: #bbb; }
+
+/* ── Add to Cart Button ── */
+.add-to-cart-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-bottom: 20px;
+}
+.add-to-cart-btn:hover { background-color: #333; }
+.add-to-cart-btn:disabled { background-color: #bbb; cursor: not-allowed; }
+.add-to-cart-btn.added { background-color: #2a7a2a; }
+.cart-feedback {
+    background-color: #fff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #2a7a2a;
+    text-align: center;
+    height: 16px;
+    margin-bottom: 14px;
+}
+
+/* ── Cart Drawer ── */
+.cart-overlay-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0,0,0,0.45);
+    z-index: 700;
+}
+.cart-overlay-bg.open { display: block; }
+.cart-drawer {
+    position: fixed;
+    top: 0;
+    right: -420px;
+    width: 420px;
+    max-width: 100vw;
+    height: 100%;
+    background-color: #fff;
+    z-index: 800;
+    display: flex;
+    flex-direction: column;
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.cart-drawer.open { right: 0; }
+.cart-drawer-header {
+    background-color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    flex-shrink: 0;
+}
+.cart-drawer-title {
+    background-color: #000;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #fff;
+    margin: 0;
+}
+.cart-drawer-close {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 300;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    background-color: #000;
+    font-family: Arial, sans-serif;
+    transition: opacity 0.15s;
+}
+.cart-drawer-close:hover { opacity: 0.6; }
+.cart-items-list {
+    flex: 1;
+    overflow-y: auto;
+    background-color: #fff;
+    padding: 0;
+}
+.cart-empty {
+    background-color: #fff;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #bbb;
+    padding: 60px 20px;
+}
+.cart-item-row {
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+.cart-item-img {
+    background-color: #f0f0f0;
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+.cart-item-details {
+    background-color: #fff;
+    flex: 1;
+}
+.cart-item-name {
+    background-color: #fff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #000;
+    margin: 0 0 4px 0;
+}
+.cart-item-meta {
+    background-color: #fff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    color: #777;
+    margin: 0 0 4px 0;
+    letter-spacing: 0.5px;
+}
+.cart-item-price {
+    background-color: #fff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #000;
+    margin: 0;
+}
+.cart-item-remove {
+    background: none;
+    border: none;
+    color: #bbb;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+    font-family: Arial, sans-serif;
+    background-color: #fff;
+    transition: color 0.15s;
+    flex-shrink: 0;
+}
+.cart-item-remove:hover { color: #000; }
+.cart-drawer-footer {
+    background-color: #fff;
+    border-top: 1px solid #e0e0e0;
+    padding: 20px 20px 74px 20px;
+    flex-shrink: 0;
+}
+.cart-total-row {
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+.cart-total-label {
+    background-color: #fff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #000;
+}
+.cart-total-amount {
+    background-color: #fff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #000;
+}
+.checkout-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.checkout-btn:hover { background-color: #333; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+    .shop-grid { grid-template-columns: repeat(2, 1fr); }
+    .filter-btn { padding: 10px 14px 14px; font-size: 11px; letter-spacing: 2px; }
+    .pdp-modal { flex-direction: column; }
+    .pdp-images, .pdp-info { width: 100%; }
+    .pdp-info { padding: 28px 24px 32px; }
+}
+@media (max-width: 480px) {
+    .shop-grid { grid-template-columns: repeat(2, 1fr); gap: 1px; }
+}
+
+/* ── Mobile / Hamburger ── */
+/* Hide mobile-only elements on desktop by default */
+.cart-nav-btn-mobile-wrap { display: none; }
+.hamburger-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: black;
+    font-size: 30px;
+    cursor: pointer;
+    position: fixed;
+    top: 6px;
+    left: 10px;
+    z-index: 1100;
+    padding: 2px 8px;
+    line-height: 1;
+    font-family: Arial, sans-serif;
+}
+.mobile-nav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1050;
+}
+.mobile-nav-overlay.open { display: block; }
+.mobile-nav-menu {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 230px;
+    height: 100%;
+    background-color: #111;
+    z-index: 1080;
+    padding: 64px 0 20px;
+    flex-direction: column;
+    border-right: 1px solid #333;
+}
+.mobile-nav-menu.open { display: flex; }
+.mobile-nav-menu a {
+    color: white;
+    text-decoration: none;
+    padding: 16px 28px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #222;
+    display: block;
+}
+.mobile-nav-menu a:hover, .mobile-nav-menu a.active { background-color: #222; }
+
+/* ── Mobile header bar (hamburger + logo + cart) ── */
+.mobile-header {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 48px;
+    background-color: #F2F2F2;
+    z-index: 1090;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+    box-sizing: border-box;
+    border-bottom: 1px solid #ddd;
+}
+.mobile-header-hamburger {
+    background: none; border: none;
+    font-size: 26px; cursor: pointer;
+    padding: 4px 8px; color: #000;
+    font-family: Arial, sans-serif; line-height: 1;
+}
+.mobile-header-logo {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    height: 34px; width: auto;
+}
+.mobile-header-cart {
+    background: none; border: none;
+    font-size: 22px; cursor: pointer;
+    padding: 4px 8px; color: #000;
+    font-family: Arial, sans-serif;
+    display: flex; align-items: center; gap: 4px;
+    position: relative;
+}
+.mobile-cart-badge {
+    background-color: #000; color: #fff;
+    font-size: 10px; font-weight: 700;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    border-radius: 50%;
+    min-width: 17px; height: 17px;
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 0 2px; line-height: 1;
+    position: absolute; top: 0; right: 0;
+}
+.mobile-cart-badge.visible { display: inline-flex; }
+
+@media (max-width: 768px) {
+    .mobile-header { display: flex; }
+    nav { display: none; }
+    body { overflow-y: auto; padding-top: 48px; }
+    /* Cart drawer full-width */
+    .cart-drawer { width: 100%; right: -100%; }
+    .cart-drawer.open { right: 0; }
+    /* PDP modal — full-screen on mobile, fully contained, no off-screen overflow */
+    /* z-index raised above mobile header (1090) so the close button is always tappable */
+    .pdp-overlay { overflow: hidden; z-index: 1200; }
+    .pdp-overlay.open {
+        padding: 0;
+        align-items: stretch;
+        justify-content: flex-start;
+    }
+    .pdp-modal {
+        flex-direction: column;
+        width: 100vw;
+        max-width: 100vw;
+        height: 100%;
+        min-height: 100%;
+        margin: 0;
+        border-radius: 0;
+        overflow: hidden;
+        position: relative;
+    }
+    .pdp-close {
+        top: 12px; right: 16px;
+        font-size: 28px;
+        z-index: 20;
+        background-color: transparent;
+        color: #000;
+    }
+    .pdp-images {
+        width: 100%;
+        padding: 48px 16px 10px;
+        height: 54%;
+        flex-shrink: 0;
+        background-color: #f5f5f5;
+        box-sizing: border-box;
+        position: relative;
+        overflow: hidden;
+    }
+    .pdp-main-img { flex: 1; min-height: 0; width: 100%; object-fit: contain; }
+    .pdp-view-toggle { margin-top: 0; margin-bottom: 8px; background-color: #fff; }
+    .pdp-info {
+        width: 100%;
+        padding: 10px 16px 80px;
+        overflow-y: auto;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        box-sizing: border-box;
+    }
+    .pdp-title { font-size: 13px; margin-bottom: 3px; }
+    .pdp-price { font-size: 13px; margin-bottom: 8px; }
+    .pdp-divider { margin: 0 0 8px 0; }
+    /* Show description below Add to Bag, small and styled as subtext */
+    .pdp-desc {
+        display: block !important;
+        order: 10;
+        font-size: 11px;
+        color: #666;
+        line-height: 1.5;
+        margin-top: 12px;
+        padding-top: 10px;
+        border-top: 1px solid #eee;
+    }
+    .pdp-desc strong { font-size: 9px; letter-spacing: 2px; }
+    .size-chart-link { order: 5; font-size: 9px; margin-bottom: 8px; }
+    .size-select { order: 6; padding: 9px 12px; font-size: 10px; margin-bottom: 8px; }
+    .add-to-cart-btn { order: 7; padding: 12px; font-size: 10px; margin-bottom: 6px; }
+    .cart-feedback { order: 8; margin-bottom: 0; }
+    /* Filter bar */
+    .filter-bar { flex-wrap: wrap; gap: 0; padding: 10px 0 0; }
+    .filter-btn { padding: 8px 12px 10px; font-size: 11px; letter-spacing: 2px; }
+    h1.header { font-size: 48px; }
+}
+
+/* Explicitly hide all mobile-only UI on desktop */
+@media (min-width: 769px) {
+    .hamburger-btn { display: none !important; }
+    .mobile-nav-overlay { display: none !important; }
+    .mobile-nav-menu { display: none !important; }
+    .cart-nav-btn-mobile-wrap { display: none !important; }
+}
+@keyframes audioMarquee {
+    0%   { transform: translateX(0%); }
+    100% { transform: translateX(-100%); }
+}
+</style>
+</head>
+<body>
+
+<!-- Mobile Nav -->
+<button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">&#9776;</button>
+<div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+<div class="mobile-nav-menu" id="mobileNavMenu">
+    <a href="index.html">HOME</a>
+    <a class="active" href="Shop.html">SHOP</a>
+    <a href="Gallery.html">GALLERY</a>
+    <a href="About.html">ABOUT</a>
+</div>
+
+<!-- ── Mobile Header Bar ── -->
+<div class="mobile-header" id="mobileHeader">
+    <button class="mobile-header-hamburger" id="mobileHamburger" aria-label="Menu">&#9776;</button>
+    <img class="mobile-header-logo" src="png-logo.png" alt="NOISE">
+    <button class="mobile-header-cart" id="mobileCartBtn" aria-label="Cart">
+        &#128722;<span class="mobile-cart-badge" id="mobileBadge"></span>
+    </button>
+</div>
+
+<nav>
+<img src="png-logo.png" alt="">
+    <ul>
+        <li><button class="cart-nav-btn" id="cartIconBtn">Cart <span class="cart-badge" id="cartBadge">0</span></button></li>
+        <li><a href="index.html">Home</a></li>
+        <li><a class="active" href="Shop.html">Shop</a></li>
+        <li><a href="Gallery.html">Gallery</a></li>
+        <li><a href="About.html">About</a></li>
+    </ul>
+</nav>
+
+<div></div>
+<br>
+
+<div style="background-color: black; height: 21px; width: 100%;"></div>
+<h1 class="header">SHOP</h1>
+<div style="background-color: black; height: 21px; width: 100%;"></div>
+
+<br>
+<div id="textDisplay" style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; font-weight: 900; font-size: 24px; text-align: center; background-color: transparent; color: #000;"></div>
+<br>
+
+<!-- ── Filter Bar ── -->
+<div class="filter-bar">
+    <button class="filter-btn active-filter" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="tees">Tees</button>
+    <button class="filter-btn" data-filter="sweaters">Sweaters</button>
+    <button class="filter-btn" data-filter="pants">Pants</button>
+    <button class="filter-btn" data-filter="art">Art</button>
+</div>
+
+<!-- ── Product Grid ── -->
+<div class="shop-grid" id="shopGrid"></div>
+
+<!-- ── Product Detail Modal ── -->
+<div class="pdp-overlay" id="pdpOverlay">
+    <div class="pdp-modal" id="pdpModal">
+        <button class="pdp-close" id="pdpClose">&#x2715;</button>
+
+        <!-- Images -->
+        <div class="pdp-images" id="pdpImagesArea">
+            <img class="pdp-main-img" id="pdpMainImg" src="" alt="">
+            <div class="pdp-view-toggle" id="pdpToggle">
+                <button class="view-btn active-view" id="btnFront">Front</button>
+                <button class="view-btn" id="btnBack">Back</button>
+            </div>
+        </div>
+
+        <!-- Info -->
+        <div class="pdp-info">
+            <p class="pdp-title" id="pdpTitle"></p>
+            <p class="pdp-price" id="pdpPrice"></p>
+            <div class="pdp-divider"></div>
+            <p class="pdp-desc" id="pdpDesc"></p>
+            <div class="pdp-divider"></div>
+
+            <!-- Size Chart Link -->
+            <button class="size-chart-link" id="sizeChartLink">Size Chart ↗</button>
+
+            <!-- Size Select -->
+            <select class="size-select" id="sizeSelect">
+                <option value="" disabled selected>Select a Size</option>
+                <option value="XS">XS — Extra Small</option>
+                <option value="S">S — Small</option>
+                <option value="M">M — Medium</option>
+                <option value="L">L — Large</option>
+                <option value="XL">XL — Extra Large</option>
+            </select>
+
+            <!-- Add to Cart -->
+            <button class="add-to-cart-btn" id="addToCartBtn">Add to Bag</button>
+            <div class="cart-feedback" id="cartFeedback"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Cart Overlay & Drawer ── -->
+<div class="cart-overlay-bg" id="cartOverlayBg"></div>
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+        <p class="cart-drawer-title">Your Bag</p>
+        <button class="cart-drawer-close" id="cartDrawerClose">&#x2715;</button>
+    </div>
+    <div class="cart-items-list" id="cartItemsList">
+        <div class="cart-empty" id="cartEmpty">Your bag is empty.</div>
+    </div>
+    <div class="cart-drawer-footer">
+        <div class="cart-total-row">
+            <span class="cart-total-label">Total</span>
+            <span class="cart-total-amount" id="cartTotal">$0</span>
+        </div>
+        <button class="checkout-btn" id="checkoutBtn">Checkout</button>
+    </div>
+</div>
+
+<script type="text/javascript" src="Shop.js"></script>
+
+<!-- ── Size Chart Lightbox ── -->
+<div class="sc-overlay" id="scOverlay">
+    <div class="sc-box">
+        <div class="sc-header">
+            <div class="sc-tabs">
+                <button class="sc-tab active-tab" data-unit="inches">Inches</button>
+                <button class="sc-tab" data-unit="cm">Centimeters</button>
+            </div>
+            <button class="sc-close" id="scClose">&#x2715;</button>
+        </div>
+        <div class="sc-img-wrap">
+            <img class="sc-chart-img" id="scChartImg" src="Size%20Chart%20Inches.png" alt="Size Chart">
+        </div>
+    </div>
+</div>
+
+<script>
+// ── Product Data ──
+const products = [
+    {
+        id: 1, name: "Bam Balcony Dive Tee", category: "tees", price: 30,
+        front: "clothes/Bam Balcony Dive Tee Front.png",
+        back:  "clothes/Bam Balcony Dive Tee Back.png"
+    },
+    {
+        id: 2, name: "Britney Tee", category: "tees", price: 30,
+        front: "clothes/Britney Tee Front.png",
+        back:  "clothes/Britney Tee Back.png"
+    },
+    {
+        id: 3, name: "Fuck Segregation Tee", category: "tees", price: 30,
+        front: "clothes/Fuck Segreation Tee Front.png",
+        back:  "clothes/Fuck Segregation Tee Back.png"
+    },
+    {
+        id: 4, name: "Graffiti Galleria Tee", category: "tees", price: 30,
+        front: "clothes/Graffiti Galleria Tee.png",
+        back:  null
+    },
+    {
+        id: 5, name: "Iceberg Slim Tee", category: "tees", price: 30,
+        front: "clothes/Iceberg Slim Tee Front.png",
+        back:  "clothes/Iceberg Slim Tee Back.png"
+    },
+    {
+        id: 6, name: "Lennon Tee", category: "tees", price: 30,
+        front: "clothes/Lennon Tee front.png",
+        back:  "clothes/Lennon Tee back.png"
+    },
+    {
+        id: 7, name: "With Love Stamp Tee — Black", category: "tees", price: 30,
+        front: "clothes/With Love Stamp Tee Black.png",
+        back:  null
+    },
+    {
+        id: 8, name: "With Love Stamp Tee — White", category: "tees", price: 30,
+        front: "clothes/With Love Stamp Tee White.png",
+        back:  null
+    },
+    {
+        id: 9, name: "WL Muscle Tank — Black", category: "tees", price: 30,
+        front: "clothes/WL Muscle Tank Black.png",
+        back:  null, type: "muscle-tank"
+    },
+    {
+        id: 10, name: "WL Muscle Tank — White", category: "tees", price: 30,
+        front: "clothes/WL Muscle Tank White.png",
+        back:  null, type: "muscle-tank"
+    },
+    {
+        id: 11, name: "WL Women's Rib Tank — Black", category: "tees", price: 30,
+        front: "clothes/WL Rib Tank Black.png",
+        back:  null, type: "rib-tank"
+    },
+    {
+        id: 12, name: "WL Women's Rib Tank — White", category: "tees", price: 30,
+        front: "clothes/WL Rib Tank White.png",
+        back:  null, type: "rib-tank"
+    }
+];
+
+const description = (name) =>
+    `100% ring-spun cotton. Lightweight fabric (4.5 oz).`;
+
+// ── Build Grid ──
+const grid = document.getElementById('shopGrid');
+
+products.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    card.dataset.category = p.category;
+    card.dataset.id = p.id;
+    card.innerHTML = `
+        <div class="product-thumb">
+            <img src="${p.front}" alt="${p.name}">
+        </div>
+        <div class="product-meta">
+            <p class="product-name">${p.name}</p>
+            <p class="product-price">$${p.price}</p>
+        </div>`;
+    card.addEventListener('click', () => openPDP(p));
+    grid.appendChild(card);
+});
+
+// No-results row
+const noResults = document.createElement('div');
+noResults.className = 'no-results';
+noResults.id = 'noResults';
+noResults.textContent = 'No items in this category yet.';
+grid.appendChild(noResults);
+
+// ── Filter Logic ──
+const filterBtns = document.querySelectorAll('.filter-btn');
+filterBtns.forEach(btn => {
+    btn.addEventListener('click', function () {
+        const selected = this.dataset.filter;
+        const isActive = this.classList.contains('active-filter');
+
+        if (isActive && selected !== 'all') {
+            filterBtns.forEach(b => b.classList.remove('active-filter'));
+            document.querySelector('[data-filter="all"]').classList.add('active-filter');
+            showAll(); return;
+        }
+        filterBtns.forEach(b => b.classList.remove('active-filter'));
+        this.classList.add('active-filter');
+
+        if (selected === 'all') { showAll(); return; }
+
+        let count = 0;
+        document.querySelectorAll('.product-card').forEach(card => {
+            const show = card.dataset.category === selected;
+            card.classList.toggle('hidden', !show);
+            if (show) count++;
+        });
+        noResults.style.display = count === 0 ? 'block' : 'none';
+    });
+});
+
+function showAll() {
+    document.querySelectorAll('.product-card').forEach(c => c.classList.remove('hidden'));
+    noResults.style.display = 'none';
+}
+
+// ── Inventory (5 per size per product) ──
+const sizes = ['XS', 'S', 'M', 'L', 'XL'];
+const sizeLabels = { XS: 'Extra Small', S: 'Small', M: 'Medium', L: 'Large', XL: 'Extra Large' };
+const inventory = {};
+products.forEach(p => {
+    inventory[p.id] = {};
+    sizes.forEach(sz => { inventory[p.id][sz] = 5; });
+});
+
+// ── Cart State ──
+let cart = [];
+
+function cartTotal() {
+    return cart.reduce((sum, item) => sum + item.price, 0);
+}
+
+function updateBadge() {
+    const badge = document.getElementById('cartBadge');
+    badge.textContent = cart.length;
+    badge.classList.toggle('visible', cart.length > 0);
+}
+
+function renderCart() {
+    const list  = document.getElementById('cartItemsList');
+    const empty = document.getElementById('cartEmpty');
+    const totalEl = document.getElementById('cartTotal');
+    list.querySelectorAll('.cart-item-row').forEach(el => el.remove());
+    if (cart.length === 0) {
+        empty.style.display = 'block';
+    } else {
+        empty.style.display = 'none';
+        cart.forEach((item, idx) => {
+            const row = document.createElement('div');
+            row.className = 'cart-item-row';
+            row.innerHTML = `
+                <img class="cart-item-img" src="${item.front}" alt="${item.name}">
+                <div class="cart-item-details">
+                    <p class="cart-item-name">${item.name}</p>
+                    <p class="cart-item-meta">Size: ${item.size}</p>
+                    <p class="cart-item-price">$${item.price}</p>
+                </div>
+                <button class="cart-item-remove" data-idx="${idx}">&#x2715;</button>`;
+            list.appendChild(row);
+        });
+    }
+    totalEl.textContent = `$${cartTotal()}`;
+    updateBadge();
+}
+
+function openCart() {
+    document.getElementById('cartOverlayBg').classList.add('open');
+    document.getElementById('cartDrawer').classList.add('open');
+}
+
+function closeCart() {
+    document.getElementById('cartOverlayBg').classList.remove('open');
+    document.getElementById('cartDrawer').classList.remove('open');
+}
+
+document.getElementById('cartIconBtn').addEventListener('click', openCart);
+
+document.getElementById('checkoutBtn').addEventListener('click', () => {
+    try { sessionStorage.setItem('noiseCart', JSON.stringify(cart)); } catch(e) {}
+    window.location.href = 'Checkout.html';
+});
+document.getElementById('cartDrawerClose').addEventListener('click', closeCart);
+document.getElementById('cartOverlayBg').addEventListener('click', closeCart);
+
+// Remove item (event delegation)
+document.getElementById('cartItemsList').addEventListener('click', function(e) {
+    const btn = e.target.closest('.cart-item-remove');
+    if (!btn) return;
+    const idx = parseInt(btn.dataset.idx);
+    const item = cart[idx];
+    inventory[item.productId][item.size]++;
+    cart.splice(idx, 1);
+    renderCart();
+    if (currentProduct && currentProduct.id === item.productId) {
+        updateSizeDropdown(currentProduct);
+    }
+});
+
+// ── Size Dropdown ──
+function updateSizeDropdown(p) {
+    const sel = document.getElementById('sizeSelect');
+    sel.innerHTML = '<option value="" disabled selected>Select a Size</option>';
+    sizes.forEach(sz => {
+        const qty = inventory[p.id][sz];
+        const opt = document.createElement('option');
+        opt.value = sz;
+        opt.textContent = qty > 0
+            ? `${sz} — ${sizeLabels[sz]}`
+            : `${sz} — Sold Out`;
+        if (qty <= 0) opt.disabled = true;
+        sel.appendChild(opt);
+    });
+    sel.value = '';
+    const addBtn = document.getElementById('addToCartBtn');
+    addBtn.textContent = 'Add to Bag';
+    addBtn.classList.remove('added');
+    addBtn.disabled = false;
+    document.getElementById('cartFeedback').textContent = '';
+    document.getElementById('cartFeedback').style.color = '#2a7a2a';
+}
+
+// ── Add to Cart ──
+document.getElementById('addToCartBtn').addEventListener('click', function() {
+    if (!currentProduct) return;
+    const sel  = document.getElementById('sizeSelect');
+    const size = sel.value;
+    const fb   = document.getElementById('cartFeedback');
+    if (!size) {
+        fb.textContent = 'Please select a size.';
+        fb.style.color = '#c00';
+        return;
+    }
+    if (inventory[currentProduct.id][size] <= 0) {
+        fb.textContent = 'This size is sold out.';
+        fb.style.color = '#c00';
+        return;
+    }
+    inventory[currentProduct.id][size]--;
+    cart.push({ productId: currentProduct.id, name: currentProduct.name,
+                size, price: currentProduct.price, front: currentProduct.front });
+    this.textContent = 'Added!';
+    this.classList.add('added');
+    fb.textContent = 'Added to bag!';
+    fb.style.color = '#2a7a2a';
+    renderCart();
+    setTimeout(() => { updateSizeDropdown(currentProduct); }, 1500);
+});
+
+// ── Product Detail Panel ──
+const overlay   = document.getElementById('pdpOverlay');
+const mainImg   = document.getElementById('pdpMainImg');
+const pdpTitle  = document.getElementById('pdpTitle');
+const pdpPrice  = document.getElementById('pdpPrice');
+const pdpDesc   = document.getElementById('pdpDesc');
+const btnFront  = document.getElementById('btnFront');
+const btnBack   = document.getElementById('btnBack');
+const pdpToggle = document.getElementById('pdpToggle');
+
+let currentProduct = null;
+
+function openPDP(p) {
+    currentProduct = p;
+    pdpTitle.textContent = p.name.toUpperCase();
+    pdpPrice.textContent = `$${p.price}`;
+    pdpDesc.innerHTML = `<strong>Details</strong>${description(p.name)}`;
+    mainImg.src = p.front;
+    mainImg.alt = p.name;
+
+    // Front/back toggle visibility
+    if (p.back) {
+        pdpToggle.style.display = 'flex';
+        btnFront.classList.add('active-view');
+        btnBack.classList.remove('active-view');
+    } else {
+        pdpToggle.style.display = 'none';
+    }
+
+    // Reset size dropdown for this product
+    updateSizeDropdown(p);
+
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closePDP() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+document.getElementById('pdpClose').addEventListener('click', closePDP);
+overlay.addEventListener('click', e => { if (e.target === overlay) closePDP(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePDP(); });
+
+btnFront.addEventListener('click', () => {
+    if (!currentProduct) return;
+    mainImg.src = currentProduct.front;
+    btnFront.classList.add('active-view');
+    btnBack.classList.remove('active-view');
+});
+btnBack.addEventListener('click', () => {
+    if (!currentProduct || !currentProduct.back) return;
+    mainImg.src = currentProduct.back;
+    btnBack.classList.add('active-view');
+    btnFront.classList.remove('active-view');
+});
+
+// ── Swipe to switch front / back on mobile ──
+(function () {
+    const area = document.getElementById('pdpImagesArea');
+    let txStart = 0, tyStart = 0;
+    area.addEventListener('touchstart', function (e) {
+        txStart = e.touches[0].clientX;
+        tyStart = e.touches[0].clientY;
+    }, { passive: true });
+    area.addEventListener('touchend', function (e) {
+        if (!currentProduct || !currentProduct.back) return;
+        const dx = e.changedTouches[0].clientX - txStart;
+        const dy = e.changedTouches[0].clientY - tyStart;
+        if (Math.abs(dx) < 40 || Math.abs(dy) > Math.abs(dx)) return; // too short or mostly vertical
+        if (dx < 0) {
+            // swipe left → back
+            mainImg.src = currentProduct.back;
+            btnBack.classList.add('active-view');
+            btnFront.classList.remove('active-view');
+        } else {
+            // swipe right → front
+            mainImg.src = currentProduct.front;
+            btnFront.classList.add('active-view');
+            btnBack.classList.remove('active-view');
+        }
+    }, { passive: true });
+}());
+
+// ── Size Chart Lightbox ──
+const scOverlay   = document.getElementById('scOverlay');
+const scClose     = document.getElementById('scClose');
+const scChartImg  = document.getElementById('scChartImg');
+const scLink      = document.getElementById('sizeChartLink');
+
+function getSizeChartSrc(type, unit) {
+    if (type === 'muscle-tank') {
+        return unit === 'cm'
+            ? 'Size%20Guide%20Muscle%20Tank%20CM.jpg'
+            : 'Size%20Guide%20Muscle%20Tank%20Inches.jpg';
+    } else if (type === 'rib-tank') {
+        return unit === 'cm'
+            ? 'Size%20Guide%20Rib%20Tank%20CM.jpg'
+            : 'Size%20Guide%20Rib%20Tank%20Inches.jpg';
+    } else {
+        return unit === 'cm'
+            ? 'Size%20Chart%20Centimeters.png'
+            : 'Size%20Chart%20Inches.png';
+    }
+}
+
+scLink.addEventListener('click', () => {
+    // Reset to inches tab each time it opens
+    document.querySelectorAll('.sc-tab').forEach(t => t.classList.remove('active-tab'));
+    document.querySelector('.sc-tab[data-unit="inches"]').classList.add('active-tab');
+    const type = currentProduct ? (currentProduct.type || 'tee') : 'tee';
+    scChartImg.src = getSizeChartSrc(type, 'inches');
+    scOverlay.classList.add('open');
+});
+
+scClose.addEventListener('click', () => scOverlay.classList.remove('open'));
+scOverlay.addEventListener('click', e => { if (e.target === scOverlay) scOverlay.classList.remove('open'); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') scOverlay.classList.remove('open'); });
+
+document.querySelectorAll('.sc-tab').forEach(tab => {
+    tab.addEventListener('click', function () {
+        document.querySelectorAll('.sc-tab').forEach(t => t.classList.remove('active-tab'));
+        this.classList.add('active-tab');
+        const type = currentProduct ? (currentProduct.type || 'tee') : 'tee';
+        scChartImg.src = getSizeChartSrc(type, this.dataset.unit);
+    });
+});
+</script>
+
+<!-- Audio Player -->
+<audio id="bgAudio" loop>
+    <source src="music/Madlib%20-%20Black%20Tape.mp3" type="audio/mpeg">
+</audio>
+<div style="position: fixed; bottom: 16px; left: 16px; z-index: 999;
+    display: flex; align-items: center; gap: 8px; background: transparent;">
+    <button id="audioPlayBtn"
+        style="flex-shrink: 0; width: 46px; height: 46px; border-radius: 50%;
+        background: #000; border: 1px solid #444; color: white; font-size: 20px;
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.5); transition: background 0.2s;
+        padding: 0; line-height: 1;">&#9654;</button>
+    <div style="overflow: hidden; width: 150px; background: rgba(0,0,0,0.72);
+        border-radius: 20px; padding: 5px 12px; box-sizing: border-box;">
+        <div style="white-space: nowrap; display: inline-block;
+            animation: audioMarquee 14s linear infinite;">
+            <span style="color: #ccc; font-family: 'Franklin Gothic Medium',
+            'Arial Narrow', Arial, sans-serif; font-size: 11px; letter-spacing: 1.5px;
+            text-transform: uppercase;">&#9834;&nbsp; Madlib &mdash; Black Tape
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        </div>
+    </div>
+</div>
+<script>
+(function () {
+    const btn   = document.getElementById('audioPlayBtn');
+    const audio = document.getElementById('bgAudio');
+    btn.addEventListener('click', function () {
+        if (audio.paused) {
+            audio.play();
+            btn.textContent = '\u23F8';
+        } else {
+            audio.pause();
+            btn.textContent = '\u25B6';
+        }
+    });
+    btn.addEventListener('mouseenter', function () { btn.style.background = '#222'; });
+    btn.addEventListener('mouseleave', function () { btn.style.background = '#000'; });
+}());
+</script>
+
+<script>
+// ── Mobile Nav + Cart ──────────────────────────────────────────────────────
+(function() {
+    // Hamburger slide-in menu
+    var hamburger  = document.getElementById('mobileHamburger');
+    var menu       = document.getElementById('mobileNavMenu');
+    var overlay    = document.getElementById('mobileNavOverlay');
+    var cartBtn    = document.getElementById('mobileCartBtn');
+
+    function toggleMenu() {
+        menu.classList.toggle('open');
+        overlay.classList.toggle('open');
+    }
+    if (hamburger) hamburger.addEventListener('click', toggleMenu);
+    if (overlay)   overlay.addEventListener('click', toggleMenu);
+
+    // Cart button opens the cart drawer
+    if (cartBtn) {
+        cartBtn.addEventListener('click', function() {
+            if (typeof openCart === 'function') openCart();
+        });
+    }
+
+    // Patch updateBadge to also sync the mobile badge
+    var origUpdateBadge = window.updateBadge || function(){};
+    window.updateBadge = function() {
+        origUpdateBadge();
+        var mobileBadge = document.getElementById('mobileBadge');
+        if (!mobileBadge) return;
+        var count = (typeof cart !== 'undefined') ? cart.length : 0;
+        mobileBadge.textContent = count;
+        mobileBadge.classList.toggle('visible', count > 0);
+    };
+    // Trigger once so badge reflects any pre-existing state
+    if (typeof window.updateBadge === 'function') window.updateBadge();
+})();
+</script>
+
+</body>
+</html>
