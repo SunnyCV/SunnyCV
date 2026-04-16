@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NOISE</title>
+<link rel="stylesheet" href="Cart.css">
 <style>
 html {overflow-y: scroll;}
 body {background-color: black; background-image: url("Noise.gif"); background-size: cover; overflow: hidden; padding-bottom: 55px;}
@@ -13,14 +14,14 @@ h2 {text-align: center; font-size: 36px; font-weight: 900;}
 nav ul {list-style-type: none; margin: 0; padding: 0; overflow: hidden;}
 nav li {float: right;}
 nav img {position: absolute; float: left; margin: -50%, -50%; overflow: hidden; width: 225px;}
-li a {display: block; padding: 9px; background-color: rgb(from color r g b); 
+li a {display: block; padding: 9px; background-color: rgb(from color r g b);
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-weight: 600; text-decoration: none; color: white;}
 li a:hover:not(.active) {background-color: #111;}
 .active {opacity: 75%;}
 .pheader {text-align: left; font-size: 21px; font-weight: bold; color: white;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;}
-.header {text-align: left; font-size: 50px;  font-weight: 900; color: white; 
+.header {text-align: left; font-size: 50px; font-weight: 900; color: white;
     font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;}
 .header2 {text-align: left; font-size: 40px; font-weight: 900; color: white;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;}
@@ -28,22 +29,12 @@ li a:hover:not(.active) {background-color: #111;}
 h1.header::first-line {text-align: left; font-size: 200px; font-weight: 900;
     color: white; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;}
 
-/* ── Mobile / Hamburger ── */
-.hamburger-btn {
-    display: none;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 30px;
-    cursor: pointer;
-    position: fixed;
-    top: 6px;
-    left: 10px;
-    z-index: 1100;
-    padding: 2px 8px;
-    line-height: 1;
-    font-family: Arial, sans-serif;
-}
+/* ── Cart badge colours (dark page) ── */
+.cart-badge { background-color: #fff; color: #000; }
+.mobile-header { background-color: #000; border-bottom: 1px solid #222; color: #fff; }
+.mobile-cart-badge { background-color: #fff; color: #000; }
+
+/* ── Mobile nav panel ── */
 .mobile-nav-overlay {
     display: none;
     position: fixed;
@@ -55,8 +46,7 @@ h1.header::first-line {text-align: left; font-size: 200px; font-weight: 900;
 .mobile-nav-menu {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
+    top: 0; left: 0;
     width: 230px;
     height: 100%;
     background-color: #000;
@@ -79,17 +69,15 @@ h1.header::first-line {text-align: left; font-size: 200px; font-weight: 900;
     display: block;
 }
 .mobile-nav-menu a:hover, .mobile-nav-menu a.active { background-color: #111; }
+
 @media (max-width: 768px) {
-    .hamburger-btn { display: block; }
-    nav ul { display: none; }
-    nav img { height: 34px; width: auto; position: absolute; left: 50%; transform: translateX(-50%); top: 7px; }
-    nav { height: 48px; position: relative; background-color: transparent; display: flex; align-items: center; justify-content: center; }
+    nav { display: none; }
     /* NOISE larger with extra spacing below */
     h1.header { font-size: 56px; text-align: center; padding: 0 12px; line-height: 1.1; }
     h1.header::first-line { font-size: 80px; text-align: center; line-height: 1.5; }
-    /* Subtitle ("Loud, Amplified…") smaller, acts as subtext */
+    /* Subtitle smaller, acts as subtext */
     .pheader { font-size: 13px; text-align: center; padding: 0 24px; opacity: 0.85; letter-spacing: 0.5px; }
-    body { overflow-y: auto; }
+    body { overflow-y: auto; padding-top: 48px; }
 }
 @keyframes audioMarquee {
     0%   { transform: translateX(0%); }
@@ -98,8 +86,15 @@ h1.header::first-line {text-align: left; font-size: 200px; font-weight: 900;
 </style>
 </head>
 <body>
+
+<!-- Mobile Header Bar -->
+<div class="mobile-header" id="mobileHeader">
+    <button class="mobile-header-hamburger" id="mobileHamburger" aria-label="Menu">&#9776;</button>
+    <img class="mobile-header-logo" src="png-logo-inv.png" alt="NOISE">
+    <button class="mobile-header-cart" id="mobileCartBtn" aria-label="Cart">&#128722;<span class="mobile-cart-badge" id="mobileBadge"></span></button>
+</div>
+
 <!-- Mobile Nav -->
-<button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">&#9776;</button>
 <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
 <div class="mobile-nav-menu" id="mobileNavMenu">
     <a class="active" href="index.html">HOME</a>
@@ -107,25 +102,46 @@ h1.header::first-line {text-align: left; font-size: 200px; font-weight: 900;
     <a href="Gallery.html">GALLERY</a>
     <a href="About.html">ABOUT</a>
 </div>
+
 <nav>
 <img src="png-logo-inv.png" alt="">
-	<ul>
+    <ul>
         <li><a class="active" href="index.html">Home</a></li>
         <li><a href="Shop.html">Shop</a></li>
         <li><a href="Gallery.html">Gallery</a></li>
         <li><a href="About.html">About</a></li>
+        <li><button class="cart-nav-btn" id="cartIconBtn">&#128722;<span class="cart-badge" id="cartBadge"></span></button></li>
     </ul>
 </nav>
 
 <div style="background-color: transparent; height: 21px; width: 100%;"></div>
 
 <h1 class="header">NOISE<br>
-    Loud, Amplified,<br>& Made WITH LOVE</h1>
+    Loud, Amplified,<br>&amp; Made WITH LOVE</h1>
     <br>
 <p class="pheader">Clothes are clothes, but that's not what's sold here.<br>
 These are statements. Attitudes. You don't just wear it, you don't just put it on.<br><br>
 You learn it. You rock it. You breathe it. You believe it.</p>
 <br>
+
+<!-- Cart Overlay & Drawer -->
+<div class="cart-overlay-bg" id="cartOverlayBg"></div>
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+        <p class="cart-drawer-title">Your Bag</p>
+        <button class="cart-drawer-close" id="cartDrawerClose">&#x2715;</button>
+    </div>
+    <div class="cart-items-list" id="cartItemsList">
+        <div class="cart-empty" id="cartEmpty">Your bag is empty.</div>
+    </div>
+    <div class="cart-drawer-footer">
+        <div class="cart-total-row">
+            <span class="cart-total-label">Total</span>
+            <span class="cart-total-amount" id="cartTotal">$0</span>
+        </div>
+        <button class="checkout-btn" id="checkoutBtn">Checkout</button>
+    </div>
+</div>
 
 <!-- Audio Player -->
 <audio id="bgAudio" loop>
@@ -150,33 +166,26 @@ You learn it. You rock it. You breathe it. You believe it.</p>
         </div>
     </div>
 </div>
+
+<script src="Cart.js"></script>
 <script>
 (function () {
     const btn   = document.getElementById('audioPlayBtn');
     const audio = document.getElementById('bgAudio');
     btn.addEventListener('click', function () {
-        if (audio.paused) {
-            audio.play();
-            btn.textContent = '\u23F8';
-        } else {
-            audio.pause();
-            btn.textContent = '\u25B6';
-        }
+        if (audio.paused) { audio.play(); btn.textContent = '\u23F8'; }
+        else { audio.pause(); btn.textContent = '\u25B6'; }
     });
     btn.addEventListener('mouseenter', function () { btn.style.background = '#222'; });
     btn.addEventListener('mouseleave', function () { btn.style.background = '#000'; });
 }());
 </script>
-
 <script>
 (function(){
-    var btn = document.getElementById('hamburgerBtn');
-    var menu = document.getElementById('mobileNavMenu');
+    var btn     = document.getElementById('mobileHamburger');
+    var menu    = document.getElementById('mobileNavMenu');
     var overlay = document.getElementById('mobileNavOverlay');
-    function toggleNav() {
-        menu.classList.toggle('open');
-        overlay.classList.toggle('open');
-    }
+    function toggleNav() { menu.classList.toggle('open'); overlay.classList.toggle('open'); }
     btn.addEventListener('click', toggleNav);
     overlay.addEventListener('click', toggleNav);
 })();
