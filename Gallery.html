@@ -4,6 +4,7 @@
  <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" type="text/css" href="Gallery.css">
+    <link rel="stylesheet" href="Cart.css">
 <title>NOISE</title>
 <style>
 /* ── Self-contained mobile nav styles ──
@@ -133,11 +134,20 @@
     0%   { transform: translateX(0%); }
     100% { transform: translateX(-100%); }
 }
+/* ── Cart badge colours (light page) ── */
+.cart-badge { background-color: #000; color: #fff; }
+.mobile-header { background-color: #f2f2f2; border-bottom: 1px solid #ccc; color: #000; }
+.mobile-cart-badge { background-color: #000; color: #fff; }
 </style>
 </head>
 <body id="dark-mode">
+<!-- Mobile Header Bar -->
+<div class="mobile-header" id="mobileHeader">
+    <button class="mobile-header-hamburger" id="mobileHamburger" aria-label="Menu">&#9776;</button>
+    <img class="mobile-header-logo" src="png-logo.png" alt="NOISE">
+    <button class="mobile-header-cart" id="mobileCartBtn" aria-label="Cart">&#128722;<span class="mobile-cart-badge" id="mobileBadge"></span></button>
+</div>
 <!-- Mobile Nav -->
-<button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">&#9776;</button>
 <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
 <div class="mobile-nav-menu" id="mobileNavMenu">
     <a href="index.html">HOME</a>
@@ -154,6 +164,7 @@
 	<li><a href="Shop.html">Shop</a></li>
     <li><a class="active" href="Gallery.html">Gallery</a></li>
     <li><a href="About.html">About</a></li>
+    <li><button class="cart-nav-btn" id="cartIconBtn">&#128722;<span class="cart-badge" id="cartBadge"></span></button></li>
 </ul>
 </nav>
 
@@ -343,7 +354,27 @@ Scroll to browse.</div>
     'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><br><br>
 If you happen to know the source for any of these photos, contact me so I may add their credit.</div>
 
+<!-- Cart Overlay & Drawer -->
+<div class="cart-overlay-bg" id="cartOverlayBg"></div>
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+        <p class="cart-drawer-title">Your Bag</p>
+        <button class="cart-drawer-close" id="cartDrawerClose">&#x2715;</button>
+    </div>
+    <div class="cart-items-list" id="cartItemsList">
+        <div class="cart-empty" id="cartEmpty">Your bag is empty.</div>
+    </div>
+    <div class="cart-drawer-footer">
+        <div class="cart-total-row">
+            <span class="cart-total-label">Total</span>
+            <span class="cart-total-amount" id="cartTotal">$0</span>
+        </div>
+        <button class="checkout-btn" id="checkoutBtn">Checkout</button>
+    </div>
+</div>
+
 <!-- Custom JS -->
+    <script src="Cart.js"></script>
     <script type="text/javascript" src="Gallery.js"></script>
 
 <!-- Audio Player -->
@@ -391,7 +422,7 @@ If you happen to know the source for any of these photos, contact me so I may ad
 <script>
 (function(){
     // Hamburger menu
-    var btn = document.getElementById('hamburgerBtn');
+    var btn = document.getElementById('mobileHamburger');
     var menu = document.getElementById('mobileNavMenu');
     var overlay = document.getElementById('mobileNavOverlay');
     function toggleNav() {

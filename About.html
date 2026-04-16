@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NOISE</title>
+<link rel="stylesheet" href="Cart.css">
 <style>
 	html {overflow-y: scroll;}
 div {background-color: black;}
@@ -101,11 +102,21 @@ h1.header::first-line {text-align: center; font-size: 96px; font-weight: 900;
     0%   { transform: translateX(0%); }
     100% { transform: translateX(-100%); }
 }
+/* ── Cart badge colours (dark page) ── */
+.cart-badge { background-color: #fff; color: #000; }
+.mobile-header { background-color: #000; border-bottom: 1px solid #222; color: #fff; }
+.mobile-cart-badge { background-color: #fff; color: #000; }
+.cart-nav-btn { color: white; }
 </style>
 </head>
 <body>
+<!-- Mobile Header Bar -->
+<div class="mobile-header" id="mobileHeader">
+    <button class="mobile-header-hamburger" id="mobileHamburger" aria-label="Menu">&#9776;</button>
+    <img class="mobile-header-logo" src="png-logo-inv.png" alt="NOISE">
+    <button class="mobile-header-cart" id="mobileCartBtn" aria-label="Cart">&#128722;<span class="mobile-cart-badge" id="mobileBadge"></span></button>
+</div>
 <!-- Mobile Nav -->
-<button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">&#9776;</button>
 <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
 <div class="mobile-nav-menu" id="mobileNavMenu">
     <a href="index.html">HOME</a>
@@ -121,6 +132,7 @@ h1.header::first-line {text-align: center; font-size: 96px; font-weight: 900;
         <li><a href="Shop.html">Shop</a></li>
         <li><a href="Gallery.html">Gallery</a></li>
         <li><a class="active" href="About.html">About</a></li>
+        <li><button class="cart-nav-btn" id="cartIconBtn">&#128722;<span class="cart-badge" id="cartBadge"></span></button></li>
     </ul>
 	</nav>
     <div>
@@ -172,6 +184,25 @@ h1.header::first-line {text-align: center; font-size: 96px; font-weight: 900;
     'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><br><br>
 &copy; 2021 WITH LOVE - All Rights Reserved.</div>
 
+<!-- Cart Overlay & Drawer -->
+<div class="cart-overlay-bg" id="cartOverlayBg"></div>
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+        <p class="cart-drawer-title">Your Bag</p>
+        <button class="cart-drawer-close" id="cartDrawerClose">&#x2715;</button>
+    </div>
+    <div class="cart-items-list" id="cartItemsList">
+        <div class="cart-empty" id="cartEmpty">Your bag is empty.</div>
+    </div>
+    <div class="cart-drawer-footer">
+        <div class="cart-total-row">
+            <span class="cart-total-label">Total</span>
+            <span class="cart-total-amount" id="cartTotal">$0</span>
+        </div>
+        <button class="checkout-btn" id="checkoutBtn">Checkout</button>
+    </div>
+</div>
+
 <!-- Audio Player -->
 <audio id="bgAudio" loop>
     <source src="music/Aphex%20Twin%20-%20Ambient%20Works.mp3" type="audio/mpeg">
@@ -214,9 +245,10 @@ h1.header::first-line {text-align: center; font-size: 96px; font-weight: 900;
 </script>
 
 
+<script src="Cart.js"></script>
 <script>
 (function(){
-    var btn = document.getElementById("hamburgerBtn");
+    var btn = document.getElementById("mobileHamburger");
     var menu = document.getElementById("mobileNavMenu");
     var overlay = document.getElementById("mobileNavOverlay");
     function toggleNav() {
