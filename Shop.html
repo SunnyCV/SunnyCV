@@ -1086,6 +1086,19 @@ products.forEach(p => {
 
 // ── Cart State ──
 let cart = [];
+// Load persisted cart from sessionStorage and adjust inventory accordingly
+try {
+    const _saved = JSON.parse(sessionStorage.getItem('noiseCart'));
+    if (_saved && Array.isArray(_saved)) {
+        cart = _saved;
+        cart.forEach(function(item) {
+            if (inventory[item.productId] && item.size &&
+                inventory[item.productId][item.size] > 0) {
+                inventory[item.productId][item.size]--;
+            }
+        });
+    }
+} catch(e) {}
 
 function cartTotal() {
     return cart.reduce((sum, item) => sum + item.price, 0);
@@ -1122,6 +1135,8 @@ function renderCart() {
     }
     totalEl.textContent = `$${cartTotal()}`;
     updateBadge();
+    // Persist so other pages stay in sync
+    try { sessionStorage.setItem('noiseCart', JSON.stringify(cart)); } catch(e) {}
 }
 
 function openCart() {
@@ -1133,6 +1148,8 @@ function closeCart() {
     document.getElementById('cartOverlayBg').classList.remove('open');
     document.getElementById('cartDrawer').classList.remove('open');
 }
+
+renderCart(); // initialize drawer + badge from loaded sessionStorage state
 
 document.getElementById('cartIconBtn').addEventListener('click', openCart);
 
