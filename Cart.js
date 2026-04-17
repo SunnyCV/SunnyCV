@@ -93,7 +93,10 @@
 
         ['cartIconBtn', 'mobileCartBtn'].forEach(function (id) {
             var el = document.getElementById(id);
-            if (el) el.addEventListener('click', openCart);
+            if (el) el.addEventListener('click', function () {
+                var dr = document.getElementById('cartDrawer');
+                if (dr && dr.classList.contains('open')) closeCart(); else openCart();
+            });
         });
 
         var closeBtn = document.getElementById('cartDrawerClose');
