@@ -14,8 +14,8 @@ h1 {text-align: center; font-size: 115px; font-weight: 900;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;}
 h2 {text-align: center; font-size: 36px; font-weight: 900; color: white;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;}
-nav ul {list-style-type: none; margin: 0; padding: 0; overflow: hidden;}
-nav li {float: right;}
+nav ul {list-style-type: none; margin: 0; padding: 0; overflow: hidden; display: flex; flex-direction: row-reverse; align-items: center;}
+nav li {float: none;}
 nav img {position: absolute; float: left; margin: -50%, -50%; overflow: hidden; width: 225px;}
 li a {display: block; padding: 9px; background-color: rgb(from color r g b);
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; font-weight: 600; text-decoration: none; color: black;}
@@ -839,11 +839,11 @@ li a:hover:not(.active) {background-color: lightgray;}
 <nav>
 <img src="png-logo.png" alt="">
     <ul>
-        <li><button class="cart-nav-btn" id="cartIconBtn">Cart <span class="cart-badge" id="cartBadge">0</span></button></li>
         <li><a href="index.html">Home</a></li>
         <li><a class="active" href="Shop.html">Shop</a></li>
         <li><a href="Gallery.html">Gallery</a></li>
         <li><a href="About.html">About</a></li>
+        <li><button class="cart-nav-btn" id="cartIconBtn">&#128722;<span class="cart-badge" id="cartBadge"></span></button></li>
     </ul>
 </nav>
 

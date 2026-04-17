@@ -1,6 +1,13 @@
 /* Cart.css — shared shopping cart styles for all pages */
 
 /* ── Desktop nav cart button ── */
+/* Switch nav to flexbox so cart icon aligns vertically with links */
+nav ul {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+}
+
 .cart-nav-btn {
     background: none;
     border: none;
