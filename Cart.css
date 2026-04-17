@@ -254,7 +254,7 @@
 /* ── Mobile responsive ── */
 @media (max-width: 768px) {
     .mobile-header { display: flex; }
-    .cart-drawer { width: 100%; right: -100%; }
+    .cart-drawer { width: 100%; right: -100%; top: 48px; height: calc(100% - 48px); }
     .cart-drawer.open { right: 0; }
     .cart-drawer-footer { padding-bottom: 74px; }
 }
