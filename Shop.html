@@ -729,7 +729,9 @@ li a:hover:not(.active) {background-color: lightgray;}
     .cart-drawer { width: 100%; right: -100%; top: 48px; height: calc(100% - 48px); }
     .cart-drawer.open { right: 0; }
     /* PDP modal — starts below mobile header so header stays always tappable */
-    .pdp-overlay { overflow-y: auto; z-index: 1100; top: 48px; }
+    .pdp-overlay { overflow-y: auto; z-index: 1100; inset: 48px 0 0 0; }
+    /* Size chart — above PDP overlay so it opens on top of the product card */
+    .sc-overlay { z-index: 1200; }
     .pdp-overlay.open {
         padding: 0;
         align-items: stretch;
