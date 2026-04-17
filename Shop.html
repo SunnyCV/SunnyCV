@@ -728,9 +728,8 @@ li a:hover:not(.active) {background-color: lightgray;}
     /* Cart drawer full-width, starts below mobile header so header stays tappable */
     .cart-drawer { width: 100%; right: -100%; top: 48px; height: calc(100% - 48px); }
     .cart-drawer.open { right: 0; }
-    /* PDP modal — full-screen on mobile, fully contained, no off-screen overflow */
-    /* z-index raised above mobile header (1090) so the close button is always tappable */
-    .pdp-overlay { overflow: hidden; z-index: 1200; }
+    /* PDP modal — starts below mobile header so header stays always tappable */
+    .pdp-overlay { overflow-y: auto; z-index: 1100; top: 48px; }
     .pdp-overlay.open {
         padding: 0;
         align-items: stretch;
@@ -756,7 +755,7 @@ li a:hover:not(.active) {background-color: lightgray;}
     }
     .pdp-images {
         width: 100%;
-        padding: 48px 16px 10px;
+        padding: 16px 16px 10px;
         height: 54%;
         flex-shrink: 0;
         background-color: #f5f5f5;
