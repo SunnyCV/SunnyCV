@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="Cart.css">
 <style>
 html {overflow-y: scroll;}
-body {background-color: black; background-image: url("Noise.gif"); background-size: cover; overflow: hidden; padding-bottom: 55px;}
+body {background-color: black; overflow: hidden; padding-bottom: 55px;}
 p {font-size: 18px; text-align: center; font-weight: bold; color: white;}
 h1 {text-align: center; font-size: 54px; font-weight: 900;}
 h2 {text-align: center; font-size: 36px; font-weight: 900;}
@@ -86,6 +86,12 @@ h1.header::first-line {text-align: left; font-size: 200px; font-weight: 900;
 </style>
 </head>
 <body>
+
+<!-- Background video (replaces Noise.gif for performance) -->
+<video autoplay muted loop playsinline
+    style="position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:-1;">
+    <source src="Noise.mp4" type="video/mp4">
+</video>
 
 <!-- Mobile Header Bar -->
 <div class="mobile-header" id="mobileHeader">
