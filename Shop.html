@@ -722,11 +722,11 @@ li a:hover:not(.active) {background-color: lightgray;}
 .mobile-cart-badge.visible { display: inline-flex; }
 
 @media (max-width: 768px) {
-    .mobile-header { display: flex; }
+    .mobile-header { display: flex; z-index: 1500; }
     nav { display: none; }
     body { overflow-y: auto; padding-top: 48px; }
-    /* Cart drawer full-width */
-    .cart-drawer { width: 100%; right: -100%; }
+    /* Cart drawer full-width, starts below mobile header so header stays tappable */
+    .cart-drawer { width: 100%; right: -100%; top: 48px; height: calc(100% - 48px); }
     .cart-drawer.open { right: 0; }
     /* PDP modal — full-screen on mobile, fully contained, no off-screen overflow */
     /* z-index raised above mobile header (1090) so the close button is always tappable */
