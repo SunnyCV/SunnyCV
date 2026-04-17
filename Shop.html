@@ -1417,7 +1417,9 @@ document.querySelectorAll('.sc-tab').forEach(tab => {
     // Cart button opens the cart drawer
     if (cartBtn) {
         cartBtn.addEventListener('click', function() {
-            if (typeof openCart === 'function') openCart();
+            var dr = document.getElementById('cartDrawer');
+            if (dr && dr.classList.contains('open')) { if (typeof closeCart === 'function') closeCart(); }
+            else { if (typeof openCart === 'function') openCart(); }
         });
     }
 
