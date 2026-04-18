@@ -351,6 +351,13 @@ Scroll to browse.</div>
     <div id="caption"></div>
   </div>
 
+  <!-- Standalone mobile close button — lives outside the modal so nothing clips or offsets it -->
+  <button id="mobileModalClose" onclick="closeModal()"
+      style="display:none; position:fixed; top:56px; right:16px; z-index:2000;
+      background:none; border:none; color:#fff; font-size:36px; font-weight:bold;
+      cursor:pointer; padding:8px; line-height:1; -webkit-appearance:none;
+      text-shadow:0 1px 4px rgba(0,0,0,0.8);">&times;</button>
+
 
 <div id="galleryFooterText" style="background-color: black; color: white; height: 85px; line-height: -10px; text-align:
     center; margin-top: 0px; margin-bottom: 0px; font-weight: 900; font-family:
@@ -452,6 +459,25 @@ function modalNext() {
     modalImg.src = images[imageIndex].src;
     captionText.innerHTML = images[imageIndex].alt;
 }
+
+// Show/hide standalone mobile close button with modal
+(function () {
+    var mobileClose = document.getElementById('mobileModalClose');
+    var modal = document.getElementById('myModal');
+    if (!mobileClose || !modal) return;
+    var isMobile = window.innerWidth <= 768;
+    var _open = window.openModal;
+    var _close = window.closeModal;
+    window.openModal = function (src, alt) {
+        if (_open) _open(src, alt);
+        if (window.innerWidth <= 768) mobileClose.style.display = 'block';
+    };
+    window.closeModal = function () {
+        if (_close) _close();
+        mobileClose.style.display = 'none';
+    };
+    mobileClose.onclick = function () { window.closeModal(); };
+}());
 </script>
 </body>
 </html>
