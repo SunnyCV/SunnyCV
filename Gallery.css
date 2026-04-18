@@ -154,7 +154,7 @@ h1.header::first-line {text-align: center; font-size: 150px; font-weight: 900;
 }
 
 #myModal {
-  z-index: 101;
+  z-index: 1600;
 }
 
 .scrollable-images::-webkit-scrollbar {
