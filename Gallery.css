@@ -295,24 +295,7 @@ h1.header::first-line {text-align: center; font-size: 150px; font-weight: 900;
       margin-right: 4px;
     }
     .gallery-nav-arrows { display: flex; }
-    .close {
-        position: fixed;
-        top: 56px;
-        right: 16px;
-        font-size: 36px;
-        background: none;
-        border: none;
-        box-shadow: none;
-        outline: none;
-        -webkit-appearance: none;
-        appearance: none;
-        padding: 8px;
-        min-width: 44px;
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+    .close { display: none !important; }
 }
 @media (min-width: 769px) {
   .modal-content {
