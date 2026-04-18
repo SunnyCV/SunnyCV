@@ -295,6 +295,15 @@ h1.header::first-line {text-align: center; font-size: 150px; font-weight: 900;
       margin-right: 4px;
     }
     .gallery-nav-arrows { display: flex; }
+    .close {
+        top: 54px;
+        right: 16px;
+        font-size: 34px;
+        background: none;
+        border: none;
+        box-shadow: none;
+        outline: none;
+    }
 }
 @media (min-width: 769px) {
   .modal-content {
