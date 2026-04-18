@@ -35,8 +35,8 @@ foreach ($items as $item) {
 $item_count = count($items);
 if ($item_count >= 3) {
     $shipping_options = [
-        ['shipping_rate' => 'shr_BULK_US_ID_HERE'],    // US $5.00 (3+ items)
-        ['shipping_rate' => 'shr_BULK_INTL_ID_HERE'],  // Intl $25.00 (3+ items)
+        ['shipping_rate' => 'shr_1TNf6OHXEAGWgeFQ2Tltrrbn'],  // US $5.00 (3+ items)
+        ['shipping_rate' => 'shr_1TNf6rHXEAGWgeFQzxdffrFX'],  // Intl $25.00 (3+ items)
     ];
 } else {
     $shipping_options = [
