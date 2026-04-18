@@ -132,6 +132,18 @@
     h1.header::first-line { font-size: 30px !important; }
     /* Allow body to scroll */
     body { overflow-y: auto !important; }
+    /* Modal: vertically center image on mobile */
+    .modal {
+        display: none;
+        padding: 52px 8px 12px !important;
+        box-sizing: border-box !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow-y: hidden !important;
+    }
+    /* Hide the inner close button — standalone #mobileModalClose is used instead */
+    .close { display: none !important; visibility: hidden !important; }
 }
 @keyframes audioMarquee {
     0%   { transform: translateX(0%); }
