@@ -116,7 +116,29 @@
 
         var chk = document.getElementById('checkoutBtn');
         if (chk) chk.addEventListener('click', function () {
-            window.location.href = 'Checkout.html';
+            if (cart.length === 0) return;
+            chk.textContent = 'Processing...';
+            chk.disabled = true;
+            fetch('stripe-checkout.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ items: cart })
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.url) {
+                    window.location.href = data.url;
+                } else {
+                    alert('Something went wrong. Please try again.');
+                    chk.textContent = 'Checkout';
+                    chk.disabled = false;
+                }
+            })
+            .catch(function() {
+                alert('Something went wrong. Please try again.');
+                chk.textContent = 'Checkout';
+                chk.disabled = false;
+            });
         });
     });
 

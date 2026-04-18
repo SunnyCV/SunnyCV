@@ -1157,9 +1157,31 @@ document.getElementById('cartIconBtn').addEventListener('click', function () {
     if (dr && dr.classList.contains('open')) closeCart(); else openCart();
 });
 
-document.getElementById('checkoutBtn').addEventListener('click', () => {
-    try { sessionStorage.setItem('noiseCart', JSON.stringify(cart)); } catch(e) {}
-    window.location.href = 'Checkout.html';
+document.getElementById('checkoutBtn').addEventListener('click', function() {
+    if (cart.length === 0) return;
+    const btn = document.getElementById('checkoutBtn');
+    btn.textContent = 'Processing...';
+    btn.disabled = true;
+    fetch('stripe-checkout.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: cart })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.url) {
+            window.location.href = data.url;
+        } else {
+            alert('Something went wrong. Please try again.');
+            btn.textContent = 'Checkout';
+            btn.disabled = false;
+        }
+    })
+    .catch(() => {
+        alert('Something went wrong. Please try again.');
+        btn.textContent = 'Checkout';
+        btn.disabled = false;
+    });
 });
 document.getElementById('cartDrawerClose').addEventListener('click', closeCart);
 document.getElementById('cartOverlayBg').addEventListener('click', closeCart);

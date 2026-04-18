@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Order Confirmed — NOISE</title>
+<style>
+html { overflow-y: scroll; }
+body {
+    background-color: #000;
+    color: #fff;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 40px 24px;
+    box-sizing: border-box;
+    text-align: center;
+}
+.checkmark {
+    font-size: 64px;
+    margin-bottom: 24px;
+}
+h1 {
+    font-size: 36px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin: 0 0 16px;
+}
+p {
+    font-size: 15px;
+    color: #aaa;
+    letter-spacing: 1px;
+    line-height: 1.8;
+    max-width: 480px;
+    margin: 0 0 40px;
+}
+a {
+    display: inline-block;
+    background-color: #fff;
+    color: #000;
+    text-decoration: none;
+    padding: 14px 36px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    transition: opacity 0.2s;
+}
+a:hover { opacity: 0.8; }
+</style>
+</head>
+<body>
+<div class="checkmark">✓</div>
+<h1>Order Confirmed</h1>
+<p>Thank you for your order. A receipt has been sent to your email.<br>
+Your items are being prepared and will ship soon.</p>
+<a href="Shop.html">Continue Shopping</a>
+<script>
+    // Clear the cart after successful checkout
+    try { sessionStorage.removeItem('noiseCart'); } catch(e) {}
+</script>
+</body>
+</html>
