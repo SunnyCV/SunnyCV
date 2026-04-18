@@ -336,9 +336,9 @@ li a:hover:not(.active) {background-color: lightgray;}
 .sc-chart-img {
     background-color: #fff;
     width: 100%;
-    max-width: 720px;
+    max-width: 100%;
     display: block;
-    object-fit: contain;
+    height: auto;
 }
 
 /* ── Cart Icon in Nav ── */
@@ -830,14 +830,14 @@ li a:hover:not(.active) {background-color: lightgray;}
 <!-- ── Mobile Header Bar ── -->
 <div class="mobile-header" id="mobileHeader">
     <button class="mobile-header-hamburger" id="mobileHamburger" aria-label="Menu">&#9776;</button>
-    <img class="mobile-header-logo" src="png-logo.png" alt="NOISE">
+    <a href="index.html" style="display:contents;"><img class="mobile-header-logo" src="png-logo.png" alt="NOISE"></a>
     <button class="mobile-header-cart" id="mobileCartBtn" aria-label="Cart">
         &#128722;<span class="mobile-cart-badge" id="mobileBadge"></span>
     </button>
 </div>
 
 <nav>
-<img src="png-logo.png" alt="">
+<a href="index.html" style="display:contents;"><img src="png-logo.png" alt=""></a>
     <ul>
         <li><a href="index.html">Home</a></li>
         <li><a class="active" href="Shop.html">Shop</a></li>
