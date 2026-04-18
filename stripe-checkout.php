@@ -35,13 +35,13 @@ foreach ($items as $item) {
 $item_count = count($items);
 if ($item_count >= 3) {
     $shipping_options = [
-        ['shipping_rate' => 'shr_1TNf6OHXEAGWgeFQ2Tltrrbn'],  // US $5.00 (3+ items)
-        ['shipping_rate' => 'shr_1TNf6rHXEAGWgeFQzxdffrFX'],  // Intl $25.00 (3+ items)
+        ['shipping_rate' => 'shr_1TNfZUHXEAGWgeFQzIPKMGSd'],  // US $5.00 (3+ items)
+        ['shipping_rate' => 'shr_1TNfZPHXEAGWgeFQ6oFWSw2J'],  // Intl $25.00 (3+ items)
     ];
 } else {
     $shipping_options = [
-        ['shipping_rate' => 'shr_1TNeiKHXEAGWgeFQajPs1O2p'], // US $2.50
-        ['shipping_rate' => 'shr_1TNeihHXEAGWgeFQsALHmxJ6'], // Intl $15.00
+        ['shipping_rate' => 'shr_1TNfZhHXEAGWgeFQltCT0nji'], // US $3.00
+        ['shipping_rate' => 'shr_1TNfZdHXEAGWgeFQuNyHZEeT'], // Intl $15.00
     ];
 }
 
