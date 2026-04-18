@@ -23,7 +23,7 @@ foreach ($items as $item) {
             'product_data' => [
                 'name'   => $item['name'] . ' — Size: ' . $item['size'],
                 'images' => [
-                    'https://madewith-luv.com/' . $item['front']
+                    'https://madewith-luv.com/' . str_replace(' ', '%20', $item['front'])
                 ],
             ],
         ],

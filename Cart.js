@@ -13,7 +13,7 @@
     }
 
     function cartTotal() {
-        return cart.reduce(function (s, i) { return s + i.price; }, 0);
+        return cart.reduce(function (s, i) { return s + parseFloat(i.price || 0); }, 0);
     }
 
     // ── Badge ─────────────────────────────────────────────────────────────────
