@@ -299,8 +299,9 @@ h1.header::first-line {text-align: center; font-size: 150px; font-weight: 900;
 }
 @media (min-width: 769px) {
   .modal-content {
-    /*max-width: none; */
-    max-height: 100%; 
-    width: auto; 
+    max-width: 90vw;
+    max-height: calc(100vh - 140px);
+    width: auto;
+    height: auto;
   }
 }
