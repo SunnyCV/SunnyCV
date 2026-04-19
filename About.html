@@ -32,9 +32,6 @@ li a:hover:not(.active) {background-color: #373737;}
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;}
 .pnotes {text-align: center; font-size: 28px; font-weight: bold; color: white;}
 .year-label {font-size: 36px; margin-bottom: 0;}
-h1.header::first-line {text-align: center; font-size: 96px; font-weight: 900; 
-    color: white; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;}
-
 /* ── Mobile / Hamburger ── */
 .hamburger-btn {
     display: none;
@@ -100,6 +97,9 @@ h1.header::first-line {text-align: center; font-size: 96px; font-weight: 900;
     p.pnotes { font-size: 15px; padding: 0 20px; line-height: 1.7; }
     p.pnotes br { display: none; }
     div { word-break: break-word; }
+}
+@media (min-width: 769px) {
+    h1.header::first-line { font-size: 96px; font-weight: 900; }
 }
 @keyframes audioMarquee {
     0%   { transform: translateX(0%); }
