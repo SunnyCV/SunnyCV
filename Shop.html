@@ -970,11 +970,11 @@ li a:hover:not(.active) {background-color: lightgray;}
             <!-- Size Select -->
             <select class="size-select" id="sizeSelect">
                 <option value="" disabled selected>Select a Size</option>
-                <option value="XS">XS — Extra Small</option>
                 <option value="S">S — Small</option>
                 <option value="M">M — Medium</option>
                 <option value="L">L — Large</option>
                 <option value="XL">XL — Extra Large</option>
+                <option value="2XL">2XL — XX-Large</option>
             </select>
 
             <!-- Add to Cart -->
@@ -1156,8 +1156,8 @@ function showAll() {
 }
 
 // ── Inventory (5 per size per product) ──
-const sizes = ['XS', 'S', 'M', 'L', 'XL'];
-const sizeLabels = { XS: 'Extra Small', S: 'Small', M: 'Medium', L: 'Large', XL: 'Extra Large' };
+const sizes = ['S', 'M', 'L', 'XL', '2XL'];
+const sizeLabels = { S: 'Small', M: 'Medium', L: 'Large', XL: 'Extra Large', '2XL': 'XX-Large' };
 const inventory = {};
 products.forEach(p => {
     inventory[p.id] = {};
