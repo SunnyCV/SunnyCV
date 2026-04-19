@@ -127,11 +127,13 @@
     #galleryFooterText br { display: none !important; }
     #galleryScrollText { text-align: center !important; height: auto !important; padding: 16px 20px !important; display: flex !important; align-items: center !important; justify-content: center !important; }
     #galleryScrollText br { display: none !important; }
-    /* "The Archives" heading — bigger on mobile */
-    h1.header { font-size: 52px !important; }
+    /* "The Archives" heading — bigger on mobile, balanced spacing */
+    h1.header { font-size: 52px !important; margin-top: 18px !important; margin-bottom: 12px !important; }
     h1.header::first-line { font-size: 52px !important; }
     /* Paragraph between heading and scroll text — smaller on mobile */
-    p { font-size: 13px !important; }
+    p { font-size: 13px !important; margin-top: 0 !important; margin-bottom: 4px !important; }
+    /* Remove the extra <br> spacing above heading on mobile */
+    h1.header + br, nav + br { display: none !important; }
     /* Allow body to scroll */
     body { overflow-y: auto !important; }
     /* Modal: vertically center image on mobile */
