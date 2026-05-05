@@ -81,10 +81,55 @@ li a:hover:not(.active) {background-color: #111;}
     width: 46px;
 }
 
+/* ── Welcome section ── */
+.welcome-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 48px;
+    padding: 0 20px;
+}
+.welcome-heading {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 96px;
+    font-weight: 900;
+    color: white;
+    margin: 0 0 36px 0;
+    letter-spacing: 2px;
+    text-align: center;
+}
+.portfolio-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+}
+.portfolio-btn {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: white;
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.5);
+    padding: 14px 32px;
+    background: rgba(255,255,255,0.05);
+    transition: background 0.2s, border-color 0.2s;
+    border-radius: 2px;
+}
+.portfolio-btn:hover {
+    background: rgba(255,255,255,0.15);
+    border-color: white;
+}
+
 @media (max-width: 768px) {
     nav { display: none; }
     .mobile-header { display: flex; }
     body { overflow-y: auto; padding-top: 48px; }
+    .welcome-heading { font-size: 56px; }
+    .welcome-section { margin-top: 32px; }
+    .portfolio-btn { padding: 12px 22px; }
 }
 </style>
 </head>
@@ -123,6 +168,17 @@ li a:hover:not(.active) {background-color: #111;}
 </nav>
 
 
+
+<div class="welcome-section">
+    <h1 class="welcome-heading">Welcome</h1>
+    <div class="portfolio-buttons">
+        <a class="portfolio-btn" href="Videos.html">Videos</a>
+        <a class="portfolio-btn" href="Designs.html">Designs</a>
+        <a class="portfolio-btn" href="Photos.html">Photos</a>
+        <a class="portfolio-btn" href="Music.html">Music</a>
+        <a class="portfolio-btn" href="Info.html">About</a>
+    </div>
+</div>
 
 <script>
 (function(){
