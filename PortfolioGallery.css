@@ -8,8 +8,8 @@ html {scroll-behavior: smooth; overflow-y: scroll;}
     top: 0; left: 0;
     width: 100%;
     height: 48px;
-    background-color: #f2f2f2;
-    border-bottom: 1px solid #ccc;
+    background-color: #000;
+    border-bottom: 1px solid #222;
     z-index: 1090;
     align-items: center;
     justify-content: space-between;
@@ -19,7 +19,7 @@ html {scroll-behavior: smooth; overflow-y: scroll;}
 .mobile-header-hamburger {
     background: none; border: none;
     font-size: 26px; cursor: pointer;
-    padding: 4px 8px; color: #000;
+    padding: 4px 8px; color: #fff;
     font-family: Arial, sans-serif; line-height: 1;
 }
 .mobile-header-logo {
@@ -43,11 +43,11 @@ html {scroll-behavior: smooth; overflow-y: scroll;}
     top: 0; left: 0;
     width: 230px;
     height: 100%;
-    background-color: #111;
+    background-color: #000;
     z-index: 1080;
     padding: 64px 0 20px;
     flex-direction: column;
-    border-right: 1px solid #333;
+    border-right: 1px solid #222;
     box-sizing: border-box;
 }
 .mobile-nav-menu.open { display: flex; }
@@ -64,7 +64,7 @@ html {scroll-behavior: smooth; overflow-y: scroll;}
     display: block;
     background-color: transparent;
 }
-.mobile-nav-menu a:hover, .mobile-nav-menu a.active { background-color: #222; }
+.mobile-nav-menu a:hover, .mobile-nav-menu a.active { background-color: #111; }
 
 /* ── Gallery Nav Arrows (mobile) ── */
 .gallery-nav-arrows {
@@ -72,11 +72,11 @@ html {scroll-behavior: smooth; overflow-y: scroll;}
     justify-content: center;
     gap: 20px;
     padding: 18px 0 100px;
-    background-color: #f2f2f2;
+    background-color: transparent;
 }
 .gallery-arrow-btn {
-    background-color: #000;
-    color: #fff;
+    background-color: #fff;
+    color: #000;
     border: none;
     font-size: 22px;
     padding: 10px 28px;
@@ -89,21 +89,21 @@ html {scroll-behavior: smooth; overflow-y: scroll;}
 
 /* ── Hide mobile elements on desktop ── */
 @media (min-width: 769px) {
-    .mobile-header     { display: none !important; }
+    .mobile-header      { display: none !important; }
     .mobile-nav-overlay { display: none !important; }
-    .mobile-nav-menu   { display: none !important; }
+    .mobile-nav-menu    { display: none !important; }
     .gallery-nav-arrows { display: none !important; }
 }
 
-body { background-color: #f2f2f2; background-size: cover; background-position: center; overflow: hidden; padding-bottom: 0; }
+body { background-color: #000; background-size: cover; background-position: center; overflow: hidden; padding-bottom: 55px; }
 
 nav ul { list-style-type: none; margin: 0; padding: 0; overflow: hidden; }
 nav li { float: right; }
 nav img { position: absolute; float: left; margin: -50%, -50%; overflow: hidden; width: 225px; }
 li a { display: block; padding: 9px; background-color: rgb(from color r g b);
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-weight: 600; text-decoration: none; color: black; }
-li a:hover:not(.active) { background-color: lightgray; }
+    font-weight: 600; text-decoration: none; color: white; }
+li a:hover:not(.active) { background-color: #111; }
 .active { opacity: 75%; }
 
 .centered-container {
