@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" type="text/css" href="Gallery.css">
+<title>Designs — Portfolio</title>
+<style>
+.mobile-header {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    height: 48px;
+    background-color: #f2f2f2;
+    border-bottom: 1px solid #ccc;
+    z-index: 1090;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+    box-sizing: border-box;
+}
+.mobile-header-hamburger {
+    background: none; border: none;
+    font-size: 26px; cursor: pointer;
+    padding: 4px 8px; color: #000;
+    font-family: Arial, sans-serif; line-height: 1;
+}
+.mobile-header-logo {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    height: 34px; width: auto;
+}
+.mobile-header-spacer { width: 46px; }
+@media (max-width: 768px) {
+    nav { display: none !important; }
+    .mobile-header { display: flex; }
+    body { overflow-y: auto !important; padding-top: 48px; }
+}
+@keyframes audioMarquee {
+    0%   { transform: translateX(0%); }
+    100% { transform: translateX(-100%); }
+}
+</style>
+</head>
+<body>
+
+<!-- Mobile Header Bar -->
+<div class="mobile-header" id="mobileHeader">
+    <button class="mobile-header-hamburger" id="mobileHamburger" aria-label="Menu">&#9776;</button>
+    <a href="Portfolio.html" style="display:contents;"><img class="mobile-header-logo" src="png-logo.png" alt="Portfolio"></a>
+    <div class="mobile-header-spacer"></div>
+</div>
+
+<!-- Mobile Nav -->
+<div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+<div class="mobile-nav-menu" id="mobileNavMenu">
+    <a href="Videos.html">VIDEOS</a>
+    <a class="active" href="Designs.html">DESIGNS</a>
+    <a href="Photos.html">PHOTOS</a>
+    <a href="Info.html">INFO</a>
+</div>
+
+<nav>
+<a href="Portfolio.html" style="display:contents;"><img src="png-logo.png" alt=""></a>
+<ul>
+    <li><a href="Videos.html">Videos</a></li>
+    <li><a class="active" href="Designs.html">Designs</a></li>
+    <li><a href="Photos.html">Photos</a></li>
+    <li><a href="Info.html">Info</a></li>
+</ul>
+</nav>
+
+<div class="centered-container">
+    <div class="image-container">
+        <div class="scrollable-images">
+            <!-- Content goes here -->
+        </div>
+    </div>
+</div>
+
+<!-- Mobile nav arrows -->
+<div class="gallery-nav-arrows">
+    <button class="gallery-arrow-btn" id="galleryPrevBtn">&#8592;</button>
+    <button class="gallery-arrow-btn" id="galleryNextBtn">&#8594;</button>
+</div>
+
+<!-- Modal -->
+<div id="myModal" class="modal">
+    <button class="close" onclick="closeModal()">&times;</button>
+    <img class="modal-content" id="modalImage" alt="">
+    <div id="caption"></div>
+</div>
+
+<!-- Standalone mobile close button -->
+<button id="mobileModalClose" onclick="closeModal()"
+    style="display:none; position:fixed; top:58px; right:14px; z-index:2000;
+    background:none; border:none; color:#fff; font-size:26px; font-weight:bold;
+    cursor:pointer; padding:6px 10px; line-height:1; -webkit-appearance:none;
+    text-shadow:0 1px 6px rgba(0,0,0,0.9);">&times;</button>
+
+<!-- Audio Player -->
+<audio id="bgAudio" loop>
+    <source src="music/Germs%20-%20GI.mp3" type="audio/mpeg">
+</audio>
+<div style="position: fixed; bottom: 16px; left: 16px; z-index: 999;
+    display: flex; align-items: center; gap: 8px;">
+    <button id="audioPlayBtn"
+        style="flex-shrink: 0; width: 46px; height: 46px; border-radius: 50%;
+        background: #000; border: 1px solid #444; color: white; font-size: 20px;
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.5); transition: background 0.2s;
+        padding: 0; line-height: 1;">&#9654;</button>
+    <div style="overflow: hidden; width: 150px; background: rgba(0,0,0,0.72);
+        border-radius: 20px; padding: 5px 12px; box-sizing: border-box;">
+        <div style="white-space: nowrap; display: inline-block;
+            animation: audioMarquee 12s linear infinite;">
+            <span style="color: #ccc; font-family: 'Franklin Gothic Medium',
+            'Arial Narrow', Arial, sans-serif; font-size: 11px; letter-spacing: 1.5px;
+            text-transform: uppercase;">&#9834;&nbsp; Germs &mdash; GI
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        </div>
+    </div>
+</div>
+
+<!-- Instagram link -->
+<a href="https://www.instagram.com/withlovefrom.moi/" target="_blank" rel="noopener"
+    style="position: fixed; bottom: 16px; right: 16px; z-index: 999;
+    width: 46px; height: 46px; border-radius: 50%;
+    background: #000; border: 1px solid #444;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5); transition: background 0.2s;
+    text-decoration: none;"
+    onmouseover="this.style.background='#222'" onmouseout="this.style.background='#000'">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+        <circle cx="12" cy="12" r="4"/>
+        <circle cx="17.5" cy="6.5" r="0.5" fill="white" stroke="none"/>
+    </svg>
+</a>
+
+<script>
+(function () {
+    var imagesContainer = document.querySelector('.scrollable-images');
+    var images = document.querySelectorAll('.scrollable-images img');
+    var modal = document.getElementById('myModal');
+    var modalImg = document.getElementById('modalImage');
+    var captionText = document.getElementById('caption');
+    var scrollPosition = 0;
+    var imageIndex = 0;
+
+    window.openModal = function (src, alt) {
+        if (!modal) return;
+        modal.style.display = window.innerWidth <= 768 ? 'flex' : 'block';
+        if (modalImg) modalImg.src = src;
+        if (captionText) captionText.innerHTML = alt;
+    };
+    window.closeModal = function () {
+        if (!modal) return;
+        modal.style.display = 'none';
+    };
+
+    var pageReady = false;
+    setTimeout(function () { pageReady = true; }, 500);
+
+    if (images.length > 0 && imagesContainer) {
+        images.forEach(function (img, index) {
+            img.setAttribute('draggable', 'false');
+            img.onclick = function () {
+                if (!pageReady) return;
+                window.openModal(this.src, this.alt);
+                imageIndex = index;
+            };
+        });
+
+        function updateImagePositions() {
+            var centerIndex = Math.floor(images.length / 2);
+            scrollPosition = centerIndex * images[0].offsetWidth - imagesContainer.offsetWidth / 2;
+            scrollPosition = Math.min(imagesContainer.scrollWidth - imagesContainer.clientWidth, Math.max(0, scrollPosition));
+            imagesContainer.scrollLeft = scrollPosition;
+            imageIndex = centerIndex;
+        }
+        updateImagePositions();
+        window.addEventListener('resize', updateImagePositions);
+
+        imagesContainer.addEventListener('wheel', function (e) {
+            scrollPosition += e.deltaY;
+            scrollPosition = Math.min(imagesContainer.scrollWidth - imagesContainer.clientWidth, Math.max(0, scrollPosition));
+            imagesContainer.scrollLeft = scrollPosition;
+            imageIndex = Math.round(scrollPosition / images[0].offsetWidth);
+            e.preventDefault();
+        });
+
+        images.forEach(function (item, index) {
+            item.addEventListener('mouseenter', function () {
+                images.forEach(function (el, i) {
+                    el.style.transform = i === index ? 'scale(1.3)' : '';
+                    el.style.margin = i === index ? '0 10px' : '';
+                });
+            });
+        });
+        imagesContainer.addEventListener('mouseleave', function () {
+            images.forEach(function (el) { el.style.transform = ''; el.style.margin = ''; });
+        });
+
+        var prevBtn = document.getElementById('galleryPrevBtn');
+        var nextBtn = document.getElementById('galleryNextBtn');
+        if (prevBtn) prevBtn.addEventListener('click', function () {
+            imageIndex = Math.max(0, imageIndex - 1);
+            imagesContainer.scrollLeft = imageIndex * images[0].offsetWidth;
+        });
+        if (nextBtn) nextBtn.addEventListener('click', function () {
+            imageIndex = Math.min(images.length - 1, imageIndex + 1);
+            imagesContainer.scrollLeft = imageIndex * images[0].offsetWidth;
+        });
+    }
+
+    document.addEventListener('keydown', function (e) { if (e.keyCode === 27) window.closeModal(); });
+}());
+</script>
+
+<script>
+(function () {
+    var btn   = document.getElementById('audioPlayBtn');
+    var audio = document.getElementById('bgAudio');
+    btn.addEventListener('click', function () {
+        if (audio.paused) { audio.play(); btn.textContent = '⏸'; }
+        else { audio.pause(); btn.textContent = '▶'; }
+    });
+    btn.addEventListener('mouseenter', function () { btn.style.background = '#222'; });
+    btn.addEventListener('mouseleave', function () { btn.style.background = '#000'; });
+}());
+</script>
+
+<script>
+(function () {
+    var btn     = document.getElementById('mobileHamburger');
+    var menu    = document.getElementById('mobileNavMenu');
+    var overlay = document.getElementById('mobileNavOverlay');
+    function toggleNav() { menu.classList.toggle('open'); overlay.classList.toggle('open'); }
+    btn.addEventListener('click', toggleNav);
+    overlay.addEventListener('click', toggleNav);
+}());
+</script>
+
+<script>
+(function () {
+    if (window.innerWidth > 768) return;
+    var modal       = document.getElementById('myModal');
+    var mobileClose = document.getElementById('mobileModalClose');
+    var innerClose  = document.querySelector('#myModal .close');
+    if (innerClose && innerClose.parentNode) innerClose.parentNode.removeChild(innerClose);
+    if (modal) {
+        modal.style.flexDirection  = 'column';
+        modal.style.alignItems     = 'center';
+        modal.style.justifyContent = 'center';
+        modal.style.padding        = '52px 8px 12px';
+        modal.style.boxSizing      = 'border-box';
+        modal.style.overflowY      = 'hidden';
+    }
+    var _open  = window.openModal;
+    var _close = window.closeModal;
+    window.openModal = function (src, alt) {
+        if (_open) _open(src, alt);
+        if (modal) { modal.style.justifyContent = 'center'; modal.style.alignItems = 'center'; }
+        if (mobileClose) mobileClose.style.display = 'block';
+    };
+    window.closeModal = function () {
+        if (_close) _close();
+        if (mobileClose) mobileClose.style.display = 'none';
+    };
+    if (mobileClose) mobileClose.onclick = function () { window.closeModal(); };
+}());
+</script>
+</body>
+</html>
