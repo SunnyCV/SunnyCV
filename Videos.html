@@ -161,40 +161,50 @@
     gap: 5px;
 }
 
-.vhs-knob {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 38% 35%, #3c3c3c, #141414);
-    box-shadow:
-        0 3px 6px rgba(0,0,0,0.9),
-        0 0 0 2px #0e0e0e,
-        inset 0 1px 0 rgba(255,255,255,0.08);
-    cursor: grab;
-    position: relative;
-    user-select: none;
-}
-
-.vhs-knob:active { cursor: grabbing; }
-
-.vhs-knob::after {
-    content: '';
-    position: absolute;
-    top: 5px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 2px;
-    height: 10px;
-    background: rgba(255,255,255,0.28);
-    border-radius: 1px;
-}
-
 .vhs-vol-label {
     font-family: Arial, sans-serif;
     font-size: 7px;
     letter-spacing: 2px;
     color: #2c2c2c;
     text-transform: uppercase;
+}
+
+.vhs-vol-btns {
+    display: flex;
+    gap: 6px;
+}
+
+.vhs-vol-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: none;
+    background: linear-gradient(180deg, #2e2e2e 0%, #1e1e1e 100%);
+    color: #777;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+        0 3px 0 #0c0c0c,
+        0 4px 8px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+    transition: transform 0.07s, box-shadow 0.07s;
+    position: relative;
+    top: 0;
+}
+
+.vhs-vol-btn:hover { color: #aaa; }
+
+.vhs-vol-btn:active {
+    transform: translateY(3px);
+    box-shadow:
+        0 1px 0 #0c0c0c,
+        0 2px 4px rgba(0,0,0,0.5),
+        inset 0 2px 4px rgba(0,0,0,0.4);
 }
 
 .vhs-display {
@@ -387,8 +397,11 @@
         <!-- Left: volume knob + display -->
         <div class="vhs-left">
             <div class="vhs-vol-wrap">
-                <div class="vhs-knob" id="vhsKnob"></div>
                 <span class="vhs-vol-label">Vol</span>
+                <div class="vhs-vol-btns">
+                    <button class="vhs-vol-btn" id="vhsVolDown">&#8722;</button>
+                    <button class="vhs-vol-btn" id="vhsVolUp">&#43;</button>
+                </div>
             </div>
             <div class="vhs-display" id="vhsDisplay">-- : --</div>
         </div>
@@ -477,37 +490,18 @@
     setTimeout(triggerGlitch, 600 + Math.random() * 1500);
 }());
 
-/* ── Volume knob drag ── */
+/* ── Volume +/- ── */
 (function () {
-    var knob     = document.getElementById('vhsKnob');
-    var rotation = -130;
-    var dragging = false;
-    var lastY    = 0;
+    var volume = 0.8;
+    var step   = 0.1;
 
-    function setRotation(r) {
-        rotation = Math.max(-130, Math.min(130, r));
-        knob.style.transform = 'rotate(' + rotation + 'deg)';
-    }
-
-    knob.addEventListener('mousedown', function (e) {
-        dragging = true; lastY = e.clientY; e.preventDefault();
+    document.getElementById('vhsVolUp').addEventListener('click', function () {
+        volume = Math.min(1, parseFloat((volume + step).toFixed(1)));
+        /* wire to video.volume when tapes are added */
     });
-    document.addEventListener('mousemove', function (e) {
-        if (!dragging) return;
-        setRotation(rotation + (lastY - e.clientY));
-        lastY = e.clientY;
+    document.getElementById('vhsVolDown').addEventListener('click', function () {
+        volume = Math.max(0, parseFloat((volume - step).toFixed(1)));
     });
-    document.addEventListener('mouseup', function () { dragging = false; });
-
-    knob.addEventListener('touchstart', function (e) {
-        dragging = true; lastY = e.touches[0].clientY; e.preventDefault();
-    }, { passive: false });
-    document.addEventListener('touchmove', function (e) {
-        if (!dragging) return;
-        setRotation(rotation + (lastY - e.touches[0].clientY));
-        lastY = e.touches[0].clientY;
-    });
-    document.addEventListener('touchend', function () { dragging = false; });
 }());
 
 /* ── Transport buttons (wired up when tapes are added) ── */
