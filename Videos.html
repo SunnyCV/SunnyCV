@@ -112,7 +112,6 @@
     box-shadow: 0 0 6px #f00, 0 0 14px rgba(255,0,0,0.35);
 }
 
-/* CSS glitch shake */
 @keyframes glitch-shake {
     0%   { transform: translate(0, 0);     filter: none; }
     20%  { transform: translate(-4px, 0);  filter: hue-rotate(80deg) saturate(4); }
@@ -136,7 +135,7 @@
     border-radius: 6px;
     display: flex;
     align-items: center;
-    padding: 0 28px;
+    padding: 0 24px;
     box-sizing: border-box;
     box-shadow:
         0 0 0 2px #2e2e2e,
@@ -144,13 +143,58 @@
         0 12px 36px rgba(0,0,0,0.85),
         inset 0 1px 0 rgba(255,255,255,0.05),
         inset 0 -1px 0 rgba(0,0,0,0.5);
-    gap: 0;
+    gap: 20px;
 }
 
+/* Left: volume + display */
 .vhs-left {
     flex: 1;
     display: flex;
     align-items: center;
+    gap: 16px;
+}
+
+.vhs-vol-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.vhs-knob {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 35%, #3c3c3c, #141414);
+    box-shadow:
+        0 3px 6px rgba(0,0,0,0.9),
+        0 0 0 2px #0e0e0e,
+        inset 0 1px 0 rgba(255,255,255,0.08);
+    cursor: grab;
+    position: relative;
+    user-select: none;
+}
+
+.vhs-knob:active { cursor: grabbing; }
+
+.vhs-knob::after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 10px;
+    background: rgba(255,255,255,0.28);
+    border-radius: 1px;
+}
+
+.vhs-vol-label {
+    font-family: Arial, sans-serif;
+    font-size: 7px;
+    letter-spacing: 2px;
+    color: #2c2c2c;
+    text-transform: uppercase;
 }
 
 .vhs-display {
@@ -167,11 +211,9 @@
     text-align: center;
 }
 
+/* Center: tape slot */
 .vhs-center {
     flex: 0 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
 .vhs-slot {
@@ -183,7 +225,6 @@
         inset 0 4px 12px rgba(0,0,0,0.98),
         inset 0 1px 2px rgba(0,0,0,0.9),
         0 1px 0 rgba(255,255,255,0.04);
-    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -215,6 +256,7 @@
     text-overflow: ellipsis;
 }
 
+/* Right: transport buttons */
 .vhs-right {
     flex: 1;
     display: flex;
@@ -222,19 +264,46 @@
     align-items: center;
 }
 
-.vhs-vents {
+.vhs-controls {
     display: flex;
-    gap: 5px;
+    align-items: center;
+    gap: 10px;
 }
 
-.vhs-vents span {
-    display: block;
-    width: 2px;
-    height: 26px;
-    background: #111;
-    border-radius: 1px;
-    box-shadow: 1px 0 0 rgba(255,255,255,0.03);
+.vhs-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 5px;
+    border: none;
+    background: linear-gradient(180deg, #2e2e2e 0%, #1e1e1e 100%);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    box-shadow:
+        0 4px 0 #0c0c0c,
+        0 5px 10px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+    transition: transform 0.07s, box-shadow 0.07s;
+    position: relative;
+    top: 0;
 }
+
+.vhs-btn:active {
+    transform: translateY(3px);
+    box-shadow:
+        0 1px 0 #0c0c0c,
+        0 2px 4px rgba(0,0,0,0.5),
+        inset 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.vhs-btn-play  { color: #4e9a4e; }
+.vhs-btn-pause { color: #9a9a4e; }
+.vhs-btn-stop  { color: #9a4e4e; }
+.vhs-btn-eject { color: #6a8a9a; }
+
+.vhs-btn:hover { filter: brightness(1.3); }
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
@@ -242,25 +311,19 @@
         padding: 20px 10px 60px;
         min-height: auto;
     }
-    .tv-body {
-        padding: 16px 16px 14px;
-    }
-    .tv-screen {
-        aspect-ratio: 4 / 3;
-    }
+    .tv-body { padding: 16px 16px 14px; }
+    .tv-screen { aspect-ratio: 4 / 3; }
     .vhs-body {
-        height: 90px;
-        padding: 0 16px;
+        height: auto;
+        padding: 14px 14px;
+        flex-wrap: wrap;
+        gap: 12px;
     }
-    .vhs-slot {
-        width: 180px;
-        height: 52px;
-    }
-    .vhs-display {
-        font-size: 11px;
-        padding: 5px 10px;
-        letter-spacing: 2px;
-    }
+    .vhs-left { gap: 10px; }
+    .vhs-slot { width: 180px; height: 52px; }
+    .vhs-display { font-size: 11px; padding: 5px 10px; letter-spacing: 2px; }
+    .vhs-btn { width: 32px; height: 32px; font-size: 12px; }
+    .vhs-knob { width: 28px; height: 28px; }
 }
 </style>
 </head>
@@ -320,9 +383,17 @@
 
     <!-- VHS Player -->
     <div class="vhs-body">
+
+        <!-- Left: volume knob + display -->
         <div class="vhs-left">
-            <div class="vhs-display">-- : --</div>
+            <div class="vhs-vol-wrap">
+                <div class="vhs-knob" id="vhsKnob"></div>
+                <span class="vhs-vol-label">Vol</span>
+            </div>
+            <div class="vhs-display" id="vhsDisplay">-- : --</div>
         </div>
+
+        <!-- Center: tape slot -->
         <div class="vhs-center">
             <div class="vhs-slot">
                 <div class="vhs-tape-label">
@@ -330,17 +401,24 @@
                 </div>
             </div>
         </div>
+
+        <!-- Right: transport buttons -->
         <div class="vhs-right">
-            <div class="vhs-vents">
-                <span></span><span></span><span></span><span></span><span></span>
+            <div class="vhs-controls">
+                <button class="vhs-btn vhs-btn-play"  id="vhsPlay"  title="Play">&#9654;</button>
+                <button class="vhs-btn vhs-btn-pause" id="vhsPause" title="Pause">&#9646;&#9646;</button>
+                <button class="vhs-btn vhs-btn-stop"  id="vhsStop"  title="Stop">&#9632;</button>
+                <button class="vhs-btn vhs-btn-eject" id="vhsEject" title="Eject">&#9650;</button>
             </div>
         </div>
+
     </div>
 
 </div>
 
 <script src="PortfolioGallery.js"></script>
 <script>
+/* ── Static + glitch ── */
 (function () {
     var canvas    = document.getElementById('staticCanvas');
     var ctx       = canvas.getContext('2d');
@@ -356,37 +434,26 @@
     window.addEventListener('resize', resizeCanvas);
 
     function drawStatic() {
-        var w = canvas.width;
-        var h = canvas.height;
+        var w = canvas.width, h = canvas.height;
         if (!w || !h) { requestAnimationFrame(drawStatic); return; }
-
         var imageData = ctx.createImageData(w, h);
         var data = imageData.data;
-
         for (var i = 0; i < data.length; i += 4) {
             var v = (Math.random() * 255) | 0;
-            data[i]   = v * 0.82;
-            data[i+1] = v * 0.93;
-            data[i+2] = v;
-            data[i+3] = 255;
+            data[i] = v * 0.82; data[i+1] = v * 0.93; data[i+2] = v; data[i+3] = 255;
         }
-
         if (isGlitching) {
             var bandY = (Math.random() * h) | 0;
             var bandH = ((Math.random() * 24) + 4) | 0;
             var shift = (((Math.random() - 0.5) * 50)) | 0;
             for (var y = bandY; y < Math.min(bandY + bandH, h); y++) {
                 for (var x = 0; x < w; x++) {
-                    var srcX = Math.min(w - 1, Math.max(0, x + shift));
-                    var dst  = (y * w + x) * 4;
-                    var src  = (y * w + srcX) * 4;
-                    data[dst]   = data[src];
-                    data[dst+1] = data[src+1];
-                    data[dst+2] = data[src+2];
+                    var srcX = Math.min(w-1, Math.max(0, x + shift));
+                    var dst = (y*w+x)*4, src = (y*w+srcX)*4;
+                    data[dst]=data[src]; data[dst+1]=data[src+1]; data[dst+2]=data[src+2];
                 }
             }
         }
-
         ctx.putImageData(imageData, 0, 0);
         requestAnimationFrame(drawStatic);
     }
@@ -395,22 +462,68 @@
     function triggerGlitch() {
         isGlitching = true;
         screen.classList.add('glitching');
-
-        glitchBar.style.top     = (Math.random() * 80) + '%';
-        glitchBar.style.height  = ((Math.random() * 14) + 3) + 'px';
-        glitchBar.style.opacity = '1';
-        glitchBar.style.transform = 'translateX(' + (((Math.random() - 0.5) * 24) | 0) + 'px)';
-
-        var duration = 80 + (Math.random() * 220);
+        glitchBar.style.top       = (Math.random() * 80) + '%';
+        glitchBar.style.height    = ((Math.random() * 14) + 3) + 'px';
+        glitchBar.style.opacity   = '1';
+        glitchBar.style.transform = 'translateX(' + (((Math.random()-0.5)*24)|0) + 'px)';
+        var dur = 80 + Math.random() * 220;
         setTimeout(function () {
             isGlitching = false;
             screen.classList.remove('glitching');
             glitchBar.style.opacity = '0';
-        }, duration);
-
+        }, dur);
         setTimeout(triggerGlitch, 1500 + Math.random() * 5000);
     }
     setTimeout(triggerGlitch, 600 + Math.random() * 1500);
+}());
+
+/* ── Volume knob drag ── */
+(function () {
+    var knob     = document.getElementById('vhsKnob');
+    var rotation = -130;
+    var dragging = false;
+    var lastY    = 0;
+
+    function setRotation(r) {
+        rotation = Math.max(-130, Math.min(130, r));
+        knob.style.transform = 'rotate(' + rotation + 'deg)';
+    }
+
+    knob.addEventListener('mousedown', function (e) {
+        dragging = true; lastY = e.clientY; e.preventDefault();
+    });
+    document.addEventListener('mousemove', function (e) {
+        if (!dragging) return;
+        setRotation(rotation + (lastY - e.clientY));
+        lastY = e.clientY;
+    });
+    document.addEventListener('mouseup', function () { dragging = false; });
+
+    knob.addEventListener('touchstart', function (e) {
+        dragging = true; lastY = e.touches[0].clientY; e.preventDefault();
+    }, { passive: false });
+    document.addEventListener('touchmove', function (e) {
+        if (!dragging) return;
+        setRotation(rotation + (lastY - e.touches[0].clientY));
+        lastY = e.touches[0].clientY;
+    });
+    document.addEventListener('touchend', function () { dragging = false; });
+}());
+
+/* ── Transport buttons (wired up when tapes are added) ── */
+(function () {
+    document.getElementById('vhsPlay').addEventListener('click', function () {
+        /* play action — wired when tapes are added */
+    });
+    document.getElementById('vhsPause').addEventListener('click', function () {
+        /* pause action */
+    });
+    document.getElementById('vhsStop').addEventListener('click', function () {
+        /* stop action */
+    });
+    document.getElementById('vhsEject').addEventListener('click', function () {
+        /* eject action */
+    });
 }());
 </script>
 </body>
