@@ -6,16 +6,17 @@
 <link rel="stylesheet" type="text/css" href="PortfolioGallery.css">
 <title>Videos — Portfolio</title>
 <style>
-/* ── TV Interface ── */
-.tv-wrapper {
+/* ── Setup container ── */
+.setup-container {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
     padding: 40px 20px 80px;
-    min-height: calc(100vh - 60px);
     box-sizing: border-box;
+    min-height: calc(100vh - 60px);
 }
 
+/* ── TV ── */
 .tv-body {
     width: 1050px;
     max-width: 94vw;
@@ -113,20 +114,111 @@
 
 /* CSS glitch shake */
 @keyframes glitch-shake {
-    0%   { transform: translate(0, 0);    filter: none; }
-    20%  { transform: translate(-4px, 0); filter: hue-rotate(80deg) saturate(4); }
+    0%   { transform: translate(0, 0);     filter: none; }
+    20%  { transform: translate(-4px, 0);  filter: hue-rotate(80deg) saturate(4); }
     40%  { transform: translate(4px, 1px); filter: hue-rotate(160deg) brightness(1.5); }
-    60%  { transform: translate(-2px, 0); filter: brightness(0.5); }
-    80%  { transform: translate(3px, -1px); filter: hue-rotate(240deg); }
-    100% { transform: translate(0, 0);    filter: none; }
+    60%  { transform: translate(-2px, 0);  filter: brightness(0.5); }
+    80%  { transform: translate(3px, -1px);filter: hue-rotate(240deg); }
+    100% { transform: translate(0, 0);     filter: none; }
 }
 
 .tv-screen.glitching {
     animation: glitch-shake 0.12s steps(2) forwards;
 }
 
+/* ── VHS Player ── */
+.vhs-body {
+    width: 1050px;
+    max-width: 94vw;
+    margin-top: 20px;
+    height: 90px;
+    background: linear-gradient(180deg, #242424 0%, #171717 55%, #1e1e1e 100%);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    box-sizing: border-box;
+    box-shadow:
+        0 0 0 2px #2e2e2e,
+        0 0 0 3px #111,
+        0 12px 36px rgba(0,0,0,0.85),
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        inset 0 -1px 0 rgba(0,0,0,0.5);
+    gap: 0;
+}
+
+.vhs-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.vhs-display {
+    background: #070d07;
+    color: #3d9e3d;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    letter-spacing: 3px;
+    padding: 6px 14px;
+    border-radius: 3px;
+    box-shadow:
+        inset 0 2px 6px rgba(0,0,0,0.9),
+        0 0 10px rgba(50,140,50,0.12);
+    text-align: center;
+}
+
+.vhs-center {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.vhs-slot {
+    width: 260px;
+    height: 22px;
+    background: linear-gradient(180deg, #050505 0%, #0d0d0d 100%);
+    border-radius: 3px;
+    box-shadow:
+        inset 0 4px 10px rgba(0,0,0,0.98),
+        inset 0 1px 2px rgba(0,0,0,0.9),
+        0 1px 0 rgba(255,255,255,0.04);
+    position: relative;
+}
+
+.vhs-slot::before {
+    content: '';
+    position: absolute;
+    top: 4px; left: 12px; right: 12px;
+    height: 1px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 1px;
+}
+
+.vhs-right {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.vhs-vents {
+    display: flex;
+    gap: 5px;
+}
+
+.vhs-vents span {
+    display: block;
+    width: 2px;
+    height: 26px;
+    background: #111;
+    border-radius: 1px;
+    box-shadow: 1px 0 0 rgba(255,255,255,0.03);
+}
+
+/* ── Responsive ── */
 @media (max-width: 768px) {
-    .tv-wrapper {
+    .setup-container {
         padding: 20px 10px 60px;
         min-height: auto;
     }
@@ -135,6 +227,18 @@
     }
     .tv-screen {
         aspect-ratio: 4 / 3;
+    }
+    .vhs-body {
+        height: 70px;
+        padding: 0 16px;
+    }
+    .vhs-slot {
+        width: 160px;
+    }
+    .vhs-display {
+        font-size: 11px;
+        padding: 5px 10px;
+        letter-spacing: 2px;
     }
 }
 </style>
@@ -174,8 +278,10 @@
 </ul>
 </nav>
 
-<!-- TV Interface -->
-<div class="tv-wrapper">
+<!-- TV + VHS Setup -->
+<div class="setup-container">
+
+    <!-- TV -->
     <div class="tv-body">
         <div class="tv-screen-bezel">
             <div class="tv-screen" id="tvScreen">
@@ -190,6 +296,22 @@
             <div class="tv-power-light"></div>
         </div>
     </div>
+
+    <!-- VHS Player -->
+    <div class="vhs-body">
+        <div class="vhs-left">
+            <div class="vhs-display">-- : --</div>
+        </div>
+        <div class="vhs-center">
+            <div class="vhs-slot"></div>
+        </div>
+        <div class="vhs-right">
+            <div class="vhs-vents">
+                <span></span><span></span><span></span><span></span><span></span>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script src="PortfolioGallery.js"></script>
