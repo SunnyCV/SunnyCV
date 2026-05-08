@@ -5,13 +5,291 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link rel="stylesheet" type="text/css" href="PortfolioGallery.css">
 <title>Photos — Portfolio</title>
+<style>
+
+/* ── Base ── */
+body {
+    background-color: #040001 !important;
+    overflow: hidden !important;
+}
+
+/* ── Darkroom scene ── */
+.darkroom {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    overflow: hidden;
+}
+
+.darkroom-glow {
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 900px;
+    height: 560px;
+    background: radial-gradient(ellipse at 50% 28%,
+        rgba(210,12,12,0.24) 0%,
+        rgba(130,0,0,0.10)   38%,
+        transparent          65%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.darkroom-counter {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 72px 20px 88px;
+    background: linear-gradient(180deg, transparent 0%, rgba(6,1,1,0.88) 20%, #080101 100%);
+    border-top: 1px solid rgba(110,14,14,0.38);
+}
+
+/* ── Polaroid pile ── */
+.polaroid-pile {
+    position: relative;
+    width: 210px;
+    height: 250px;
+    cursor: pointer;
+}
+
+.pile-card {
+    position: absolute;
+    width: 186px;
+    height: 218px;
+    background: #f4f2ed;
+    padding: 11px 11px 46px;
+    box-shadow: 0 5px 22px rgba(0,0,0,0.82);
+    transition: transform 0.3s cubic-bezier(0.2,0,0.2,1), box-shadow 0.3s;
+}
+
+.pile-card-photo {
+    width: 100%;
+    height: 100%;
+    background: #ddd8d0;
+}
+
+.pile-card:nth-child(1) { transform: rotate(-15deg) translate(-8px,  9px); z-index: 1; }
+.pile-card:nth-child(2) { transform: rotate( 12deg) translate(11px,  6px); z-index: 2; }
+.pile-card:nth-child(3) { transform: rotate( -7deg) translate(-5px,  4px); z-index: 3; }
+.pile-card:nth-child(4) { transform: rotate(  8deg) translate( 7px,  3px); z-index: 4; }
+.pile-card:nth-child(5) { transform: rotate( -3deg) translate(-3px,  1px); z-index: 5; }
+.pile-card:nth-child(6) { transform: rotate(  2deg) translate( 0px,  0px); z-index: 6; }
+
+.polaroid-pile:hover .pile-card:nth-child(6) {
+    transform: rotate(2deg) translate(0px, -18px);
+    box-shadow: 0 26px 64px rgba(0,0,0,0.96), 0 0 32px rgba(190,0,0,0.14);
+}
+
+.pile-hint {
+    margin-top: 30px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: rgba(165,48,48,0.52);
+    text-transform: uppercase;
+    text-align: center;
+    pointer-events: none;
+    transition: color 0.22s;
+}
+.polaroid-pile:hover + .pile-hint { color: rgba(210,75,75,0.8); }
+
+/* ── Gallery overlay ── */
+.photo-gallery {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    background: #040001;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.38s;
+    overflow: hidden;
+}
+.photo-gallery.open { opacity: 1; pointer-events: all; }
+
+.gallery-header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 28px 14px;
+    border-bottom: 1px solid rgba(105,14,14,0.38);
+}
+
+.gallery-title {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 5px;
+    color: rgba(190,52,52,0.62);
+    text-transform: uppercase;
+}
+
+.gallery-close {
+    background: none; border: none;
+    color: rgba(180,180,180,0.48);
+    font-size: 28px; cursor: pointer;
+    line-height: 1; padding: 0 4px;
+    font-family: Arial, sans-serif;
+    transition: color 0.15s;
+}
+.gallery-close:hover { color: white; }
+
+.gallery-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 44px 44px 64px;
+}
+.gallery-body::-webkit-scrollbar { width: 5px; }
+.gallery-body::-webkit-scrollbar-track { background: #0a0101; }
+.gallery-body::-webkit-scrollbar-thumb { background: #3c0a0a; border-radius: 3px; }
+
+.gallery-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 38px 26px;
+    justify-content: center;
+}
+
+/* ── Gallery polaroids ── */
+.gallery-polaroid {
+    background: #f4f2ed;
+    padding: 10px 10px 42px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.86);
+    cursor: pointer;
+    flex-shrink: 0;
+    width: 168px;
+    transform: rotate(var(--rot, 0deg));
+    transition: transform 0.22s cubic-bezier(0.2,0,0.2,1), box-shadow 0.22s;
+}
+.gallery-polaroid:hover {
+    transform: rotate(var(--rot, 0deg)) translateY(-12px) scale(1.05);
+    box-shadow: 0 24px 58px rgba(0,0,0,0.95), 0 0 24px rgba(180,0,0,0.1);
+}
+
+.polaroid-img-wrap {
+    width: 148px;
+    height: 148px;
+    overflow: hidden;
+    background: #1c0808;
+}
+
+.polaroid-img-wrap img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+    filter: brightness(0) sepia(1);
+    transition: filter 2s ease;
+}
+.gallery-polaroid.developed img {
+    filter: brightness(1) sepia(0);
+}
+
+.polaroid-caption {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #5e5e5e;
+    text-align: center;
+    margin-top: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── Lightbox ── */
+.photo-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 1500;
+    background: rgba(2,0,0,0.96);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s;
+}
+.photo-lightbox.open { opacity: 1; pointer-events: all; }
+
+.lightbox-close {
+    position: absolute;
+    top: 18px; right: 24px;
+    background: none; border: none;
+    color: rgba(200,200,200,0.48);
+    font-size: 32px; cursor: pointer;
+    line-height: 1; padding: 0;
+    font-family: Arial, sans-serif;
+    transition: color 0.15s; z-index: 10;
+}
+.lightbox-close:hover { color: white; }
+
+.lightbox-nav {
+    background: none; border: none;
+    color: rgba(200,200,200,0.28);
+    font-size: 56px; cursor: pointer;
+    line-height: 1; padding: 0 6px;
+    font-family: Arial, sans-serif;
+    transition: color 0.15s;
+    user-select: none; flex-shrink: 0;
+}
+.lightbox-nav:hover { color: rgba(255,255,255,0.88); }
+
+.lightbox-polaroid {
+    background: #f4f2ed;
+    padding: 14px 14px 58px;
+    box-shadow: 0 28px 100px rgba(0,0,0,0.98), 0 0 44px rgba(180,0,0,0.07);
+    width: min(360px, 78vw);
+    flex-shrink: 0;
+}
+
+.lightbox-img-wrap {
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: #1c0808;
+}
+
+.lightbox-img-wrap img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+}
+
+.lightbox-caption {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #5e5e5e;
+    text-align: center;
+    margin-top: 16px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .darkroom { height: calc(100vh - 48px); }
+    .darkroom-counter { padding: 44px 16px 64px; }
+    .polaroid-pile { width: 168px; height: 202px; }
+    .pile-card { width: 150px; height: 176px; padding: 9px 9px 36px; }
+    .gallery-body { padding: 24px 14px 40px; }
+    .gallery-grid { gap: 22px 12px; }
+    .gallery-polaroid { width: 136px; padding: 8px 8px 32px; }
+    .polaroid-img-wrap { width: 120px; height: 120px; }
+    .lightbox-nav { font-size: 40px; padding: 0 4px; }
+    .lightbox-polaroid { padding: 10px 10px 44px; }
+}
+
+</style>
 </head>
 <body>
-
-<video autoplay muted loop playsinline
-    style="position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:-1;transform:translateZ(0);will-change:transform;">
-    <source src="insert here" type="video/mp4">
-</video>
 
 <!-- Mobile Header Bar -->
 <div class="mobile-header" id="mobileHeader">
@@ -41,34 +319,157 @@
 </ul>
 </nav>
 
-<div class="centered-container">
-    <div class="image-container">
-        <div class="scrollable-images">
-            <!-- Content goes here -->
+<!-- Darkroom -->
+<div class="darkroom">
+    <div class="darkroom-glow"></div>
+
+    <div class="darkroom-counter">
+        <div class="polaroid-pile" id="polaroidPile">
+            <div class="pile-card"><div class="pile-card-photo"></div></div>
+            <div class="pile-card"><div class="pile-card-photo"></div></div>
+            <div class="pile-card"><div class="pile-card-photo"></div></div>
+            <div class="pile-card"><div class="pile-card-photo"></div></div>
+            <div class="pile-card"><div class="pile-card-photo"></div></div>
+            <div class="pile-card"><div class="pile-card-photo"></div></div>
         </div>
+        <p class="pile-hint">Click to browse</p>
     </div>
 </div>
 
-<!-- Mobile nav arrows -->
-<div class="gallery-nav-arrows">
-    <button class="gallery-arrow-btn" id="galleryPrevBtn">&#8592;</button>
-    <button class="gallery-arrow-btn" id="galleryNextBtn">&#8594;</button>
+<!-- Gallery overlay -->
+<div class="photo-gallery" id="photoGallery">
+    <div class="gallery-header">
+        <span class="gallery-title">Photos</span>
+        <button class="gallery-close" id="galleryClose">&times;</button>
+    </div>
+    <div class="gallery-body">
+        <div class="gallery-grid" id="galleryGrid"></div>
+    </div>
 </div>
 
-<!-- Modal -->
-<div id="myModal" class="modal">
-    <button class="close" onclick="closeModal()">&times;</button>
-    <img class="modal-content" id="modalImage" alt="">
-    <div id="caption"></div>
+<!-- Lightbox -->
+<div class="photo-lightbox" id="photoLightbox">
+    <button class="lightbox-close" id="lightboxClose">&times;</button>
+    <button class="lightbox-nav" id="lightboxPrev">&#8249;</button>
+    <div class="lightbox-polaroid">
+        <div class="lightbox-img-wrap">
+            <img id="lightboxImg" src="" alt="">
+        </div>
+        <div class="lightbox-caption" id="lightboxCaption"></div>
+    </div>
+    <button class="lightbox-nav" id="lightboxNext">&#8250;</button>
 </div>
-
-<!-- Standalone mobile close button -->
-<button id="mobileModalClose" onclick="closeModal()"
-    style="display:none; position:fixed; top:58px; right:14px; z-index:2000;
-    background:none; border:none; color:#fff; font-size:26px; font-weight:bold;
-    cursor:pointer; padding:6px 10px; line-height:1; -webkit-appearance:none;
-    text-shadow:0 1px 6px rgba(0,0,0,0.9);">&times;</button>
 
 <script src="PortfolioGallery.js"></script>
+<script>
+(function () {
+
+    var photos = [
+        { src: 'insert here', caption: '' },
+        { src: 'insert here', caption: '' },
+        { src: 'insert here', caption: '' },
+        { src: 'insert here', caption: '' },
+        { src: 'insert here', caption: '' },
+        { src: 'insert here', caption: '' },
+        { src: 'insert here', caption: '' },
+        { src: 'insert here', caption: '' },
+        { src: 'insert here', caption: '' },
+        { src: 'insert here', caption: '' },
+    ];
+
+    var gallery    = document.getElementById('photoGallery');
+    var grid       = document.getElementById('galleryGrid');
+    var lightbox   = document.getElementById('photoLightbox');
+    var lbImg      = document.getElementById('lightboxImg');
+    var lbCaption  = document.getElementById('lightboxCaption');
+    var pile       = document.getElementById('polaroidPile');
+    var currentIdx = 0;
+    var devTimers  = [];
+    var rotations  = [-7, 5, -4, 8, -6, 3, -9, 6, -3, 7];
+
+    /* Build gallery grid */
+    photos.forEach(function (photo, i) {
+        var pol = document.createElement('div');
+        pol.className = 'gallery-polaroid';
+        pol.style.setProperty('--rot', rotations[i % rotations.length] + 'deg');
+
+        var wrap = document.createElement('div');
+        wrap.className = 'polaroid-img-wrap';
+
+        var img = document.createElement('img');
+        if (photo.src !== 'insert here') img.src = photo.src;
+        img.alt = photo.caption || '';
+        wrap.appendChild(img);
+
+        var cap = document.createElement('div');
+        cap.className = 'polaroid-caption';
+        cap.textContent = photo.caption;
+
+        pol.appendChild(wrap);
+        pol.appendChild(cap);
+        pol.addEventListener('click', function () { openLightbox(i); });
+        grid.appendChild(pol);
+    });
+
+    /* Open gallery — staggered develop animation */
+    function openGallery() {
+        gallery.classList.add('open');
+        devTimers.forEach(clearTimeout);
+        devTimers = [];
+        var cards = grid.querySelectorAll('.gallery-polaroid');
+        cards.forEach(function (c) { c.classList.remove('developed'); });
+        cards.forEach(function (c, i) {
+            devTimers.push(setTimeout(function () {
+                c.classList.add('developed');
+            }, 200 + i * 220));
+        });
+    }
+
+    function closeGallery() {
+        gallery.classList.remove('open');
+    }
+
+    /* Lightbox */
+    function openLightbox(idx) {
+        currentIdx = idx;
+        var p = photos[idx];
+        lbImg.src = p.src !== 'insert here' ? p.src : '';
+        lbCaption.textContent = p.caption;
+        lightbox.classList.add('open');
+    }
+
+    function closeLightbox() {
+        lightbox.classList.remove('open');
+    }
+
+    function navigate(dir) {
+        currentIdx = (currentIdx + dir + photos.length) % photos.length;
+        var p = photos[currentIdx];
+        lbImg.src = p.src !== 'insert here' ? p.src : '';
+        lbCaption.textContent = p.caption;
+    }
+
+    /* Event listeners */
+    pile.addEventListener('click', openGallery);
+    document.getElementById('galleryClose').addEventListener('click', closeGallery);
+    document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+    document.getElementById('lightboxPrev').addEventListener('click', function () { navigate(-1); });
+    document.getElementById('lightboxNext').addEventListener('click', function () { navigate(1); });
+    lightbox.addEventListener('click', function (e) {
+        if (e.target === lightbox) closeLightbox();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (lightbox.classList.contains('open')) {
+            if (e.key === 'ArrowLeft')  navigate(-1);
+            if (e.key === 'ArrowRight') navigate(1);
+            if (e.key === 'Escape')     closeLightbox();
+        } else if (gallery.classList.contains('open')) {
+            if (e.key === 'Escape') closeGallery();
+        }
+    });
+
+}());
+</script>
 </body>
 </html>
