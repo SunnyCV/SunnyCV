@@ -881,7 +881,7 @@
         rwBtn.classList.add('held');
         rwInterval = setInterval(function () {
             if (video.currentTime <= 0) { stopRW(); return; }
-            video.currentTime = Math.max(0, video.currentTime - 1);
+            video.currentTime = Math.max(0, video.currentTime - 0.4);
         }, 50);
     }
     function stopRW() {
