@@ -121,6 +121,48 @@
 }
 .tv-fullscreen-btn:hover { background: rgba(0,0,0,0.8); border-color: rgba(255,255,255,0.4); opacity: 1; }
 
+/* Volume meter overlay */
+.vol-meter {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    background: rgba(0,0,0,0.72);
+    padding: 8px 10px 7px;
+    border-radius: 4px;
+    border: 1px solid rgba(61,158,61,0.3);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+}
+.vol-meter.visible { opacity: 1; }
+.vol-meter-label {
+    font-family: 'Courier New', monospace;
+    font-size: 7px;
+    letter-spacing: 3px;
+    color: #3d9e3d;
+    text-transform: uppercase;
+}
+.vol-meter-bars {
+    display: flex;
+    gap: 3px;
+    align-items: flex-end;
+}
+.vol-bar {
+    width: 5px;
+    height: 14px;
+    background: #102210;
+    border-radius: 1px;
+    transition: background 0.1s;
+}
+.vol-bar.on { background: #3d9e3d; }
+.vol-bar.on.hi { background: #bfa030; }
+.vol-bar.on.peak { background: #c84040; }
+
 .tv-bottom {
     display: flex;
     align-items: center;
@@ -332,8 +374,10 @@
 }
 .vhs-btn:hover { filter: brightness(1.35); }
 
+.vhs-btn-rw    { color: #9a9a4e; font-size: 11px; }
 .vhs-btn-play  { color: #4e9a4e; }
 .vhs-btn-pause { color: #9a9a4e; }
+.vhs-btn-ff    { color: #9a9a4e; font-size: 11px; }
 .vhs-btn-stop  { color: #9a4e4e; }
 .vhs-btn-eject { color: #6a8a9a; }
 
@@ -540,6 +584,11 @@
                 <div class="tv-scanlines"></div>
                 <div class="tv-vignette"></div>
                 <div class="tv-glitch-bar" id="glitchBar"></div>
+                <!-- Volume meter -->
+                <div class="vol-meter" id="volMeter">
+                    <div class="vol-meter-label">VOL</div>
+                    <div class="vol-meter-bars" id="volBars"></div>
+                </div>
                 <!-- Fullscreen button -->
                 <button class="tv-fullscreen-btn" id="tvFullscreenBtn" title="Fullscreen">
                     <svg id="fsIcon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.8)">
@@ -578,8 +627,10 @@
 
         <div class="vhs-right">
             <div class="vhs-controls">
+                <button class="vhs-btn vhs-btn-rw"    id="vhsRW"    title="Rewind 10s">&#9664;&#9664;</button>
                 <button class="vhs-btn vhs-btn-play"  id="vhsPlay"  title="Play">&#9654;</button>
                 <button class="vhs-btn vhs-btn-pause" id="vhsPause" title="Pause">&#9646;&#9646;</button>
+                <button class="vhs-btn vhs-btn-ff"    id="vhsFF"    title="Fast Forward 10s">&#9654;&#9654;</button>
                 <button class="vhs-btn vhs-btn-stop"  id="vhsStop"  title="Stop">&#9632;</button>
                 <button class="vhs-btn vhs-btn-eject" id="vhsEject" title="Eject">&#9650;</button>
                 <div class="vhs-divider"></div>
@@ -660,8 +711,8 @@
 /* ── Tape system ── */
 (function () {
     var tapes = [
-        { title: 'Video 01', src: 'insert here', labelBg: '#4a1212', labelColor: '#f5c8c8' },
-        { title: 'Video 02', src: 'insert here', labelBg: '#12244a', labelColor: '#c8d4f5' },
+        { title: 'Promo Video #1', src: 'PORTFOLIO/Videos/Promo 1.mp4', labelBg: '#4a1212', labelColor: '#f5c8c8' },
+        { title: 'Promo Video #2', src: 'PORTFOLIO/Videos/Promo 2.mp4', labelBg: '#12244a', labelColor: '#c8d4f5' },
         { title: 'Video 03', src: 'insert here', labelBg: '#124a22', labelColor: '#c8f5d4' },
         { title: 'Video 04', src: 'insert here', labelBg: '#32124a', labelColor: '#e8c8f5' },
         { title: 'Video 05', src: 'insert here', labelBg: '#4a2e12', labelColor: '#f5e0c8' },
@@ -758,16 +809,53 @@
     });
     document.getElementById('vhsEject').addEventListener('click', eject);
 
+    /* Volume meter */
+    var volMeter      = document.getElementById('volMeter');
+    var volBarsEl     = document.getElementById('volBars');
+    var volHideTimer  = null;
+    for (var b = 0; b < 10; b++) {
+        var bar = document.createElement('div');
+        bar.className = 'vol-bar';
+        volBarsEl.appendChild(bar);
+    }
+    function showVolMeter() {
+        var bars   = volBarsEl.querySelectorAll('.vol-bar');
+        var filled = Math.round(volume * 10);
+        bars.forEach(function (bar, idx) {
+            bar.classList.remove('on', 'hi', 'peak');
+            if (idx < filled) {
+                bar.classList.add('on');
+                if (idx >= 9)      bar.classList.add('peak');
+                else if (idx >= 7) bar.classList.add('hi');
+            }
+        });
+        volMeter.classList.add('visible');
+        clearTimeout(volHideTimer);
+        volHideTimer = setTimeout(function () { volMeter.classList.remove('visible'); }, 2000);
+    }
+
     /* Volume */
     var volume = 0.8;
     video.volume = volume;
     document.getElementById('vhsVolUp').addEventListener('click', function () {
         volume = Math.min(1, parseFloat((volume + 0.1).toFixed(1)));
         video.volume = volume;
+        showVolMeter();
     });
     document.getElementById('vhsVolDown').addEventListener('click', function () {
         volume = Math.max(0, parseFloat((volume - 0.1).toFixed(1)));
         video.volume = volume;
+        showVolMeter();
+    });
+
+    /* FF / RW */
+    document.getElementById('vhsRW').addEventListener('click', function () {
+        if (video.src && video.src !== window.location.href)
+            video.currentTime = Math.max(0, video.currentTime - 10);
+    });
+    document.getElementById('vhsFF').addEventListener('click', function () {
+        if (video.src && video.src !== window.location.href)
+            video.currentTime = Math.min(video.duration || 0, video.currentTime + 10);
     });
 }());
 
