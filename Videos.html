@@ -240,16 +240,29 @@
 .vhs-center { flex: 0 0 auto; }
 
 .vhs-slot {
-    width: 320px;
-    height: 68px;
-    background: linear-gradient(180deg, #050505 0%, #0d0d0d 100%);
-    border-radius: 4px;
-    box-shadow: inset 0 4px 12px rgba(0,0,0,0.98), inset 0 1px 2px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.04);
+    width: 400px;
+    height: 72px;
+    background: linear-gradient(180deg, #030303 0%, #0a0a0a 100%);
+    border-radius: 3px;
+    box-shadow: inset 0 5px 16px rgba(0,0,0,0.99), inset 0 1px 2px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.04);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    position: relative;
 }
+
+/* Guide rails at top and bottom of slot */
+.vhs-slot::before,
+.vhs-slot::after {
+    content: '';
+    position: absolute;
+    left: 10px; right: 10px;
+    height: 1px;
+    background: rgba(255,255,255,0.04);
+}
+.vhs-slot::before { top: 6px; }
+.vhs-slot::after  { bottom: 6px; }
 
 .vhs-tape-label {
     width: 88%;
@@ -352,7 +365,7 @@
     box-shadow: 0 16px 40px rgba(0,0,0,0.9), 0 0 0 2px #222, 0 0 0 3px #111;
 }
 .tape-drawer.open {
-    max-height: 200px;
+    max-height: 220px;
     padding: 22px 24px;
 }
 
@@ -369,55 +382,79 @@
 /* ── VHS Cassette ── */
 .vhs-cassette {
     flex-shrink: 0;
-    width: 128px;
-    height: 90px;
-    background: linear-gradient(170deg, #202020 0%, #121212 100%);
-    border-radius: 4px 4px 6px 6px;
+    width: 172px;
+    height: 108px;
+    background: linear-gradient(175deg, #222 0%, #111 100%);
+    border-radius: 3px 3px 5px 5px;
     position: relative;
     cursor: pointer;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.8), 0 0 0 1px #2a2a2a, inset 0 1px 0 rgba(255,255,255,0.05);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.85), 0 0 0 1px #2a2a2a, inset 0 1px 0 rgba(255,255,255,0.05);
     transition: transform 0.2s, box-shadow 0.2s;
     user-select: none;
 }
 .vhs-cassette:hover {
     transform: translateY(-6px);
-    box-shadow: 0 12px 28px rgba(0,0,0,0.9), 0 0 0 1px #333, inset 0 1px 0 rgba(255,255,255,0.08);
+    box-shadow: 0 14px 30px rgba(0,0,0,0.9), 0 0 0 1px #383838, inset 0 1px 0 rgba(255,255,255,0.08);
 }
 .vhs-cassette.active {
     transform: translateY(-8px);
-    box-shadow: 0 16px 34px rgba(0,0,0,0.95), 0 0 0 1px #555, inset 0 1px 0 rgba(255,255,255,0.1);
+    box-shadow: 0 18px 36px rgba(0,0,0,0.95), 0 0 0 1px #555, inset 0 1px 0 rgba(255,255,255,0.1);
 }
 
+/* Tape window — wide, spans most of the cassette */
 .cassette-window {
     position: absolute;
     top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 82px;
-    height: 22px;
-    background: #050505;
+    left: 10px;
+    right: 10px;
+    height: 36px;
+    background: #040404;
     border-radius: 2px;
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.95);
+    box-shadow: inset 0 3px 8px rgba(0,0,0,0.98), inset 0 0 1px rgba(255,255,255,0.03);
     display: flex;
     align-items: center;
-    justify-content: space-around;
-    padding: 0 10px;
+    justify-content: space-between;
+    padding: 0 16px;
+}
+
+/* Tape path line between reels */
+.cassette-window::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 38px; right: 38px;
+    height: 1px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 1px;
 }
 
 .cassette-reel {
-    width: 13px;
-    height: 13px;
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #282828, #070707);
-    box-shadow: 0 0 0 1px #1e1e1e, inset 0 0 0 3px #090909;
+    background: radial-gradient(circle at 38% 36%, #303030, #060606);
+    box-shadow: 0 0 0 1px #252525, inset 0 0 0 5px #080808, inset 0 0 0 6px #222;
+    position: relative;
 }
 
+/* Reel hub dot */
+.cassette-reel::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #1a1a1a;
+}
+
+/* Cassette label */
 .cassette-label {
     position: absolute;
-    bottom: 9px;
-    left: 7px;
-    right: 7px;
-    height: 34px;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
+    height: 40px;
     border-radius: 2px;
     display: flex;
     align-items: center;
@@ -432,7 +469,7 @@
     letter-spacing: 2px;
     text-transform: uppercase;
     text-align: center;
-    padding: 0 4px;
+    padding: 0 6px;
 }
 
 /* ── Responsive ── */
@@ -447,10 +484,10 @@
     .vhs-btn { width: 32px; height: 32px; font-size: 12px; }
     .tape-drawer { padding: 0 14px; }
     .tape-drawer.open { padding: 16px 14px; }
-    .vhs-cassette { width: 100px; height: 72px; }
-    .cassette-window { width: 64px; height: 18px; }
-    .cassette-reel { width: 10px; height: 10px; }
-    .cassette-label { height: 26px; bottom: 7px; }
+    .vhs-cassette { width: 134px; height: 86px; }
+    .cassette-window { height: 28px; top: 8px; left: 8px; right: 8px; padding: 0 12px; }
+    .cassette-reel { width: 17px; height: 17px; }
+    .cassette-label { height: 30px; bottom: 7px; left: 6px; right: 6px; }
     .cassette-label-text { font-size: 8px; }
 }
 </style>
