@@ -7,477 +7,616 @@
 <title>Photos — Portfolio</title>
 <style>
 
-/* ── Base ── */
+/* ── Page: 2000s modernism aesthetic ── */
 body {
-    background-color: #040001 !important;
+    background: radial-gradient(ellipse at 50% 35%, #f4f4f4 0%, #dcdcdc 100%) !important;
     overflow: hidden !important;
+    min-height: 100vh;
 }
 
-/* ── Darkroom scene ── */
-.darkroom {
-    position: relative;
+/* Nav overrides for light background */
+nav li a { color: #222 !important; }
+li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
+.mobile-header {
+    background-color: #d8d8d8 !important;
+    border-bottom: 1px solid #bbb !important;
+}
+.mobile-header-hamburger { color: #333 !important; }
+.mobile-nav-menu {
+    background-color: #e4e4e4 !important;
+    border-right: 1px solid #ccc !important;
+}
+.mobile-nav-menu a { color: #222 !important; border-bottom: 1px solid #ccc !important; }
+.mobile-nav-overlay { background: rgba(0,0,0,0.25) !important; }
+
+/* ── Layout ── */
+.cam-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
-    overflow: hidden;
+    gap: 24px;
+    padding: 12px 16px;
+    box-sizing: border-box;
 }
 
-.darkroom-glow {
-    position: absolute;
-    top: -100px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 900px;
-    height: 560px;
-    background: radial-gradient(ellipse at 50% 28%,
-        rgba(210,12,12,0.24) 0%,
-        rgba(130,0,0,0.10)   38%,
-        transparent          65%);
-    pointer-events: none;
-    z-index: 0;
-}
-
-.darkroom-counter {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 72px 20px 88px;
-    background:
-        /* Safelight bleed along top edge */
-        radial-gradient(ellipse 65% 28% at 50% 0%, rgba(190,28,28,0.13) 0%, transparent 100%),
-        /* Subtle wood grain lines */
-        repeating-linear-gradient(
-            91deg,
-            transparent 0px,
-            transparent 56px,
-            rgba(0,0,0,0.18) 56px,
-            rgba(0,0,0,0.18) 58px,
-            transparent 58px,
-            transparent 82px,
-            rgba(190,110,30,0.04) 82px,
-            rgba(190,110,30,0.04) 83px
-        ),
-        /* Dark walnut base */
-        linear-gradient(180deg, #1c0e06 0%, #140a04 60%, #0f0703 100%);
-    border-top: 2px solid #2e1208;
-    box-shadow:
-        inset 0 2px 0 rgba(255,255,255,0.025),
-        0 -12px 40px rgba(0,0,0,0.7);
-}
-
-/* ── Polaroid pile ── */
-.polaroid-pile {
-    position: relative;
-    width: 210px;
-    height: 250px;
-    cursor: pointer;
-}
-
-.pile-card {
-    position: absolute;
-    width: 186px;
-    height: 218px;
-    background: #f4f2ed;
-    padding: 11px 11px 46px;
-    box-shadow: 0 5px 22px rgba(0,0,0,0.82);
-    transition: transform 0.3s cubic-bezier(0.2,0,0.2,1), box-shadow 0.3s;
-}
-
-.pile-card-photo {
-    width: 100%;
-    height: 100%;
-    background: #ddd8d0;
-}
-
-.pile-card:nth-child(1) { transform: rotate(-15deg) translate(-8px,  9px); z-index: 1; }
-.pile-card:nth-child(2) { transform: rotate( 12deg) translate(11px,  6px); z-index: 2; }
-.pile-card:nth-child(3) { transform: rotate( -7deg) translate(-5px,  4px); z-index: 3; }
-.pile-card:nth-child(4) { transform: rotate(  8deg) translate( 7px,  3px); z-index: 4; }
-.pile-card:nth-child(5) { transform: rotate( -3deg) translate(-3px,  1px); z-index: 5; }
-.pile-card:nth-child(6) { transform: rotate(  2deg) translate( 0px,  0px); z-index: 6; }
-
-.polaroid-pile:hover .pile-card:nth-child(6) {
-    transform: rotate(2deg) translate(0px, -18px);
-    box-shadow: 0 26px 64px rgba(0,0,0,0.96), 0 0 32px rgba(190,0,0,0.14);
-}
-
-.pile-hint {
-    margin-top: 30px;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 9px;
-    letter-spacing: 4px;
-    color: rgba(165,48,48,0.52);
-    text-transform: uppercase;
-    text-align: center;
-    pointer-events: none;
-    transition: color 0.22s;
-}
-.polaroid-pile:hover + .pile-hint { color: rgba(210,75,75,0.8); }
-
-/* ── Gallery overlay ── */
-.photo-gallery {
-    position: fixed;
-    inset: 0;
-    z-index: 1200;
-    background: #040001;
-    display: flex;
-    flex-direction: column;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.38s;
-    overflow: hidden;
-}
-.photo-gallery.open { opacity: 1; pointer-events: all; }
-
-.gallery-header {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 18px 28px 14px;
-    border-bottom: 1px solid rgba(105,14,14,0.38);
-}
-
-.gallery-title {
+.cam-prompt {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 11px;
-    letter-spacing: 5px;
-    color: rgba(190,52,52,0.62);
+    letter-spacing: 4px;
     text-transform: uppercase;
+    color: #999;
+    margin: 0;
+    user-select: none;
+    transition: color 0.2s;
 }
 
-.gallery-close {
-    background: none; border: none;
-    color: rgba(180,180,180,0.48);
-    font-size: 28px; cursor: pointer;
-    line-height: 1; padding: 0 4px;
-    font-family: Arial, sans-serif;
-    transition: color 0.15s;
-}
-.gallery-close:hover { color: white; }
+/* ── 3D Flip Scene ── */
+.cam-scene { perspective: 1400px; }
 
-.gallery-body {
-    flex: 1;
-    overflow-y: auto;
-    padding: 44px 44px 64px;
-}
-.gallery-body::-webkit-scrollbar { width: 5px; }
-.gallery-body::-webkit-scrollbar-track { background: #0a0101; }
-.gallery-body::-webkit-scrollbar-thumb { background: #3c0a0a; border-radius: 3px; }
-
-.gallery-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 38px 26px;
-    justify-content: center;
-}
-
-/* ── Gallery polaroids ── */
-.gallery-polaroid {
-    background: #f4f2ed;
-    padding: 10px 10px 42px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.86);
-    cursor: pointer;
-    flex-shrink: 0;
-    width: 168px;
-    transform: rotate(var(--rot, 0deg));
-    transition: transform 0.22s cubic-bezier(0.2,0,0.2,1), box-shadow 0.22s;
-}
-.gallery-polaroid:hover {
-    transform: rotate(var(--rot, 0deg)) translateY(-12px) scale(1.05);
-    box-shadow: 0 24px 58px rgba(0,0,0,0.95), 0 0 24px rgba(180,0,0,0.1);
-}
-
-.polaroid-img-wrap {
-    width: 148px;
-    height: 148px;
-    overflow: hidden;
-    background: #1c0808;
-}
-
-.polaroid-img-wrap img {
-    width: 100%; height: 100%;
-    object-fit: cover; display: block;
-    filter: brightness(0) sepia(1);
-    transition: filter 2s ease;
-}
-.gallery-polaroid.developed img {
-    filter: brightness(1) sepia(0);
-}
-
-.polaroid-caption {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 8px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: #5e5e5e;
-    text-align: center;
-    margin-top: 12px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* ── Lightbox ── */
-.photo-lightbox {
-    position: fixed;
-    inset: 0;
-    z-index: 1500;
-    background: rgba(2,0,0,0.96);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 22px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.28s;
-}
-.photo-lightbox.open { opacity: 1; pointer-events: all; }
-
-.lightbox-close {
-    position: absolute;
-    top: 18px; right: 24px;
-    background: none; border: none;
-    color: rgba(200,200,200,0.48);
-    font-size: 32px; cursor: pointer;
-    line-height: 1; padding: 0;
-    font-family: Arial, sans-serif;
-    transition: color 0.15s; z-index: 10;
-}
-.lightbox-close:hover { color: white; }
-
-.lightbox-nav {
-    background: none; border: none;
-    color: rgba(200,200,200,0.28);
-    font-size: 56px; cursor: pointer;
-    line-height: 1; padding: 0 6px;
-    font-family: Arial, sans-serif;
-    transition: color 0.15s;
-    user-select: none; flex-shrink: 0;
-}
-.lightbox-nav:hover { color: rgba(255,255,255,0.88); }
-
-.lightbox-polaroid {
-    background: #f4f2ed;
-    padding: 14px 14px 58px;
-    box-shadow: 0 28px 100px rgba(0,0,0,0.98), 0 0 44px rgba(180,0,0,0.07);
-    width: min(360px, 78vw);
-    flex-shrink: 0;
-}
-
-.lightbox-img-wrap {
-    width: 100%;
-    aspect-ratio: 1;
-    overflow: hidden;
-    background: #1c0808;
-}
-
-.lightbox-img-wrap img {
-    width: 100%; height: 100%;
-    object-fit: cover; display: block;
-}
-
-.lightbox-caption {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 9px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: #5e5e5e;
-    text-align: center;
-    margin-top: 16px;
-}
-
-/* ── Decorative camera ── */
-.deco-camera {
-    position: absolute;
-    left: max(18px, calc(50% - 282px));
-    bottom: 68px;
-    filter: drop-shadow(0 14px 34px rgba(0,0,0,0.95));
-    z-index: 0;
-}
-
-.cam-body {
-    width: 138px;
-    height: 84px;
-    background: linear-gradient(155deg, #2d2d2d 0%, #1c1c1c 55%, #252525 100%);
-    border-radius: 5px;
+.cam-flip {
+    width: 480px;
+    height: 318px;
     position: relative;
+    transform-style: preserve-3d;
+    transition: transform 1s cubic-bezier(0.42, 0, 0.18, 1);
+    cursor: pointer;
+}
+.cam-flip.flipped { transform: rotateX(180deg); }
+
+.cam-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+
+/* ══════════════════ FRONT FACE ══════════════════ */
+.cam-face-front {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(158deg, #dadadа 0%, #c4c4c4 55%, #cdcdcd 100%);
+    background: linear-gradient(158deg, #dadada 0%, #c4c4c4 55%, #cdcdcd 100%);
     box-shadow:
-        0 0 0 1px #111,
-        inset 0 1px 0 rgba(255,255,255,0.05),
-        inset 0 -2px 0 rgba(0,0,0,0.45);
+        0 0 0 1px #aaa,
+        0 22px 64px rgba(0,0,0,0.28),
+        inset 0 1px 0 rgba(255,255,255,0.75),
+        inset 0 -1px 0 rgba(0,0,0,0.1);
+}
+
+/* Strap lug — left side */
+.cam-face-front::before {
+    content: '';
+    position: absolute;
+    left: -7px; top: 32px;
+    width: 7px; height: 26px;
+    background: linear-gradient(90deg, #a8a8a8 0%, #bbb 100%);
+    border-radius: 2px 0 0 2px;
+    box-shadow: 0 0 0 1px #999;
+}
+
+/* ── Top control bar (front) ── */
+.cf-top {
+    height: 44px;
+    background: linear-gradient(180deg, #d2d2d2 0%, #bcbcbc 100%);
+    border-radius: 12px 12px 0 0;
+    border-bottom: 1px solid #aaa;
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* Power button */
+.cf-top::before {
+    content: '';
+    position: absolute;
+    left: 16px; top: 50%; transform: translateY(-50%);
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 34%, #d0d0d0, #a2a2a2);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.55);
+}
+
+/* Mode dial */
+.cf-mode-dial {
+    position: absolute;
+    right: 14px; top: 50%; transform: translateY(-50%);
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: conic-gradient(
+        #d44 0deg 50deg, #c84 50deg 100deg, #4a8 100deg 150deg,
+        #448 150deg 200deg, #888 200deg 250deg, #4aa 250deg 300deg,
+        #a4a 300deg 360deg
+    );
+    box-shadow: 0 2px 6px rgba(0,0,0,0.28), 0 0 0 2px #a8a8a8;
+}
+.cf-mode-dial::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 50%; transform: translateX(-50%);
+    width: 2px; height: 6px;
+    background: white;
+    border-radius: 1px;
+}
+
+/* Zoom lever */
+.cf-zoom {
+    position: absolute;
+    right: 54px; top: 50%; transform: translateY(-50%);
+    width: 42px; height: 13px;
+    background: linear-gradient(180deg, #ccc 0%, #aaa 100%);
+    border-radius: 7px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.4);
+}
+.cf-zoom::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 16px; height: 11px;
+    background: linear-gradient(180deg, #d8d8d8 0%, #b8b8b8 100%);
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
 /* Shutter button */
-.cam-body::before {
-    content: '';
+.cf-shutter {
     position: absolute;
-    top: -10px; left: 20px;
-    width: 13px; height: 13px;
+    right: 100px; top: 50%; transform: translateY(-50%);
+    width: 22px; height: 22px;
     border-radius: 50%;
-    background: radial-gradient(circle at 36% 30%, #585858, #1e1e1e);
-    box-shadow: 0 3px 7px rgba(0,0,0,0.8), 0 0 0 1px #111;
+    background: radial-gradient(circle at 38% 32%, #e2e2e2, #b0b0b0);
+    box-shadow: 0 3px 7px rgba(0,0,0,0.25), 0 0 0 2px #a8a8a8, inset 0 2px 0 rgba(255,255,255,0.65);
 }
 
-/* Film advance knob */
-.cam-body::after {
-    content: '';
-    position: absolute;
-    top: -12px; right: 12px;
-    width: 28px; height: 18px;
-    border-radius: 3px 3px 0 0;
-    background: linear-gradient(180deg, #393939 0%, #222 100%);
-    box-shadow: 0 3px 8px rgba(0,0,0,0.7), 0 0 0 1px #111;
+/* ── Front body ── */
+.cf-body {
+    flex: 1;
+    position: relative;
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
 }
 
-/* Lens — concentric rings via box-shadow */
-.cam-lens {
+/* Right grip */
+.cf-grip {
     position: absolute;
-    top: 50%; left: 28px;
-    transform: translateY(-50%);
-    width: 28px; height: 28px;
+    right: 0; top: 0; bottom: 0;
+    width: 54px;
+    background: linear-gradient(90deg, #b6b6b6 0%, #ababab 40%, #a2a2a2 100%);
+    border-radius: 0 0 12px 0;
+}
+.cf-grip::after {
+    content: '';
+    position: absolute;
+    inset: 14px 10px;
+    background: repeating-linear-gradient(
+        0deg, transparent, transparent 5px,
+        rgba(0,0,0,0.09) 5px, rgba(0,0,0,0.09) 6px
+    );
+    border-radius: 2px;
+}
+
+/* Flash */
+.cf-flash {
+    position: absolute;
+    top: 18px; left: 18px;
+    width: 40px; height: 22px;
+    background: linear-gradient(180deg, #eae6da 0%, #d8d4c8 100%);
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px #b8b8b8, inset 0 1px 0 rgba(255,255,255,0.9), 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* AF lamp */
+.cf-af-lamp {
+    position: absolute;
+    top: 20px; left: 64px;
+    width: 9px; height: 9px;
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #182538, #04080f);
+    background: radial-gradient(circle at 38% 34%, #ffee88, #c89000);
+    box-shadow: 0 0 5px rgba(200,130,0,0.45), 0 0 0 1px #b0b0b0;
+}
+
+/* Front viewfinder */
+.cf-vf-front {
+    position: absolute;
+    top: 22px; right: 64px;
+    width: 28px; height: 17px;
+    background: #0a0818;
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px #999, inset 0 1px 4px rgba(0,0,0,0.85);
+}
+
+/* Lens housing — the hero element */
+.cf-lens {
+    position: absolute;
+    top: 50%; left: 44%;
+    transform: translate(-50%, -48%);
+    width: 116px; height: 116px;
+    border-radius: 50%;
+    /* Outer bezel ring */
     box-shadow:
-        0 0 0 5px  #0c0c0c,
-        0 0 0 7px  #1f1f1f,
-        0 0 0 10px #121212,
-        0 0 0 12px #242424,
-        0 0 0 15px #191919,
-        0 0 0 17px #101010;
+        0 0 0 1px #888,
+        0 0 0 4px #b0b0b0,
+        0 0 0 6px #888,
+        0 8px 28px rgba(0,0,0,0.45);
+    background: radial-gradient(circle at 40% 38%, #3a3a3a, #181818);
 }
-/* Lens glass reflection */
-.cam-lens::after {
+
+/* Middle lens ring */
+.cf-lens::before {
     content: '';
+    position: absolute;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 35%, #282828, #0e0e0e);
+    box-shadow: 0 0 0 2px #1e1e1e, 0 0 0 4px #303030, inset 0 3px 8px rgba(0,0,0,0.9);
+}
+
+/* Glass element */
+.cf-lens::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #1a2e48, #050e1c);
+    box-shadow: inset 0 3px 10px rgba(0,0,0,0.85), 0 0 14px rgba(10,30,70,0.35);
+}
+
+/* Lens glass highlight */
+.cf-lens-highlight {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    pointer-events: none;
+}
+.cf-lens-highlight::after {
+    content: '';
+    position: absolute;
+    top: 9px; left: 11px;
+    width: 13px; height: 9px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.14);
+    transform: rotate(-28deg);
+}
+
+/* Brand text */
+.cf-brand {
+    position: absolute;
+    bottom: 14px;
+    left: 50%; transform: translateX(-38%);
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 10px;
+    letter-spacing: 5px;
+    color: #a8a8a8;
+    text-transform: uppercase;
+}
+
+/* Microphone */
+.cf-mic {
+    position: absolute;
+    bottom: 50px; left: 22px;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #9a9a9a;
+    box-shadow: 0 0 0 1px #888;
+}
+
+
+/* ══════════════════ BACK FACE ══════════════════ */
+.cam-face-back {
+    transform: rotateX(180deg);
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(158deg, #d8d8d8 0%, #c2c2c2 55%, #cbcbcb 100%);
+    box-shadow:
+        0 0 0 1px #aaa,
+        0 22px 64px rgba(0,0,0,0.28),
+        inset 0 1px 0 rgba(255,255,255,0.7),
+        inset 0 -1px 0 rgba(0,0,0,0.1);
+}
+
+/* Strap lug — right side (back) */
+.cam-face-back::before {
+    content: '';
+    position: absolute;
+    right: -7px; top: 32px;
+    width: 7px; height: 26px;
+    background: linear-gradient(90deg, #bbb 0%, #a8a8a8 100%);
+    border-radius: 0 2px 2px 0;
+    box-shadow: 0 0 0 1px #999;
+}
+
+/* ── Top bar (back) ── */
+.cb-top {
+    height: 44px;
+    background: linear-gradient(180deg, #d0d0d0 0%, #bcbcbc 100%);
+    border-radius: 12px 12px 0 0;
+    border-bottom: 1px solid #aaa;
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+}
+
+/* Viewfinder eyepiece */
+.cb-vf {
+    width: 34px; height: 22px;
+    background: #08060e;
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px #999, inset 0 1px 5px rgba(0,0,0,0.9);
+    position: relative;
+    flex-shrink: 0;
+}
+.cb-vf::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 5px;
+    border: 3px solid #b4b4b4;
+    box-shadow: 0 0 0 1px #aaa;
+}
+
+/* Top label */
+.cb-top-label {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: #a0a0a0;
+    text-transform: uppercase;
+    margin-left: 12px;
+}
+
+/* ── Back body ── */
+.cb-body {
+    flex: 1;
+    display: flex;
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
+    padding: 10px;
+    gap: 8px;
+}
+
+/* LCD screen */
+.cb-screen {
+    flex: 1;
+    background: #0c0c16;
+    border-radius: 4px;
+    box-shadow:
+        0 0 0 2px #1c1c1c,
+        0 0 0 4px #8c8c8c,
+        inset 0 2px 10px rgba(0,0,0,0.8);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    cursor: default;
+}
+
+/* LCD header bar */
+.lcd-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 8px;
+    background: rgba(0,0,0,0.5);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    flex-shrink: 0;
+}
+.lcd-mode {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    color: rgba(148,172,220,0.85);
+    letter-spacing: 1px;
+}
+.lcd-count {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    color: rgba(148,172,220,0.6);
+}
+.lcd-batt {
+    width: 20px; height: 9px;
+    border: 1px solid rgba(148,172,220,0.45);
+    border-radius: 2px;
+    position: relative;
+}
+.lcd-batt::before {
+    content: '';
+    position: absolute;
+    right: -4px; top: 1px;
+    width: 3px; height: 7px;
+    background: rgba(148,172,220,0.45);
+    border-radius: 0 1px 1px 0;
+}
+.lcd-batt::after {
+    content: '';
+    position: absolute;
+    inset: 2px; right: 4px;
+    background: rgba(70,190,110,0.75);
+    border-radius: 1px;
+}
+
+/* Grid view */
+.lcd-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+    padding: 5px;
+    overflow-y: auto;
+    align-content: start;
+}
+.lcd-grid::-webkit-scrollbar { display: none; }
+
+.lcd-thumb {
+    aspect-ratio: 4/3;
+    background: #181822;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    outline: 1px solid transparent;
+    transition: outline-color 0.1s;
+}
+.lcd-thumb:hover { outline-color: rgba(148,172,220,0.55); }
+.lcd-thumb img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+}
+.lcd-thumb-n {
+    position: absolute;
+    bottom: 2px; right: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 7px;
+    color: rgba(255,255,255,0.45);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+    pointer-events: none;
+}
+
+/* Single photo view */
+.lcd-single {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 6px;
+}
+.lcd-single.active { display: flex; }
+.lcd-single img {
+    max-width: 100%; max-height: 100%;
+    object-fit: contain;
+    cursor: pointer;
+}
+.lcd-single-nav {
+    position: absolute;
+    bottom: 8px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 8px;
+    box-sizing: border-box;
+}
+.lcd-nav-btn {
+    background: rgba(148,172,220,0.12);
+    border: 1px solid rgba(148,172,220,0.3);
+    color: rgba(148,172,220,0.9);
+    font-size: 10px; cursor: pointer;
+    padding: 4px 12px;
+    border-radius: 2px;
+    font-family: 'Courier New', monospace;
+    transition: background 0.12s;
+}
+.lcd-nav-btn:hover { background: rgba(148,172,220,0.24); }
+.lcd-back-btn {
     position: absolute;
     top: 5px; left: 6px;
-    width: 8px; height: 6px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.13);
-    transform: rotate(-25deg);
-}
-
-/* Viewfinder window */
-.cam-finder {
-    position: absolute;
-    top: 13px; right: 18px;
-    width: 24px; height: 16px;
-    background: #060810;
+    background: rgba(148,172,220,0.12);
+    border: 1px solid rgba(148,172,220,0.3);
+    color: rgba(148,172,220,0.75);
+    font-size: 7px; cursor: pointer;
+    padding: 3px 8px;
     border-radius: 2px;
-    box-shadow: 0 0 0 1px #1a1a1a, inset 0 1px 4px rgba(0,0,0,0.95);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+    transition: background 0.12s;
 }
-.cam-finder::after {
-    content: '';
-    position: absolute;
-    top: 3px; left: 3px;
-    width: 7px; height: 5px;
-    border-radius: 1px;
-    background: rgba(90,130,180,0.1);
-}
+.lcd-back-btn:hover { background: rgba(148,172,220,0.24); }
 
-/* Strap lugs */
-.cam-lug-l, .cam-lug-r {
-    position: absolute;
-    top: 10px;
-    width: 5px; height: 20px;
-    background: linear-gradient(180deg, #222 0%, #1a1a1a 100%);
-    box-shadow: 0 0 0 1px #0f0f0f;
-}
-.cam-lug-l { left: -5px;  border-radius: 2px 0 0 2px; }
-.cam-lug-r { right: -5px; border-radius: 0 2px 2px 0; }
-
-/* ── Decorative film canisters ── */
-.deco-film {
-    position: absolute;
-    right: max(18px, calc(50% - 224px));
-    bottom: 70px;
+/* ── Controls panel (right of LCD) ── */
+.cb-controls {
+    width: 122px;
+    flex-shrink: 0;
     display: flex;
-    align-items: flex-end;
-    gap: 10px;
-    filter: drop-shadow(0 10px 28px rgba(0,0,0,0.93));
-    z-index: 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding-top: 4px;
 }
 
-.film-can { width: 28px; position: relative; }
-.film-can-a { transform: rotate(-6deg) translateY(3px); }
-.film-can-b { transform: rotate(3deg); }
-
-/* Film leader strip (only on first canister) */
-.film-leader {
-    position: absolute;
-    top: -14px;
-    left: 50%; transform: translateX(-50%);
-    width: 9px; height: 18px;
-    background: linear-gradient(180deg, #948d62 0%, #4e4430 100%);
-    border-radius: 1px;
-    z-index: 2;
-}
-/* Sprocket holes on the leader */
-.film-leader::before,
-.film-leader::after {
-    content: '';
-    position: absolute;
-    left: 50%; transform: translateX(-50%);
-    width: 3px; height: 3px;
-    border-radius: 50%;
-    background: #26200f;
-}
-.film-leader::before { top: 3px; }
-.film-leader::after  { top: 9px; }
-
-/* Cap (top of canister) */
-.film-cap {
+/* D-pad */
+.cb-dpad {
     position: relative;
-    width: 28px; height: 8px;
-    background: linear-gradient(180deg, #3c3c3c 0%, #252525 100%);
-    box-shadow: 0 0 0 1px #111;
+    width: 78px; height: 78px;
+    flex-shrink: 0;
 }
-/* Elliptical top lip */
-.film-cap::before {
-    content: '';
+.cb-dpad-disc {
     position: absolute;
-    top: -4px; left: -1px;
-    width: 30px; height: 8px;
+    inset: 0;
     border-radius: 50%;
-    background: linear-gradient(180deg, #494949 0%, #303030 100%);
-    box-shadow: 0 0 0 1px #111;
+    background: radial-gradient(circle at 40% 38%, #2c2c2c, #191919);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.38), 0 0 0 1px #111, inset 0 1px 0 rgba(255,255,255,0.06);
 }
-
-/* Canister body */
-.film-body {
-    width: 28px; height: 36px;
-    background: linear-gradient(90deg, #181818 0%, #272727 20%, #202020 80%, #131313 100%);
-    border-radius: 0 0 2px 2px;
-    box-shadow: 0 0 0 1px #111;
-    position: relative; overflow: hidden;
-}
-/* Subtle vertical seam line */
-.film-body::after {
-    content: '';
+.cb-dpad-ok {
     position: absolute;
-    top: 0; bottom: 0; left: 7px;
-    width: 1px;
-    background: rgba(255,255,255,0.04);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 38%, #343434, #1c1c1c);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4), 0 0 0 1px #222;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 7px; color: #888; letter-spacing: 1px;
 }
+.dpad-arr {
+    position: absolute;
+    color: #646464;
+    font-size: 9px;
+    line-height: 1;
+    user-select: none;
+    pointer-events: none;
+}
+.dpad-arr.u { top: 7px;    left: 50%; transform: translateX(-50%); }
+.dpad-arr.d { bottom: 7px; left: 50%; transform: translateX(-50%); }
+.dpad-arr.l { left: 7px;   top: 50%;  transform: translateY(-50%); }
+.dpad-arr.r { right: 7px;  top: 50%;  transform: translateY(-50%); }
+
+/* Control buttons */
+.cb-btn-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+}
+.cb-btn {
+    background: linear-gradient(180deg, #303030 0%, #1e1e1e 100%);
+    border: none;
+    border-radius: 3px;
+    color: #808080;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 7px;
+    letter-spacing: 1px;
+    cursor: default;
+    padding: 5px 3px;
+    box-shadow: 0 3px 0 #101010, 0 4px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
+    text-transform: uppercase;
+    text-align: center;
+    user-select: none;
+}
+.cb-btn-play { color: #5a9a6a; }
+.cb-btn-del  { color: #9a5a5a; }
+
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
-    .deco-camera, .deco-film { display: none; }
-    .darkroom { height: calc(100vh - 48px); }
-    .darkroom-counter { padding: 44px 16px 64px; }
-    .polaroid-pile { width: 168px; height: 202px; }
-    .pile-card { width: 150px; height: 176px; padding: 9px 9px 36px; }
-    .gallery-body { padding: 24px 14px 40px; }
-    .gallery-grid { gap: 22px 12px; }
-    .gallery-polaroid { width: 136px; padding: 8px 8px 32px; }
-    .polaroid-img-wrap { width: 120px; height: 120px; }
-    .lightbox-nav { font-size: 40px; padding: 0 4px; }
-    .lightbox-polaroid { padding: 10px 10px 44px; }
+    body { overflow-y: hidden !important; padding-top: 48px; }
+    .cam-page { height: calc(100vh - 48px); gap: 18px; }
+    .cam-flip {
+        width: min(88vw, 360px);
+        height: calc(min(88vw, 360px) * 0.6625);
+    }
+    .cb-controls { width: 96px; gap: 6px; }
+    .cb-dpad { width: 62px; height: 62px; }
+    .cb-dpad-ok { width: 22px; height: 22px; }
+    .dpad-arr { font-size: 7px; }
+    .cb-btn { font-size: 6px; padding: 4px 2px; }
+    .lcd-mode, .lcd-count { font-size: 6px; }
+    .lcd-thumb-n { font-size: 6px; }
 }
 
 </style>
@@ -512,69 +651,92 @@ body {
 </ul>
 </nav>
 
-<!-- Darkroom -->
-<div class="darkroom">
-    <div class="darkroom-glow"></div>
+<!-- Camera page -->
+<div class="cam-page">
 
-    <div class="darkroom-counter">
-        <div class="polaroid-pile" id="polaroidPile">
-            <div class="pile-card"><div class="pile-card-photo"></div></div>
-            <div class="pile-card"><div class="pile-card-photo"></div></div>
-            <div class="pile-card"><div class="pile-card-photo"></div></div>
-            <div class="pile-card"><div class="pile-card-photo"></div></div>
-            <div class="pile-card"><div class="pile-card-photo"></div></div>
-            <div class="pile-card"><div class="pile-card-photo"></div></div>
-        </div>
-        <p class="pile-hint">Click to browse</p>
+    <p class="cam-prompt" id="camPrompt">Click on the camera</p>
 
-        <!-- Decorative camera (left) -->
-        <div class="deco-camera" aria-hidden="true">
-            <div class="cam-body">
-                <div class="cam-lens"></div>
-                <div class="cam-finder"></div>
-                <div class="cam-lug-l"></div>
-                <div class="cam-lug-r"></div>
+    <div class="cam-scene">
+        <div class="cam-flip" id="camFlip">
+
+            <!-- ▸ FRONT FACE -->
+            <div class="cam-face cam-face-front">
+                <!-- Top bar -->
+                <div class="cf-top">
+                    <div class="cf-shutter"></div>
+                    <div class="cf-zoom"></div>
+                    <div class="cf-mode-dial"></div>
+                </div>
+                <!-- Body -->
+                <div class="cf-body">
+                    <div class="cf-grip"></div>
+                    <div class="cf-flash"></div>
+                    <div class="cf-af-lamp"></div>
+                    <div class="cf-vf-front"></div>
+                    <!-- Lens -->
+                    <div class="cf-lens">
+                        <div class="cf-lens-highlight"></div>
+                    </div>
+                    <div class="cf-mic"></div>
+                    <div class="cf-brand">DIGICAM</div>
+                </div>
             </div>
-        </div>
 
-        <!-- Decorative film canisters (right) -->
-        <div class="deco-film" aria-hidden="true">
-            <div class="film-can film-can-a">
-                <div class="film-leader"></div>
-                <div class="film-cap"></div>
-                <div class="film-body"></div>
-            </div>
-            <div class="film-can film-can-b">
-                <div class="film-cap"></div>
-                <div class="film-body"></div>
-            </div>
-        </div>
-    </div>
-</div>
+            <!-- ▸ BACK FACE -->
+            <div class="cam-face cam-face-back">
+                <!-- Top bar -->
+                <div class="cb-top">
+                    <div class="cb-vf"></div>
+                    <span class="cb-top-label">Digital Camera</span>
+                </div>
+                <!-- Body -->
+                <div class="cb-body">
 
-<!-- Gallery overlay -->
-<div class="photo-gallery" id="photoGallery">
-    <div class="gallery-header">
-        <span class="gallery-title">Photos</span>
-        <button class="gallery-close" id="galleryClose">&times;</button>
-    </div>
-    <div class="gallery-body">
-        <div class="gallery-grid" id="galleryGrid"></div>
-    </div>
-</div>
+                    <!-- LCD Screen -->
+                    <div class="cb-screen" id="cbScreen">
+                        <div class="lcd-header">
+                            <span class="lcd-mode">&#9654; PLAYBACK</span>
+                            <span class="lcd-count" id="lcdCount">0 photos</span>
+                            <div class="lcd-batt"></div>
+                        </div>
+                        <!-- Grid view -->
+                        <div class="lcd-grid" id="lcdGrid"></div>
+                        <!-- Single view -->
+                        <div class="lcd-single" id="lcdSingle">
+                            <button class="lcd-back-btn" id="lcdBackBtn">&#9664; BACK</button>
+                            <img id="lcdSingleImg" src="" alt="">
+                            <div class="lcd-single-nav">
+                                <button class="lcd-nav-btn" id="lcdPrev">&#9664;</button>
+                                <button class="lcd-nav-btn" id="lcdNext">&#9654;</button>
+                            </div>
+                        </div>
+                    </div>
 
-<!-- Lightbox -->
-<div class="photo-lightbox" id="photoLightbox">
-    <button class="lightbox-close" id="lightboxClose">&times;</button>
-    <button class="lightbox-nav" id="lightboxPrev">&#8249;</button>
-    <div class="lightbox-polaroid">
-        <div class="lightbox-img-wrap">
-            <img id="lightboxImg" src="" alt="">
-        </div>
-        <div class="lightbox-caption" id="lightboxCaption"></div>
-    </div>
-    <button class="lightbox-nav" id="lightboxNext">&#8250;</button>
-</div>
+                    <!-- Controls -->
+                    <div class="cb-controls">
+                        <div class="cb-dpad">
+                            <div class="cb-dpad-disc"></div>
+                            <div class="cb-dpad-ok">OK</div>
+                            <span class="dpad-arr u">&#9650;</span>
+                            <span class="dpad-arr d">&#9660;</span>
+                            <span class="dpad-arr l">&#9664;</span>
+                            <span class="dpad-arr r">&#9654;</span>
+                        </div>
+                        <div class="cb-btn-grid">
+                            <div class="cb-btn">MENU</div>
+                            <div class="cb-btn">DISP</div>
+                            <div class="cb-btn cb-btn-play">&#9654; PLAY</div>
+                            <div class="cb-btn cb-btn-del">&#9003; DEL</div>
+                        </div>
+                    </div>
+
+                </div><!-- /cb-body -->
+            </div><!-- /cam-face-back -->
+
+        </div><!-- /cam-flip -->
+    </div><!-- /cam-scene -->
+
+</div><!-- /cam-page -->
 
 <script src="PortfolioGallery.js"></script>
 <script>
@@ -591,97 +753,90 @@ body {
         { src: 'insert here', caption: '' },
         { src: 'insert here', caption: '' },
         { src: 'insert here', caption: '' },
+        { src: 'insert here', caption: '' },
+        { src: 'insert here', caption: '' },
     ];
 
-    var gallery    = document.getElementById('photoGallery');
-    var grid       = document.getElementById('galleryGrid');
-    var lightbox   = document.getElementById('photoLightbox');
-    var lbImg      = document.getElementById('lightboxImg');
-    var lbCaption  = document.getElementById('lightboxCaption');
-    var pile       = document.getElementById('polaroidPile');
+    var camFlip    = document.getElementById('camFlip');
+    var prompt     = document.getElementById('camPrompt');
+    var lcdGrid    = document.getElementById('lcdGrid');
+    var lcdSingle  = document.getElementById('lcdSingle');
+    var lcdSingleImg = document.getElementById('lcdSingleImg');
+    var lcdCount   = document.getElementById('lcdCount');
+    var lcdBackBtn = document.getElementById('lcdBackBtn');
+    var lcdPrev    = document.getElementById('lcdPrev');
+    var lcdNext    = document.getElementById('lcdNext');
     var currentIdx = 0;
-    var devTimers  = [];
-    var rotations  = [-7, 5, -4, 8, -6, 3, -9, 6, -3, 7];
+    var isFlipped  = false;
 
-    /* Build gallery grid */
+    /* Mobile prompt text */
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        prompt.textContent = 'Tap on the camera';
+    }
+
+    /* Build LCD grid */
+    lcdCount.textContent = photos.length + ' photos';
     photos.forEach(function (photo, i) {
-        var pol = document.createElement('div');
-        pol.className = 'gallery-polaroid';
-        pol.style.setProperty('--rot', rotations[i % rotations.length] + 'deg');
+        var thumb = document.createElement('div');
+        thumb.className = 'lcd-thumb';
 
-        var wrap = document.createElement('div');
-        wrap.className = 'polaroid-img-wrap';
+        if (photo.src !== 'insert here') {
+            var img = document.createElement('img');
+            img.src = photo.src;
+            img.alt = photo.caption || '';
+            thumb.appendChild(img);
+        }
 
-        var img = document.createElement('img');
-        if (photo.src !== 'insert here') img.src = photo.src;
-        img.alt = photo.caption || '';
-        wrap.appendChild(img);
+        var num = document.createElement('div');
+        num.className = 'lcd-thumb-n';
+        num.textContent = String(i + 1).padStart(2, '0');
+        thumb.appendChild(num);
 
-        var cap = document.createElement('div');
-        cap.className = 'polaroid-caption';
-        cap.textContent = photo.caption;
-
-        pol.appendChild(wrap);
-        pol.appendChild(cap);
-        pol.addEventListener('click', function () { openLightbox(i); });
-        grid.appendChild(pol);
+        thumb.addEventListener('click', function (e) {
+            e.stopPropagation();
+            openSingle(i);
+        });
+        lcdGrid.appendChild(thumb);
     });
 
-    /* Open gallery — staggered develop animation */
-    function openGallery() {
-        gallery.classList.add('open');
-        devTimers.forEach(clearTimeout);
-        devTimers = [];
-        var cards = grid.querySelectorAll('.gallery-polaroid');
-        cards.forEach(function (c) { c.classList.remove('developed'); });
-        cards.forEach(function (c, i) {
-            devTimers.push(setTimeout(function () {
-                c.classList.add('developed');
-            }, 200 + i * 220));
-        });
-    }
+    /* Flip camera */
+    camFlip.addEventListener('click', function () {
+        isFlipped = !isFlipped;
+        camFlip.classList.toggle('flipped', isFlipped);
+        prompt.style.opacity = isFlipped ? '0' : '1';
+    });
 
-    function closeGallery() {
-        gallery.classList.remove('open');
-    }
-
-    /* Lightbox */
-    function openLightbox(idx) {
+    /* Single photo view */
+    function openSingle(idx) {
         currentIdx = idx;
         var p = photos[idx];
-        lbImg.src = p.src !== 'insert here' ? p.src : '';
-        lbCaption.textContent = p.caption;
-        lightbox.classList.add('open');
+        lcdSingleImg.src = p.src !== 'insert here' ? p.src : '';
+        lcdGrid.style.display = 'none';
+        lcdSingle.classList.add('active');
     }
 
-    function closeLightbox() {
-        lightbox.classList.remove('open');
+    function closeSingle() {
+        lcdSingle.classList.remove('active');
+        lcdGrid.style.display = '';
     }
 
     function navigate(dir) {
         currentIdx = (currentIdx + dir + photos.length) % photos.length;
         var p = photos[currentIdx];
-        lbImg.src = p.src !== 'insert here' ? p.src : '';
-        lbCaption.textContent = p.caption;
+        lcdSingleImg.src = p.src !== 'insert here' ? p.src : '';
     }
 
-    /* Event listeners */
-    pile.addEventListener('click', openGallery);
-    document.getElementById('galleryClose').addEventListener('click', closeGallery);
-    document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
-    document.getElementById('lightboxPrev').addEventListener('click', function () { navigate(-1); });
-    document.getElementById('lightboxNext').addEventListener('click', function () { navigate(1); });
-    lightbox.addEventListener('click', function (e) {
-        if (e.target === lightbox) closeLightbox();
-    });
+    lcdBackBtn.addEventListener('click', function (e) { e.stopPropagation(); closeSingle(); });
+    lcdPrev.addEventListener('click', function (e) { e.stopPropagation(); navigate(-1); });
+    lcdNext.addEventListener('click', function (e) { e.stopPropagation(); navigate(1); });
 
+    /* Keyboard nav */
     document.addEventListener('keydown', function (e) {
-        if (lightbox.classList.contains('open')) {
+        if (!isFlipped) return;
+        if (lcdSingle.classList.contains('active')) {
             if (e.key === 'ArrowLeft')  navigate(-1);
             if (e.key === 'ArrowRight') navigate(1);
-            if (e.key === 'Escape')     closeLightbox();
-        } else if (gallery.classList.contains('open')) {
-            if (e.key === 'Escape') closeGallery();
+            if (e.key === 'Escape')     closeSingle();
         }
     });
 
