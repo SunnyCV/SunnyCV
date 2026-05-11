@@ -9,24 +9,24 @@
 
 /* ── Page ── */
 body {
-    background: radial-gradient(ellipse at 50% 35%, #1c1c1c 0%, #0a0a0a 100%) !important;
+    background: radial-gradient(ellipse at 50% 30%, #f5f4f2 0%, #dddbd8 100%) !important;
     overflow: hidden !important;
     min-height: 100vh;
 }
 
-nav li a { color: #ccc !important; }
-li a:hover:not(.active) { background-color: rgba(255,255,255,0.07) !important; }
+nav li a { color: #333 !important; }
+li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 .mobile-header {
-    background-color: #111 !important;
-    border-bottom: 1px solid #222 !important;
+    background-color: #e8e6e3 !important;
+    border-bottom: 1px solid #ccc !important;
 }
-.mobile-header-hamburger { color: #ccc !important; }
+.mobile-header-hamburger { color: #333 !important; }
 .mobile-nav-menu {
-    background-color: #111 !important;
-    border-right: 1px solid #222 !important;
+    background-color: #eeecea !important;
+    border-right: 1px solid #ccc !important;
 }
-.mobile-nav-menu a { color: #ccc !important; border-bottom: 1px solid #222 !important; }
-.mobile-nav-overlay { background: rgba(0,0,0,0.55) !important; }
+.mobile-nav-menu a { color: #333 !important; border-bottom: 1px solid #ddd !important; }
+.mobile-nav-overlay { background: rgba(0,0,0,0.25) !important; }
 
 /* ── Layout ── */
 .cam-page {
@@ -45,7 +45,7 @@ li a:hover:not(.active) { background-color: rgba(255,255,255,0.07) !important; }
     font-size: 10px;
     letter-spacing: 4px;
     text-transform: uppercase;
-    color: #484848;
+    color: #999;
     margin: 0;
     user-select: none;
     transition: opacity 0.4s;
@@ -55,8 +55,8 @@ li a:hover:not(.active) { background-color: rgba(255,255,255,0.07) !important; }
 .cam-scene { perspective: 2000px; }
 
 .cam-flip {
-    width: 760px;
-    height: 480px;
+    width: 820px;
+    height: 518px;
     position: relative;
     transform-style: preserve-3d;
     -webkit-transform-style: preserve-3d;
@@ -76,29 +76,43 @@ li a:hover:not(.active) { background-color: rgba(255,255,255,0.07) !important; }
 
 /* ══════ FRONT FACE — Canon PowerShot S110 ══════ */
 .cam-face-front {
-    background: linear-gradient(155deg, #2e2e2e 0%, #1a1a1a 55%, #242424 100%);
+    background: linear-gradient(155deg, #e8e8e8 0%, #c8c8c8 45%, #d8d8d8 100%);
     box-shadow:
-        0 0 0 1px #0d0d0d,
-        0 0 0 2.5px #3c3c3c,
-        0 6px 0 3px #0a0a0a,
-        0 35px 90px rgba(0,0,0,0.95),
-        inset 0 1px 0 rgba(255,255,255,0.07),
-        inset 0 -1px 0 rgba(0,0,0,0.5);
+        0 0 0 1px #aaa,
+        0 0 0 2.5px #e0e0e0,
+        0 6px 0 3px #a0a0a0,
+        0 30px 70px rgba(0,0,0,0.35),
+        inset 0 2px 0 rgba(255,255,255,0.95),
+        inset 0 -1px 0 rgba(0,0,0,0.12);
     display: flex;
     flex-direction: column;
+}
+/* Gloss sheen sweep across the front */
+.cam-face-front::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background: linear-gradient(160deg,
+        rgba(255,255,255,0.55) 0%,
+        rgba(255,255,255,0.18) 30%,
+        transparent 55%
+    );
+    pointer-events: none;
+    z-index: 50;
 }
 
 /* ── Top control bar ── */
 .cf-top {
     height: 52px;
-    background: linear-gradient(180deg, #282828 0%, #1d1d1d 100%);
-    border-bottom: 1px solid #0f0f0f;
+    background: linear-gradient(180deg, #dedede 0%, #c8c8c8 100%);
+    border-bottom: 1px solid #b0b0b0;
     border-radius: 16px 16px 0 0;
     position: relative;
     flex-shrink: 0;
     display: flex;
     align-items: center;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
 }
 
 /* Canon logo centred on top bar */
@@ -241,12 +255,12 @@ li a:hover:not(.active) { background-color: rgba(255,255,255,0.07) !important; }
     border-radius: 0 0 16px 16px;
 }
 
-/* Left grip — slightly darker, ridged rubber */
+/* Left grip — darker rubber for contrast against silver */
 .cf-grip-left {
     position: absolute;
     left: 0; top: 0; bottom: 0;
     width: 30px;
-    background: linear-gradient(90deg, #111 0%, #1a1a1a 100%);
+    background: linear-gradient(90deg, #888 0%, #999 100%);
     border-radius: 0 0 0 16px;
 }
 .cf-grip-left::after {
@@ -256,7 +270,7 @@ li a:hover:not(.active) { background-color: rgba(255,255,255,0.07) !important; }
     background: repeating-linear-gradient(
         0deg,
         transparent, transparent 3px,
-        rgba(255,255,255,0.035) 3px, rgba(255,255,255,0.035) 4px
+        rgba(0,0,0,0.12) 3px, rgba(0,0,0,0.12) 4px
     );
     border-radius: 2px;
 }
@@ -438,29 +452,44 @@ li a:hover:not(.active) { background-color: rgba(255,255,255,0.07) !important; }
     bottom: 10px;
     left: 50%; transform: translateX(-50%);
     width: 100px; height: 4px;
-    background: linear-gradient(90deg, transparent, #262626 30%, #262626 70%, transparent);
+    background: linear-gradient(90deg, transparent, #bbb 30%, #bbb 70%, transparent);
     border-radius: 2px;
 }
 
 /* ══════ BACK FACE — Canon PowerShot S110 ══════ */
 .cam-face-back {
     transform: rotateY(180deg);
-    background: linear-gradient(155deg, #2a2a2a 0%, #181818 55%, #222 100%);
+    background: linear-gradient(155deg, #e4e4e4 0%, #c4c4c4 50%, #d4d4d4 100%);
     box-shadow:
-        0 0 0 1px #0d0d0d,
-        0 0 0 2.5px #3c3c3c,
-        0 35px 90px rgba(0,0,0,0.95),
-        inset 0 1px 0 rgba(255,255,255,0.06);
+        0 0 0 1px #aaa,
+        0 0 0 2.5px #ddd,
+        0 30px 70px rgba(0,0,0,0.35),
+        inset 0 2px 0 rgba(255,255,255,0.9),
+        inset 0 -1px 0 rgba(0,0,0,0.1);
     display: flex;
     flex-direction: column;
     overflow: hidden;
+}
+/* Gloss sheen on back */
+.cam-face-back::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background: linear-gradient(160deg,
+        rgba(255,255,255,0.5) 0%,
+        rgba(255,255,255,0.15) 28%,
+        transparent 52%
+    );
+    pointer-events: none;
+    z-index: 50;
 }
 
 /* ── Back top bar ── */
 .cb-top {
     height: 52px;
-    background: linear-gradient(180deg, #252525 0%, #1c1c1c 100%);
-    border-bottom: 1px solid #0d0d0d;
+    background: linear-gradient(180deg, #dcdcdc 0%, #c8c8c8 100%);
+    border-bottom: 1px solid #b0b0b0;
     border-radius: 16px 16px 0 0;
     position: relative;
     flex-shrink: 0;
@@ -468,7 +497,7 @@ li a:hover:not(.active) { background-color: rgba(255,255,255,0.07) !important; }
     align-items: center;
     padding: 0 16px;
     gap: 12px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
 }
 
 /* Viewfinder eyepiece */
@@ -485,15 +514,15 @@ li a:hover:not(.active) { background-color: rgba(255,255,255,0.07) !important; }
     position: absolute;
     inset: -5px;
     border-radius: 7px;
-    border: 5px solid #2a2a2a;
-    box-shadow: 0 0 0 1px #111;
+    border: 5px solid #b0b0b0;
+    box-shadow: 0 0 0 1px #aaa;
 }
 
 .cb-top-label {
     font-family: Arial, sans-serif;
     font-size: 7.5px;
     letter-spacing: 2px;
-    color: #3a3a3a;
+    color: #888;
     text-transform: uppercase;
 }
 
@@ -680,12 +709,12 @@ li a:hover:not(.active) { background-color: rgba(255,255,255,0.07) !important; }
 .cb-thumb-grip {
     width: 100%;
     height: 58px;
-    background: linear-gradient(90deg, #101010 0%, #161616 100%);
+    background: linear-gradient(90deg, #888 0%, #999 100%);
     border-radius: 6px;
     flex-shrink: 0;
     position: relative;
     overflow: hidden;
-    box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.2);
 }
 .cb-thumb-grip::after {
     content: '';
@@ -694,7 +723,7 @@ li a:hover:not(.active) { background-color: rgba(255,255,255,0.07) !important; }
     background: repeating-linear-gradient(
         0deg,
         transparent, transparent 4px,
-        rgba(255,255,255,0.04) 4px, rgba(255,255,255,0.04) 5px
+        rgba(0,0,0,0.1) 4px, rgba(0,0,0,0.1) 5px
     );
     border-radius: 2px;
 }
@@ -798,10 +827,10 @@ li a:hover:not(.active) { background-color: rgba(255,255,255,0.07) !important; }
 .cb-btn-del  { color: #8a4040; }
 
 /* ── Responsive ── */
-@media (max-width: 1000px) {
+@media (max-width: 1100px) {
     .cam-flip {
-        width: min(88vw, 640px);
-        height: calc(min(88vw, 640px) * 0.6315);
+        width: min(88vw, 700px);
+        height: calc(min(88vw, 700px) * 0.6315);
     }
     .cb-controls { width: 96px; gap: 7px; }
     .cb-control-ring { width: 74px; height: 74px; }
