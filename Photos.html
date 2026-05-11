@@ -609,6 +609,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 /* Grid */
 .lcd-grid {
     flex: 1;
+    min-height: 0;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 4px;
@@ -965,6 +966,80 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 }
 .lcd-boot-bar.fill::after { transform: scaleX(1); }
 
+/* ── Full-screen lightbox ── */
+.photo-lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: rgba(0,0,0,0.92);
+    align-items: center;
+    justify-content: center;
+}
+.photo-lightbox.open { display: flex; }
+
+.lb-img {
+    max-width: 90vw;
+    max-height: 88vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 3px;
+    box-shadow: 0 12px 60px rgba(0,0,0,0.85);
+    animation: lbZoom 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    display: block;
+}
+@keyframes lbZoom {
+    from { transform: scale(0.88); opacity: 0; }
+    to   { transform: scale(1);    opacity: 1; }
+}
+
+.lb-close {
+    position: fixed;
+    top: 18px; right: 24px;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.75);
+    font-size: 40px;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.15s;
+    z-index: 2001;
+    padding: 0;
+}
+.lb-close:hover { color: #fff; }
+
+.lb-nav {
+    position: fixed;
+    top: 50%; transform: translateY(-50%);
+    background: rgba(0,0,0,0.45);
+    color: #fff;
+    border: none;
+    font-size: 30px;
+    padding: 14px 18px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.18s;
+    z-index: 2001;
+    line-height: 1;
+    user-select: none;
+}
+.lb-nav:hover { background: rgba(0,0,0,0.78); }
+.lb-prev { left: 14px; }
+.lb-next { right: 14px; }
+
+.lb-counter {
+    position: fixed;
+    bottom: 20px;
+    left: 50%; transform: translateX(-50%);
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.45);
+    z-index: 2001;
+    user-select: none;
+}
+
 /* ── Responsive ── */
 @media (max-width: 1100px) {
     .cam-flip {
@@ -1144,6 +1219,15 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 
 </div>
 
+<!-- Full-screen lightbox -->
+<div id="photoLightbox" class="photo-lightbox">
+    <button class="lb-close" id="lbClose">&#x2715;</button>
+    <button class="lb-nav lb-prev" id="lbPrev">&#8592;</button>
+    <img class="lb-img" id="lbImg" src="" alt="">
+    <button class="lb-nav lb-next" id="lbNext">&#8594;</button>
+    <div class="lb-counter" id="lbCounter"></div>
+</div>
+
 <script src="PortfolioGallery.js"></script>
 <script>
 (function () {
@@ -1218,26 +1302,27 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
         { src: 'insert here', caption: '' },
     ];
 
-    var camFlip       = document.getElementById('camFlip');
-    var prompt        = document.getElementById('camPrompt');
-    var lcdOff        = document.getElementById('lcdOff');
-    var lcdBoot       = document.getElementById('lcdBoot');
-    var lcdBootLogo   = document.getElementById('lcdBootLogo');
-    var lcdBootModel  = document.getElementById('lcdBootModel');
-    var lcdBootBar    = document.getElementById('lcdBootBar');
-    var lcdHeader     = document.getElementById('lcdHeader');
-    var lcdGrid       = document.getElementById('lcdGrid');
-    var lcdSingle     = document.getElementById('lcdSingle');
-    var lcdSingleImg  = document.getElementById('lcdSingleImg');
-    var lcdCount      = document.getElementById('lcdCount');
-    var lcdBackBtn    = document.getElementById('lcdBackBtn');
-    var lcdPrev       = document.getElementById('lcdPrev');
-    var lcdNext       = document.getElementById('lcdNext');
-    var powerBtn      = document.getElementById('cbPowerBtn');
-    var currentIdx    = 0;
-    var isFlipped     = false;
-    var isPowered     = false;
-    var isBooting     = false;
+    var camFlip      = document.getElementById('camFlip');
+    var prompt       = document.getElementById('camPrompt');
+    var lcdOff       = document.getElementById('lcdOff');
+    var lcdBoot      = document.getElementById('lcdBoot');
+    var lcdBootLogo  = document.getElementById('lcdBootLogo');
+    var lcdBootModel = document.getElementById('lcdBootModel');
+    var lcdBootBar   = document.getElementById('lcdBootBar');
+    var lcdHeader    = document.getElementById('lcdHeader');
+    var lcdGrid      = document.getElementById('lcdGrid');
+    var lcdCount     = document.getElementById('lcdCount');
+    var powerBtn     = document.getElementById('cbPowerBtn');
+    var lightbox     = document.getElementById('photoLightbox');
+    var lbImg        = document.getElementById('lbImg');
+    var lbCounter    = document.getElementById('lbCounter');
+    var lbClose      = document.getElementById('lbClose');
+    var lbPrev       = document.getElementById('lbPrev');
+    var lbNext       = document.getElementById('lbNext');
+    var currentIdx   = 0;
+    var isFlipped    = false;
+    var isPowered    = false;
+    var isBooting    = false;
 
     if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
         prompt.textContent = 'Tap the camera to view photos';
@@ -1263,7 +1348,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 
         thumb.addEventListener('click', function (e) {
             e.stopPropagation();
-            if (isPowered) openSingle(i);
+            if (isPowered) openLightbox(i);
         });
         lcdGrid.appendChild(thumb);
     });
@@ -1285,12 +1370,8 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     function powerOn() {
         isBooting = true;
         powerBtn.classList.add('on');
-
-        /* Switch to boot screen */
         lcdOff.style.display = 'none';
         lcdBoot.classList.add('active');
-
-        /* Trigger boot animations on next frame */
         requestAnimationFrame(function () {
             requestAnimationFrame(function () {
                 lcdBootLogo.classList.add('show');
@@ -1298,8 +1379,6 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
                 lcdBootBar.classList.add('fill');
             });
         });
-
-        /* After boot animation, show gallery */
         setTimeout(function () {
             lcdBoot.classList.remove('active');
             lcdBootLogo.classList.remove('show');
@@ -1315,42 +1394,49 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     function powerOff() {
         isPowered = false;
         powerBtn.classList.remove('on');
-        closeSingle();
+        closeLightbox();
         lcdHeader.style.display = 'none';
         lcdGrid.style.display = 'none';
         lcdOff.style.display = 'flex';
     }
 
-    function openSingle(idx) {
+    /* ── Lightbox ── */
+    function openLightbox(idx) {
         currentIdx = idx;
         var p = photos[idx];
-        lcdSingleImg.src = p.src !== 'insert here' ? p.src : '';
-        lcdGrid.style.display = 'none';
-        lcdSingle.classList.add('active');
+        lbImg.src = p.src !== 'insert here' ? p.src : '';
+        lbImg.alt = p.caption || '';
+        lbCounter.textContent = (idx + 1) + ' / ' + photos.length;
+        lightbox.classList.add('open');
+        document.body.style.overflow = 'hidden';
     }
 
-    function closeSingle() {
-        lcdSingle.classList.remove('active');
-        if (isPowered) lcdGrid.style.display = 'grid';
+    function closeLightbox() {
+        lightbox.classList.remove('open');
+        document.body.style.overflow = '';
+        lbImg.src = '';
     }
 
-    function navigate(dir) {
+    function lbNavigate(dir) {
         currentIdx = (currentIdx + dir + photos.length) % photos.length;
         var p = photos[currentIdx];
-        lcdSingleImg.src = p.src !== 'insert here' ? p.src : '';
+        lbImg.src = p.src !== 'insert here' ? p.src : '';
+        lbImg.alt = p.caption || '';
+        lbCounter.textContent = (currentIdx + 1) + ' / ' + photos.length;
     }
 
-    lcdBackBtn.addEventListener('click', function (e) { e.stopPropagation(); closeSingle(); });
-    lcdPrev.addEventListener('click', function (e) { e.stopPropagation(); navigate(-1); });
-    lcdNext.addEventListener('click', function (e) { e.stopPropagation(); navigate(1); });
+    lbClose.addEventListener('click', closeLightbox);
+    lbPrev.addEventListener('click', function (e) { e.stopPropagation(); lbNavigate(-1); });
+    lbNext.addEventListener('click', function (e) { e.stopPropagation(); lbNavigate(1); });
+    lightbox.addEventListener('click', function (e) {
+        if (e.target === lightbox) closeLightbox();
+    });
 
     document.addEventListener('keydown', function (e) {
-        if (!isFlipped || !isPowered) return;
-        if (lcdSingle.classList.contains('active')) {
-            if (e.key === 'ArrowLeft')  navigate(-1);
-            if (e.key === 'ArrowRight') navigate(1);
-            if (e.key === 'Escape')     closeSingle();
-        }
+        if (!lightbox.classList.contains('open')) return;
+        if (e.key === 'ArrowLeft')  lbNavigate(-1);
+        if (e.key === 'ArrowRight') lbNavigate(1);
+        if (e.key === 'Escape')     closeLightbox();
     });
 
 }());
