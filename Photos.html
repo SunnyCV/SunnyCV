@@ -612,27 +612,26 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     min-height: 0;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
-    padding: 7px;
-    overflow-y: auto;
-    align-content: start;
+    grid-template-rows: repeat(3, 1fr);
+    gap: 3px;
+    padding: 5px 5px 3px;
 }
 .lcd-grid::-webkit-scrollbar { display: none; }
 
 .lcd-thumb {
-    aspect-ratio: 4/3;
     background: #0c0c1c;
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    outline: 1.5px solid transparent;
+    outline: 2px solid transparent;
+    outline-offset: -1px;
     transition: outline-color 0.12s;
     border-radius: 2px;
 }
-.lcd-thumb:hover { outline-color: rgba(135,165,220,0.65); }
+.lcd-thumb:hover { outline-color: rgba(135,165,220,0.7); }
 .lcd-thumb img {
     width: 100%; height: 100%;
-    object-fit: contain; display: block;
+    object-fit: cover; display: block;
 }
 .lcd-thumb-n {
     position: absolute;
@@ -642,6 +641,39 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     color: rgba(255,255,255,0.38);
     text-shadow: 0 1px 2px rgba(0,0,0,0.95);
     pointer-events: none;
+}
+
+/* Page navigation bar */
+.lcd-page-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 8px;
+    background: rgba(0,0,0,0.55);
+    border-top: 1px solid rgba(255,255,255,0.03);
+    flex-shrink: 0;
+}
+.lcd-page-btn {
+    background: rgba(135,165,220,0.1);
+    border: 1px solid rgba(135,165,220,0.25);
+    color: rgba(135,165,220,0.85);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 3px 11px;
+    border-radius: 2px;
+    font-family: 'Courier New', monospace;
+    transition: background 0.12s;
+    line-height: 1;
+    user-select: none;
+}
+.lcd-page-btn:hover:not(:disabled) { background: rgba(135,165,220,0.22); }
+.lcd-page-btn:disabled { opacity: 0.22; cursor: default; }
+.lcd-page-indicator {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    color: rgba(135,165,220,0.5);
+    letter-spacing: 1px;
+    user-select: none;
 }
 
 /* Single photo view */
@@ -1176,13 +1208,10 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
                             <div class="lcd-batt"></div>
                         </div>
                         <div class="lcd-grid" id="lcdGrid" style="display:none;"></div>
-                        <div class="lcd-single" id="lcdSingle">
-                            <button class="lcd-back-btn" id="lcdBackBtn">&#9664; BACK</button>
-                            <img id="lcdSingleImg" src="" alt="">
-                            <div class="lcd-single-nav">
-                                <button class="lcd-nav-btn" id="lcdPrev">&#9664;</button>
-                                <button class="lcd-nav-btn" id="lcdNext">&#9654;</button>
-                            </div>
+                        <div class="lcd-page-nav" id="lcdPageNav" style="display:none;">
+                            <button class="lcd-page-btn" id="lcdPagePrev">&#8592;</button>
+                            <span class="lcd-page-indicator" id="lcdPageIndicator">1 / 1</span>
+                            <button class="lcd-page-btn" id="lcdPageNext">&#8594;</button>
                         </div>
                     </div>
 
@@ -1302,55 +1331,91 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
         { src: 'insert here', caption: '' },
     ];
 
-    var camFlip      = document.getElementById('camFlip');
-    var prompt       = document.getElementById('camPrompt');
-    var lcdOff       = document.getElementById('lcdOff');
-    var lcdBoot      = document.getElementById('lcdBoot');
-    var lcdBootLogo  = document.getElementById('lcdBootLogo');
-    var lcdBootModel = document.getElementById('lcdBootModel');
-    var lcdBootBar   = document.getElementById('lcdBootBar');
-    var lcdHeader    = document.getElementById('lcdHeader');
-    var lcdGrid      = document.getElementById('lcdGrid');
-    var lcdCount     = document.getElementById('lcdCount');
-    var powerBtn     = document.getElementById('cbPowerBtn');
-    var lightbox     = document.getElementById('photoLightbox');
-    var lbImg        = document.getElementById('lbImg');
-    var lbCounter    = document.getElementById('lbCounter');
-    var lbClose      = document.getElementById('lbClose');
-    var lbPrev       = document.getElementById('lbPrev');
-    var lbNext       = document.getElementById('lbNext');
-    var currentIdx   = 0;
-    var isFlipped    = false;
-    var isPowered    = false;
-    var isBooting    = false;
+    var camFlip        = document.getElementById('camFlip');
+    var prompt         = document.getElementById('camPrompt');
+    var lcdOff         = document.getElementById('lcdOff');
+    var lcdBoot        = document.getElementById('lcdBoot');
+    var lcdBootLogo    = document.getElementById('lcdBootLogo');
+    var lcdBootModel   = document.getElementById('lcdBootModel');
+    var lcdBootBar     = document.getElementById('lcdBootBar');
+    var lcdHeader      = document.getElementById('lcdHeader');
+    var lcdGrid        = document.getElementById('lcdGrid');
+    var lcdCount       = document.getElementById('lcdCount');
+    var lcdPageNav     = document.getElementById('lcdPageNav');
+    var lcdPagePrev    = document.getElementById('lcdPagePrev');
+    var lcdPageNext    = document.getElementById('lcdPageNext');
+    var lcdPageIndicator = document.getElementById('lcdPageIndicator');
+    var powerBtn       = document.getElementById('cbPowerBtn');
+    var lightbox       = document.getElementById('photoLightbox');
+    var lbImg          = document.getElementById('lbImg');
+    var lbCounter      = document.getElementById('lbCounter');
+    var lbClose        = document.getElementById('lbClose');
+    var lbPrev         = document.getElementById('lbPrev');
+    var lbNext         = document.getElementById('lbNext');
+
+    var currentIdx     = 0;
+    var isFlipped      = false;
+    var isPowered      = false;
+    var isBooting      = false;
+    var currentPage    = 0;
+    var PER_PAGE       = 9;
+    var totalPages     = Math.ceil(photos.length / PER_PAGE);
 
     if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
         prompt.textContent = 'Tap the camera to view photos';
     }
 
-    /* Build grid thumbnails */
     lcdCount.textContent = photos.length + ' photos';
-    photos.forEach(function (photo, i) {
-        var thumb = document.createElement('div');
-        thumb.className = 'lcd-thumb';
 
-        if (photo.src !== 'insert here') {
-            var img = document.createElement('img');
-            img.src = photo.src;
-            img.alt = photo.caption || '';
-            thumb.appendChild(img);
+    /* ── Paginated grid ── */
+    function renderPage(page) {
+        lcdGrid.innerHTML = '';
+        var start = page * PER_PAGE;
+        var end   = Math.min(start + PER_PAGE, photos.length);
+
+        for (var i = start; i < end; i++) {
+            (function (idx) {
+                var thumb = document.createElement('div');
+                thumb.className = 'lcd-thumb';
+
+                var photo = photos[idx];
+                if (photo.src !== 'insert here') {
+                    var img = document.createElement('img');
+                    img.src = photo.src;
+                    img.alt = photo.caption || '';
+                    thumb.appendChild(img);
+                }
+
+                var num = document.createElement('div');
+                num.className = 'lcd-thumb-n';
+                num.textContent = String(idx + 1).padStart(2, '0');
+                thumb.appendChild(num);
+
+                thumb.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    if (isPowered) openLightbox(idx);
+                });
+                lcdGrid.appendChild(thumb);
+            })(i);
         }
 
-        var num = document.createElement('div');
-        num.className = 'lcd-thumb-n';
-        num.textContent = String(i + 1).padStart(2, '0');
-        thumb.appendChild(num);
+        lcdPageIndicator.textContent = (page + 1) + ' / ' + totalPages;
+        lcdPagePrev.disabled = page === 0;
+        lcdPageNext.disabled = page === totalPages - 1;
+    }
 
-        thumb.addEventListener('click', function (e) {
-            e.stopPropagation();
-            if (isPowered) openLightbox(i);
-        });
-        lcdGrid.appendChild(thumb);
+    function goToPage(page) {
+        currentPage = page;
+        renderPage(currentPage);
+    }
+
+    lcdPagePrev.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (currentPage > 0) goToPage(currentPage - 1);
+    });
+    lcdPageNext.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (currentPage < totalPages - 1) goToPage(currentPage + 1);
     });
 
     /* Flip camera on body click */
@@ -1386,6 +1451,8 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
             lcdBootBar.classList.remove('fill');
             lcdHeader.style.display = 'flex';
             lcdGrid.style.display = 'grid';
+            lcdPageNav.style.display = 'flex';
+            renderPage(0);
             isPowered = true;
             isBooting = false;
         }, 1900);
@@ -1397,6 +1464,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
         closeLightbox();
         lcdHeader.style.display = 'none';
         lcdGrid.style.display = 'none';
+        lcdPageNav.style.display = 'none';
         lcdOff.style.display = 'flex';
     }
 
@@ -1433,10 +1501,16 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     });
 
     document.addEventListener('keydown', function (e) {
-        if (!lightbox.classList.contains('open')) return;
-        if (e.key === 'ArrowLeft')  lbNavigate(-1);
-        if (e.key === 'ArrowRight') lbNavigate(1);
-        if (e.key === 'Escape')     closeLightbox();
+        if (lightbox.classList.contains('open')) {
+            if (e.key === 'ArrowLeft')  lbNavigate(-1);
+            if (e.key === 'ArrowRight') lbNavigate(1);
+            if (e.key === 'Escape')     closeLightbox();
+            return;
+        }
+        if (isPowered) {
+            if (e.key === 'ArrowLeft'  && currentPage > 0)              goToPage(currentPage - 1);
+            if (e.key === 'ArrowRight' && currentPage < totalPages - 1) goToPage(currentPage + 1);
+        }
     });
 
 }());
