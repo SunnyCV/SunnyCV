@@ -826,6 +826,128 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 .cb-btn-play { color: #4a8a5e; }
 .cb-btn-del  { color: #8a4040; }
 
+/* ── Back power button ── */
+.cb-power-btn {
+    position: absolute;
+    right: 16px; top: 50%; transform: translateY(-50%);
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 34%, #555, #2a2a2a);
+    box-shadow:
+        0 3px 8px rgba(0,0,0,0.45),
+        0 0 0 1.5px #111,
+        0 0 0 3px #484848,
+        inset 0 1px 0 rgba(255,255,255,0.1);
+    cursor: pointer;
+    border: none;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: box-shadow 0.35s, background 0.35s;
+    z-index: 60;
+}
+.cb-power-btn::after {
+    content: '⏻';
+    font-size: 13px;
+    color: #606060;
+    transition: color 0.35s, text-shadow 0.35s;
+    line-height: 1;
+}
+.cb-power-btn.on {
+    background: radial-gradient(circle at 38% 34%, #606060, #2e2e2e);
+    box-shadow:
+        0 3px 8px rgba(0,0,0,0.45),
+        0 0 0 1.5px #111,
+        0 0 0 3px #484848,
+        0 0 14px rgba(50,220,80,0.65),
+        0 0 28px rgba(50,220,80,0.25),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.cb-power-btn.on::after {
+    color: #3ddc55;
+    text-shadow: 0 0 8px rgba(50,220,80,0.9);
+}
+
+/* ── LCD off state ── */
+.lcd-off {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #020304;
+}
+.lcd-off-icon {
+    font-size: 26px;
+    color: rgba(255,255,255,0.07);
+    line-height: 1;
+}
+.lcd-off-hint {
+    font-family: 'Courier New', monospace;
+    font-size: 7.5px;
+    letter-spacing: 2.5px;
+    color: rgba(255,255,255,0.05);
+    text-transform: uppercase;
+}
+
+/* ── Boot screen ── */
+.lcd-boot {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #020304;
+    position: relative;
+    overflow: hidden;
+}
+.lcd-boot.active { display: flex; }
+.lcd-boot-logo {
+    font-family: 'Times New Roman', serif;
+    font-size: 26px;
+    font-weight: bold;
+    font-style: italic;
+    color: #cc0000;
+    letter-spacing: 3px;
+    opacity: 0;
+    transform: scale(0.88);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+    text-shadow: 0 0 18px rgba(180,0,0,0.4);
+}
+.lcd-boot-logo.show { opacity: 1; transform: scale(1); }
+.lcd-boot-model {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: rgba(135,165,220,0.65);
+    text-transform: uppercase;
+    margin-top: 8px;
+    opacity: 0;
+    transition: opacity 0.5s ease 0.35s;
+}
+.lcd-boot-model.show { opacity: 1; }
+.lcd-boot-bar {
+    position: absolute;
+    bottom: 22px;
+    width: 90px; height: 2px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 1px;
+    overflow: hidden;
+}
+.lcd-boot-bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(135,165,220,0.4), rgba(135,165,220,0.8));
+    border-radius: 1px;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.9s ease 0.45s;
+}
+.lcd-boot-bar.fill::after { transform: scaleX(1); }
+
 /* ── Responsive ── */
 @media (max-width: 1100px) {
     .cam-flip {
@@ -939,17 +1061,30 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
                 <div class="cb-top">
                     <div class="cb-vf"></div>
                     <span class="cb-top-label">SuperSnap T1000</span>
+                    <button class="cb-power-btn" id="cbPowerBtn" title="Power"></button>
                 </div>
                 <div class="cb-body">
 
                     <!-- LCD Screen -->
                     <div class="cb-screen" id="cbScreen">
-                        <div class="lcd-header">
+                        <!-- Off state -->
+                        <div class="lcd-off" id="lcdOff">
+                            <div class="lcd-off-icon">⏻</div>
+                            <div class="lcd-off-hint">Press power to start</div>
+                        </div>
+                        <!-- Boot screen -->
+                        <div class="lcd-boot" id="lcdBoot">
+                            <div class="lcd-boot-logo" id="lcdBootLogo">With Love</div>
+                            <div class="lcd-boot-model" id="lcdBootModel">SuperSnap T1000</div>
+                            <div class="lcd-boot-bar" id="lcdBootBar"></div>
+                        </div>
+                        <!-- Gallery (hidden until powered on) -->
+                        <div class="lcd-header" id="lcdHeader" style="display:none;">
                             <span class="lcd-mode">&#9654; PLAYBACK</span>
                             <span class="lcd-count" id="lcdCount">0 photos</span>
                             <div class="lcd-batt"></div>
                         </div>
-                        <div class="lcd-grid" id="lcdGrid"></div>
+                        <div class="lcd-grid" id="lcdGrid" style="display:none;"></div>
                         <div class="lcd-single" id="lcdSingle">
                             <button class="lcd-back-btn" id="lcdBackBtn">&#9664; BACK</button>
                             <img id="lcdSingleImg" src="" alt="">
@@ -1008,22 +1143,32 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
         { src: 'insert here', caption: '' },
     ];
 
-    var camFlip      = document.getElementById('camFlip');
-    var prompt       = document.getElementById('camPrompt');
-    var lcdGrid      = document.getElementById('lcdGrid');
-    var lcdSingle    = document.getElementById('lcdSingle');
-    var lcdSingleImg = document.getElementById('lcdSingleImg');
-    var lcdCount     = document.getElementById('lcdCount');
-    var lcdBackBtn   = document.getElementById('lcdBackBtn');
-    var lcdPrev      = document.getElementById('lcdPrev');
-    var lcdNext      = document.getElementById('lcdNext');
-    var currentIdx   = 0;
-    var isFlipped    = false;
+    var camFlip       = document.getElementById('camFlip');
+    var prompt        = document.getElementById('camPrompt');
+    var lcdOff        = document.getElementById('lcdOff');
+    var lcdBoot       = document.getElementById('lcdBoot');
+    var lcdBootLogo   = document.getElementById('lcdBootLogo');
+    var lcdBootModel  = document.getElementById('lcdBootModel');
+    var lcdBootBar    = document.getElementById('lcdBootBar');
+    var lcdHeader     = document.getElementById('lcdHeader');
+    var lcdGrid       = document.getElementById('lcdGrid');
+    var lcdSingle     = document.getElementById('lcdSingle');
+    var lcdSingleImg  = document.getElementById('lcdSingleImg');
+    var lcdCount      = document.getElementById('lcdCount');
+    var lcdBackBtn    = document.getElementById('lcdBackBtn');
+    var lcdPrev       = document.getElementById('lcdPrev');
+    var lcdNext       = document.getElementById('lcdNext');
+    var powerBtn      = document.getElementById('cbPowerBtn');
+    var currentIdx    = 0;
+    var isFlipped     = false;
+    var isPowered     = false;
+    var isBooting     = false;
 
     if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
         prompt.textContent = 'Tap the camera to view photos';
     }
 
+    /* Build grid thumbnails */
     lcdCount.textContent = photos.length + ' photos';
     photos.forEach(function (photo, i) {
         var thumb = document.createElement('div');
@@ -1043,16 +1188,63 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 
         thumb.addEventListener('click', function (e) {
             e.stopPropagation();
-            openSingle(i);
+            if (isPowered) openSingle(i);
         });
         lcdGrid.appendChild(thumb);
     });
 
+    /* Flip camera on body click */
     camFlip.addEventListener('click', function () {
         isFlipped = !isFlipped;
         camFlip.classList.toggle('flipped', isFlipped);
         prompt.style.opacity = isFlipped ? '0' : '1';
     });
+
+    /* Power button */
+    powerBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (isBooting) return;
+        isPowered ? powerOff() : powerOn();
+    });
+
+    function powerOn() {
+        isBooting = true;
+        powerBtn.classList.add('on');
+
+        /* Switch to boot screen */
+        lcdOff.style.display = 'none';
+        lcdBoot.classList.add('active');
+
+        /* Trigger boot animations on next frame */
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                lcdBootLogo.classList.add('show');
+                lcdBootModel.classList.add('show');
+                lcdBootBar.classList.add('fill');
+            });
+        });
+
+        /* After boot animation, show gallery */
+        setTimeout(function () {
+            lcdBoot.classList.remove('active');
+            lcdBootLogo.classList.remove('show');
+            lcdBootModel.classList.remove('show');
+            lcdBootBar.classList.remove('fill');
+            lcdHeader.style.display = 'flex';
+            lcdGrid.style.display = 'grid';
+            isPowered = true;
+            isBooting = false;
+        }, 1900);
+    }
+
+    function powerOff() {
+        isPowered = false;
+        powerBtn.classList.remove('on');
+        closeSingle();
+        lcdHeader.style.display = 'none';
+        lcdGrid.style.display = 'none';
+        lcdOff.style.display = 'flex';
+    }
 
     function openSingle(idx) {
         currentIdx = idx;
@@ -1064,7 +1256,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 
     function closeSingle() {
         lcdSingle.classList.remove('active');
-        lcdGrid.style.display = '';
+        if (isPowered) lcdGrid.style.display = 'grid';
     }
 
     function navigate(dir) {
@@ -1078,7 +1270,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     lcdNext.addEventListener('click', function (e) { e.stopPropagation(); navigate(1); });
 
     document.addEventListener('keydown', function (e) {
-        if (!isFlipped) return;
+        if (!isFlipped || !isPowered) return;
         if (lcdSingle.classList.contains('active')) {
             if (e.key === 'ArrowLeft')  navigate(-1);
             if (e.key === 'ArrowRight') navigate(1);
