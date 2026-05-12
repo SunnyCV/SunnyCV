@@ -344,7 +344,7 @@ body.dark-room .dsgn-screen-scanlines { opacity: 1; }
     position: relative;
     transform-style: preserve-3d;
     -webkit-transform-style: preserve-3d;
-    transform: rotateX(-16deg) rotateY(-22deg);
+    transform: rotateX(-22deg) rotateY(165deg);
 }
 
 .pj-face {
@@ -472,6 +472,97 @@ body.dark-room .dsgn-screen-scanlines { opacity: 1; }
 }
 .pj-fport:first-child { width: 12px; height: 8px; border-radius: 1px; }
 
+/* BACK face: ports panel (faces viewer after rotateY(165deg)) */
+.pj-back {
+    width: 260px; height: 64px;
+    top: 0; left: 0;
+    transform: rotateY(180deg) translateZ(85px);
+    background: linear-gradient(168deg, #d0cece 0%, #b8b6b4 50%, #c4c2c0 100%);
+    border-radius: 7px 7px 4px 4px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(0,0,0,0.1);
+}
+.pj-back::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 44%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%);
+    border-radius: 7px 7px 0 0;
+}
+.pj-back-ports {
+    position: absolute;
+    left: 14px; top: 50%;
+    transform: translateY(-50%);
+    display: flex; gap: 7px; align-items: center;
+}
+.pj-back-port {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.pj-hdmi-port {
+    width: 14px; height: 9px;
+    background: #1a1818;
+    border-radius: 1px 1px 3px 3px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.9), 0 0 0 1px rgba(0,0,0,0.3);
+}
+.pj-vga-port {
+    width: 17px; height: 10px;
+    background: #252020;
+    border-radius: 1px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.7);
+}
+.pj-usb-port {
+    width: 10px; height: 7px;
+    background: #1a1818;
+    border-radius: 1px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.8);
+}
+.pj-port-label {
+    font-family: 'Arial Narrow', Arial, sans-serif;
+    font-size: 4.5px; letter-spacing: 0.5px;
+    color: rgba(0,0,0,0.28); text-transform: uppercase;
+}
+.pj-back-power {
+    position: absolute;
+    right: 18px; top: 50%;
+    transform: translateY(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.pj-power-port {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: #1a1818;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.9), 0 0 0 1px rgba(0,0,0,0.3);
+}
+.pj-back-brand {
+    position: absolute;
+    bottom: 5px; left: 50%; transform: translateX(-50%);
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 6.5px; letter-spacing: 2px;
+    color: rgba(0,0,0,0.28); text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* LEFT side face: vents (partially visible at rotateY(165deg)) */
+.pj-left {
+    width: 170px; height: 64px;
+    top: 0; left: -170px;
+    transform-origin: right center;
+    transform: translateZ(85px) rotateY(-90deg);
+    background: linear-gradient(180deg, #c8c6c2 0%, #b0aeaa 52%, #bcbab6 100%);
+}
+.pj-left::before {
+    content: '';
+    position: absolute;
+    top: 10px; left: 10px; right: 10px; bottom: 10px;
+    background: repeating-linear-gradient(
+        90deg, transparent 0px, transparent 3px,
+        rgba(0,0,0,0.2) 3px, rgba(0,0,0,0.2) 4px
+    );
+}
+.pj-left::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 35%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 100%);
+}
+
 /* RIGHT side face: vents (170×64) */
 .pj-right {
     width: 170px; height: 64px;
@@ -590,66 +681,104 @@ body.dark-room .dsgn-screen-scanlines { opacity: 1; }
     box-shadow: inset 0 1px 1px rgba(0,0,0,0.8);
 }
 
-/* ── Stand pole ── */
-.dsgn-stand-pole {
-    width: 9px; height: 70px;
-    background: linear-gradient(to right, #1e1e1e, #303030, #1e1e1e);
-    margin: 0 auto;
-    box-shadow: 1px 0 4px rgba(0,0,0,0.3);
-}
-
-/* Tripod / stand base */
-.dsgn-tripod {
-    display: flex; align-items: flex-end; justify-content: center;
-    gap: 0; position: relative; height: 18px; width: 110px;
-}
-.dsgn-tripod-center {
-    width: 9px; height: 14px;
-    background: linear-gradient(to right, #1e1e1e, #303030, #1e1e1e);
-}
-.dsgn-tripod-leg {
-    position: absolute; bottom: 0;
-    width: 5px; height: 12px;
-    background: linear-gradient(to right, #252525, #353535);
-    border-radius: 0 0 2px 2px;
-    transform-origin: top center;
-}
-.dsgn-tripod-leg:nth-child(1) {
-    transform: rotate(-30deg);
-    left: calc(50% - 28px);
-}
-.dsgn-tripod-leg:nth-child(2) {
-    transform: rotate(30deg);
-    right: calc(50% - 28px);
-}
-
 /* ══════════════════════════════════════
-   FLOOR ROW: projector stack + laptop
+   SHARED TABLE + FLOOR ROW
 ══════════════════════════════════════ */
 .dsgn-floor-row {
     width: 100%; max-width: 980px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+}
+
+.dsgn-table-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    width: 100%;
+}
+
+.dsgn-table-items-row {
     display: flex;
     flex-direction: row;
     align-items: flex-end;
     justify-content: center;
     gap: 0;
-    position: relative;
+    padding: 0 40px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-/* Projector group centered */
 .dsgn-proj-group {
     display: flex; flex-direction: column; align-items: center;
     flex-shrink: 0;
 }
 
-/* Laptop area: to the right */
-.dsgn-laptop-area {
-    position: absolute;
-    right: 60px;
-    bottom: 0;
+/* Cable between projector and laptop */
+.dsgn-cable-wrap {
+    display: flex; align-items: center;
+    flex-shrink: 0;
+    margin-bottom: 22px;
+    padding: 0 6px;
+}
+.dsgn-cable {
+    width: 52px; height: 5px;
+    background: linear-gradient(180deg, #484848 0%, #202020 50%, #383838 100%);
+    border-radius: 3px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.55);
+    position: relative;
+}
+.dsgn-cable::before, .dsgn-cable::after {
+    content: '';
+    position: absolute; top: -3px;
+    width: 11px; height: 11px;
+    background: linear-gradient(180deg, #5a5a5a, #303030);
+    border-radius: 2px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,0,0,0.3);
+}
+.dsgn-cable::before { left: -5px; }
+.dsgn-cable::after  { right: -5px; }
+
+/* Laptop on table */
+.dsgn-laptop-wrap {
+    flex-shrink: 0;
+}
+
+/* Table surface */
+.dsgn-table-top {
+    width: 88%;
+    height: 14px;
+    background: linear-gradient(180deg, #9a8468 0%, #7d6850 55%, #6a5840 100%);
+    border-radius: 4px 4px 0 0;
+    box-shadow:
+        0 4px 10px rgba(0,0,0,0.45),
+        inset 0 1px 0 rgba(255,255,255,0.18),
+        inset 0 -1px 0 rgba(0,0,0,0.25);
+    position: relative;
+}
+.dsgn-table-top::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent 0px, transparent 28px,
+        rgba(0,0,0,0.04) 28px, rgba(0,0,0,0.04) 29px
+    );
+    border-radius: 4px 4px 0 0;
+}
+
+/* Table legs */
+.dsgn-table-legs-row {
+    width: 76%;
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    box-sizing: border-box;
+}
+.dsgn-table-leg {
+    width: 11px; height: 48px;
+    background: linear-gradient(to right, #5a4630, #7a6248, #5a4630);
+    border-radius: 0 0 4px 4px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.25);
 }
 
 /* ══════════════════════════════════════
@@ -835,27 +964,7 @@ body.dark-room .dsgn-screen-scanlines { opacity: 1; }
     pointer-events: none;
 }
 
-/* Small table under laptop */
-.lp-table {
-    width: 240px; height: 10px;
-    background: linear-gradient(to bottom, #8a7060, #6a5040);
-    border-radius: 2px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-}
-.lp-table-leg {
-    width: 6px; height: 30px;
-    background: linear-gradient(to right, #6a5040, #8a6a54);
-    margin: 0 auto;
-}
-.lp-table-legs {
-    display: flex; justify-content: space-between;
-    padding: 0 30px;
-}
-.lp-table-leg-left, .lp-table-leg-right {
-    width: 6px; height: 30px;
-    background: linear-gradient(to right, #6a5040, #8a6a54);
-    border-radius: 0 0 2px 2px;
-}
+/* (laptop table removed — both devices share the dsgn-table-wrap) */
 
 /* Subtle floor ground line */
 .dsgn-floor-line {
@@ -935,14 +1044,16 @@ body.dark-room .dsgn-floor-line {
    RESPONSIVE
 ══════════════════════════════════════ */
 @media (max-width: 900px) {
-    .dsgn-laptop-area { right: 20px; }
     .dsgn-beam-wrap { width: 420px; }
+    .dsgn-cable { width: 30px; }
 }
 @media (max-width: 700px) {
-    .dsgn-floor-row { flex-direction: column; align-items: center; gap: 20px; }
-    .dsgn-laptop-area { position: static; margin-top: 20px; }
+    .dsgn-table-items-row { flex-direction: column; align-items: center; gap: 20px; padding: 0 10px; }
+    .dsgn-cable-wrap { transform: rotate(90deg); margin: 0; }
     .dsgn-beam-wrap { width: 280px; }
-    .proj-perspective { transform: scale(0.85); transform-origin: center top; }
+    .proj-perspective { transform: scale(0.82); transform-origin: center top; }
+    .dsgn-table-top { width: 95%; }
+    .dsgn-table-legs-row { width: 90%; }
 }
 
 </style>
@@ -1030,108 +1141,124 @@ body.dark-room .dsgn-floor-line {
             <div class="dsgn-beam" id="dsgnBeam"></div>
         </div>
 
-        <!-- Floor row: [projector on stand] + [laptop to right] -->
+        <!-- Floor row: shared table with projector + cable + laptop -->
         <div class="dsgn-floor-row">
-            <!-- Projector stack -->
-            <div class="dsgn-proj-group">
-                <!-- 3D Projector body -->
-                <div class="proj-perspective">
-                    <div class="proj-body" id="projBodyEl">
-                        <!-- Front face: lens -->
-                        <div class="pj-face pj-front">
-                            <div class="pj-lens-mount">
-                                <div class="pj-lens-housing">
-                                    <div class="pj-lens-ridge">
-                                        <div class="pj-lens-glass" id="pjLensGlass"></div>
+            <div class="dsgn-table-wrap">
+                <div class="dsgn-table-items-row">
+
+                    <!-- Projector (on table, no stand) -->
+                    <div class="dsgn-proj-group">
+                        <div class="proj-perspective">
+                            <div class="proj-body" id="projBodyEl">
+                                <!-- Front face: lens (faces screen, away from viewer) -->
+                                <div class="pj-face pj-front">
+                                    <div class="pj-lens-mount">
+                                        <div class="pj-lens-housing">
+                                            <div class="pj-lens-ridge">
+                                                <div class="pj-lens-glass" id="pjLensGlass"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pj-front-leds">
+                                        <div class="pj-led pj-led-power" id="pjLedPower"></div>
+                                        <div class="pj-led pj-led-lamp" id="pjLedLamp"></div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="pj-front-ports">
-                                <div class="pj-fport"></div>
-                                <div class="pj-fport"></div>
-                                <div class="pj-fport"></div>
-                            </div>
-                            <div class="pj-brand-area">
-                                <span class="pj-brand">With Love</span>
-                                <span class="pj-model">PL-2000</span>
-                            </div>
-                            <div class="pj-front-leds">
-                                <div class="pj-led pj-led-power" id="pjLedPower"></div>
-                                <div class="pj-led pj-led-lamp" id="pjLedLamp"></div>
-                            </div>
-                        </div>
-                        <!-- Right side: vents -->
-                        <div class="pj-face pj-right"></div>
-                        <!-- Top: controls -->
-                        <div class="pj-face pj-top">
-                            <div class="pj-top-inner">
-                                <div class="pj-counter-display">
-                                    <span class="pj-counter-text" id="pjCounterText">&#8212; / &#8212;</span>
-                                </div>
-                                <div class="pj-top-btn-row">
-                                    <button class="pj-top-btn" id="pjBtnPrev" disabled>&#9664;</button>
-                                    <button class="pj-top-btn power-btn" id="pjBtnPower">&#9711;</button>
-                                    <button class="pj-top-btn" id="pjBtnNext" disabled>&#9654;</button>
-                                </div>
-                                <div class="pj-top-btn-labels">
-                                    <span class="pj-btn-label">PREV</span>
-                                    <span class="pj-btn-label pw">POWER</span>
-                                    <span class="pj-btn-label">NEXT</span>
-                                </div>
-                            </div>
-                            <div class="pj-speaker" id="pjSpeaker"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Stand -->
-                <div class="dsgn-stand-pole"></div>
-                <div class="dsgn-tripod">
-                    <div class="dsgn-tripod-leg"></div>
-                    <div class="dsgn-tripod-center"></div>
-                    <div class="dsgn-tripod-leg"></div>
-                </div>
-            </div>
-
-            <!-- Laptop to the right -->
-            <div class="dsgn-laptop-area">
-                <div class="lp-outer" id="laptopEl" title="Open laptop to start">
-                    <div class="lp-body">
-                        <!-- Screen lid (closed → open animation) -->
-                        <div class="lp-lid" id="lpLid">
-                            <div class="lp-lid-face">
-                                <div class="lp-webcam" id="lpWebcam"></div>
-                                <div class="lp-screen-content" id="lpScreenContent">
-                                    <span class="lp-screen-label" id="lpScreenLabel">Connecting...</span>
-                                    <div class="lp-screen-bar-wrap">
-                                        <div class="lp-screen-bar" id="lpScreenBar"></div>
+                                <!-- Back face: ports (faces viewer) -->
+                                <div class="pj-face pj-back">
+                                    <div class="pj-back-ports">
+                                        <div class="pj-back-port">
+                                            <div class="pj-hdmi-port"></div>
+                                            <span class="pj-port-label">HDMI</span>
+                                        </div>
+                                        <div class="pj-back-port">
+                                            <div class="pj-vga-port"></div>
+                                            <span class="pj-port-label">VGA</span>
+                                        </div>
+                                        <div class="pj-back-port">
+                                            <div class="pj-usb-port"></div>
+                                            <span class="pj-port-label">USB</span>
+                                        </div>
                                     </div>
-                                    <span class="lp-status" id="lpStatus">PROJECTOR READY</span>
+                                    <div class="pj-back-power">
+                                        <div class="pj-power-port"></div>
+                                        <span class="pj-port-label">DC IN</span>
+                                    </div>
+                                    <span class="pj-back-brand">With Love &middot; PL-2000</span>
+                                </div>
+                                <!-- Left side: vents (partially visible) -->
+                                <div class="pj-face pj-left"></div>
+                                <!-- Right side: vents -->
+                                <div class="pj-face pj-right"></div>
+                                <!-- Top: controls -->
+                                <div class="pj-face pj-top">
+                                    <div class="pj-top-inner">
+                                        <div class="pj-counter-display">
+                                            <span class="pj-counter-text" id="pjCounterText">&#8212; / &#8212;</span>
+                                        </div>
+                                        <div class="pj-top-btn-row">
+                                            <button class="pj-top-btn" id="pjBtnPrev" disabled>&#9664;</button>
+                                            <button class="pj-top-btn power-btn" id="pjBtnPower">&#9711;</button>
+                                            <button class="pj-top-btn" id="pjBtnNext" disabled>&#9654;</button>
+                                        </div>
+                                        <div class="pj-top-btn-labels">
+                                            <span class="pj-btn-label">PREV</span>
+                                            <span class="pj-btn-label pw">POWER</span>
+                                            <span class="pj-btn-label">NEXT</span>
+                                        </div>
+                                    </div>
+                                    <div class="pj-speaker" id="pjSpeaker"></div>
                                 </div>
                             </div>
-                            <div class="lp-lid-back"></div>
-                        </div>
-                        <!-- Keyboard base -->
-                        <div class="lp-base">
-                            <div class="lp-key-rows">
-                                <div class="lp-key-row" style="width:90%"></div>
-                                <div class="lp-key-row"></div>
-                                <div class="lp-key-row"></div>
-                                <div class="lp-key-row" style="width:75%"></div>
-                            </div>
-                            <div class="lp-trackpad"></div>
-                            <div class="lp-hint" id="lpHint">Open to start</div>
                         </div>
                     </div>
-                </div>
-                <!-- Small table under laptop -->
-                <div class="lp-table"></div>
-                <div class="lp-table-legs">
-                    <div class="lp-table-leg-left"></div>
-                    <div class="lp-table-leg-right"></div>
-                </div>
-            </div>
 
+                    <!-- HDMI cable -->
+                    <div class="dsgn-cable-wrap">
+                        <div class="dsgn-cable"></div>
+                    </div>
+
+                    <!-- Laptop (starts open, click to start projector) -->
+                    <div class="dsgn-laptop-wrap">
+                        <div class="lp-outer" id="laptopEl" title="Click to start">
+                            <div class="lp-body">
+                                <!-- Lid pre-opened -->
+                                <div class="lp-lid open" id="lpLid">
+                                    <div class="lp-lid-face">
+                                        <div class="lp-webcam" id="lpWebcam"></div>
+                                        <div class="lp-screen-content" id="lpScreenContent">
+                                            <span class="lp-screen-label" id="lpScreenLabel">Connecting...</span>
+                                            <div class="lp-screen-bar-wrap">
+                                                <div class="lp-screen-bar" id="lpScreenBar"></div>
+                                            </div>
+                                            <span class="lp-status" id="lpStatus">PROJECTOR READY</span>
+                                        </div>
+                                    </div>
+                                    <div class="lp-lid-back"></div>
+                                </div>
+                                <!-- Keyboard base -->
+                                <div class="lp-base">
+                                    <div class="lp-key-rows">
+                                        <div class="lp-key-row" style="width:90%"></div>
+                                        <div class="lp-key-row"></div>
+                                        <div class="lp-key-row"></div>
+                                        <div class="lp-key-row" style="width:75%"></div>
+                                    </div>
+                                    <div class="lp-trackpad"></div>
+                                    <div class="lp-hint" id="lpHint">Click to start</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /dsgn-table-items-row -->
+
+                <div class="dsgn-table-top"></div>
+                <div class="dsgn-table-legs-row">
+                    <div class="dsgn-table-leg"></div>
+                    <div class="dsgn-table-leg"></div>
+                </div>
+            </div><!-- /dsgn-table-wrap -->
         </div><!-- /dsgn-floor-row -->
 
         <!-- Floor line -->
@@ -1256,6 +1383,7 @@ var lbNext        = document.getElementById('lbNext');
 var lbClose       = document.getElementById('lbClose');
 
 /* ── Laptop click → room transition + projector boot ── */
+/* Lid starts open, so click directly triggers the sequence */
 var laptopOpened = false;
 
 laptopEl.addEventListener('click', function (e) {
@@ -1263,12 +1391,10 @@ laptopEl.addEventListener('click', function (e) {
     if (laptopOpened && isPowered) return;
 
     if (!laptopOpened) {
-        /* Step 1: Open lid */
         laptopOpened = true;
-        lpLid.classList.add('open');
         if (lpHint) lpHint.style.opacity = '0';
 
-        /* Step 2: Laptop screen turns on */
+        /* Step 1: Laptop screen turns on */
         setTimeout(function () {
             lpWebcam.classList.add('on');
             lpScreenContent.classList.add('visible');
@@ -1277,21 +1403,20 @@ laptopEl.addEventListener('click', function (e) {
                     lpScreenBar.classList.add('fill');
                 });
             });
-        }, 600);
+        }, 200);
 
-        /* Step 3: Room goes dark */
+        /* Step 2: Room goes dark */
         setTimeout(function () {
             document.body.classList.add('dark-room');
-        }, 900);
+        }, 500);
 
-        /* Step 4: Status shows + projector boots */
+        /* Step 3: Status shows + projector boots */
         setTimeout(function () {
             lpStatus.classList.add('show');
             lpScreenLabel.textContent = 'Connected';
             powerOn();
-        }, 1500);
+        }, 1100);
     } else if (!isPowered && !isBooting) {
-        /* Re-open if projector was manually powered off */
         powerOn();
     }
 });
