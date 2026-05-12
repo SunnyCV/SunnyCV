@@ -463,7 +463,7 @@ body.dark-room .dsgn-screen-scanlines { opacity: 1; }
 }
 .pj-back-ports {
     position: absolute;
-    left: 12px; top: 50%;
+    right: 12px; top: 50%;
     transform: translateY(-50%);
     display: flex; gap: 6px; align-items: center;
 }
@@ -495,7 +495,7 @@ body.dark-room .dsgn-screen-scanlines { opacity: 1; }
 }
 .pj-back-power {
     position: absolute;
-    right: 14px; top: 50%;
+    left: 14px; top: 50%;
     transform: translateY(-50%);
     display: flex; flex-direction: column; align-items: center; gap: 2px;
 }
@@ -695,10 +695,13 @@ body.dark-room .dsgn-screen-scanlines { opacity: 1; }
     display: flex; align-items: center;
     flex-shrink: 0;
     margin-bottom: 36px;
-    padding: 0 6px;
+    /* no horizontal padding — connector sits flush against the projector port */
+    padding: 0;
+    /* pull left so the left connector overlaps the projector's right edge slightly */
+    margin-left: -6px;
 }
 .dsgn-cable {
-    width: 52px; height: 5px;
+    width: 44px; height: 5px;
     background: linear-gradient(180deg, #484848 0%, #202020 50%, #383838 100%);
     border-radius: 3px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.55);
@@ -763,7 +766,7 @@ body.dark-room .dsgn-screen-scanlines { opacity: 1; }
    Screen: 236×148  Keyboard: 248×70
 ══════════════════════════════════════ */
 .lp-outer {
-    perspective: 700px;
+    perspective: 600px;
     perspective-origin: 50% 30%;
     cursor: pointer;
     user-select: none;
@@ -772,8 +775,9 @@ body.dark-room .dsgn-screen-scanlines { opacity: 1; }
 
 .lp-body {
     position: relative;
-    width: 248px;
-    transform: rotateY(-9deg);
+    width: 200px;
+    /* very slight angle — just enough to feel 3D, not crooked */
+    transform: rotateY(-3deg);
     transform-style: preserve-3d;
 }
 
@@ -781,8 +785,8 @@ body.dark-room .dsgn-screen-scanlines { opacity: 1; }
 .lp-lid {
     position: absolute;
     bottom: 0;
-    left: 6px;
-    width: 236px; height: 148px;
+    left: 4px;
+    width: 192px; height: 122px;
     transform-origin: bottom center;
     transform: rotateX(108deg);
     transform-style: preserve-3d;
@@ -805,9 +809,8 @@ body.dark-room .dsgn-screen-scanlines { opacity: 1; }
     box-sizing: border-box;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    gap: 8px;
-    /* inner screen recess */
-    box-shadow: inset 0 0 0 6px #111;
+    gap: 6px;
+    box-shadow: inset 0 0 0 5px #111;
 }
 
 /* Laptop lid back (silver exterior) */
@@ -880,14 +883,14 @@ body.dark-room .dsgn-screen-scanlines { opacity: 1; }
 }
 .lp-status.show { opacity: 1; }
 
-/* ── Keyboard base — short and wide, clearly a keyboard ── */
+/* ── Keyboard base — compact, clearly a keyboard not a tablet ── */
 .lp-base {
-    width: 248px; height: 70px;
+    width: 200px; height: 58px;
     position: relative;
     background: linear-gradient(170deg, #d6d4d2 0%, #c2c0be 55%, #cac8c6 100%);
-    border-radius: 2px 2px 6px 6px;
+    border-radius: 2px 2px 5px 5px;
     box-shadow:
-        0 6px 16px rgba(0,0,0,0.38),
+        0 4px 12px rgba(0,0,0,0.35),
         inset 0 1px 0 rgba(255,255,255,0.4),
         inset 0 -1px 0 rgba(0,0,0,0.1);
 }
@@ -895,59 +898,59 @@ body.dark-room .dsgn-screen-scanlines { opacity: 1; }
 /* Hinge bar at top of keyboard base */
 .lp-base::before {
     content: '';
-    position: absolute; top: -3px; left: 8px; right: 8px;
+    position: absolute; top: -3px; left: 6px; right: 6px;
     height: 5px;
     background: linear-gradient(180deg, #9e9c9a 0%, #7e7c7a 100%);
     border-radius: 2px 2px 0 0;
     box-shadow: 0 -1px 3px rgba(0,0,0,0.18);
 }
 
-/* Front edge thickness */
+/* Front edge depth — bottom: 0 keeps it flush with table surface */
 .lp-base::after {
     content: '';
-    position: absolute; bottom: -4px; left: 3px; right: 3px;
-    height: 4px;
-    background: linear-gradient(to bottom, #b0aeac, #949290);
-    border-radius: 0 0 5px 5px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.28);
+    position: absolute; bottom: 0; left: 3px; right: 3px;
+    height: 3px;
+    background: linear-gradient(to bottom, #aaA8a6, #929090);
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
 
-/* Key rows — 3 compact rows + space row */
+/* Key rows — compact to fit the shorter base */
 .lp-key-rows {
     position: absolute;
-    top: 8px; left: 10px; right: 10px;
+    top: 6px; left: 8px; right: 8px;
     display: flex; flex-direction: column; gap: 3px;
 }
 .lp-key-row {
-    height: 9px;
+    height: 8px;
     background: repeating-linear-gradient(
         90deg,
-        #b4b2b0 0px, #b4b2b0 16px,
-        #c8c6c4 16px, #c8c6c4 19px
+        #b4b2b0 0px, #b4b2b0 14px,
+        #c8c6c4 14px, #c8c6c4 17px
     );
     border-radius: 2px;
     box-shadow: 0 1px 2px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.22);
 }
-/* function row — narrower keys */
-.lp-key-row.fn { height: 6px; background: repeating-linear-gradient(
-    90deg, #b0aeac 0px, #b0aeac 10px, #c6c4c2 10px, #c6c4c2 12px); }
+/* function row */
+.lp-key-row.fn { height: 5px; background: repeating-linear-gradient(
+    90deg, #b0aeac 0px, #b0aeac 9px, #c6c4c2 9px, #c6c4c2 11px); }
 /* space bar row */
 .lp-key-row.space { background: repeating-linear-gradient(
     90deg,
-    #b4b2b0 0px, #b4b2b0 12px, #c8c6c4 12px, #c8c6c4 14px,
-    transparent 14px, transparent 30%,
-    #c6c4c2 30%, #c6c4c2 72%,
-    transparent 72%, transparent 76%,
-    #b4b2b0 76%, #b4b2b0 89%, #c8c6c4 89%, #c8c6c4 100%
+    #b4b2b0 0px, #b4b2b0 10px, #c8c6c4 10px, #c8c6c4 12px,
+    transparent 12px, transparent 28%,
+    #c6c4c2 28%, #c6c4c2 74%,
+    transparent 74%, transparent 78%,
+    #b4b2b0 78%, #b4b2b0 90%, #c8c6c4 90%, #c8c6c4 100%
 ); }
 
-/* Trackpad — wider, properly positioned */
+/* Trackpad */
 .lp-trackpad {
     position: absolute;
-    bottom: 8px; left: 50%; transform: translateX(-50%);
-    width: 68px; height: 40px;
+    bottom: 6px; left: 50%; transform: translateX(-50%);
+    width: 52px; height: 18px;
     background: linear-gradient(155deg, #bebcba, #aeacaa);
-    border-radius: 5px;
+    border-radius: 3px;
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.13), 0 0 0 1px rgba(0,0,0,0.1);
 }
 
