@@ -8,10 +8,24 @@
 <style>
 
 /* ── Page ── */
+html {
+    /* PortfolioGallery.css forces overflow-y:scroll on html, which lets the
+       html element scroll even when body is overflow:hidden. Lock it here. */
+    overflow: hidden !important;
+    height: 100%;
+}
+
 body {
     background: radial-gradient(ellipse at 50% 30%, #f5f4f2 0%, #dddbd8 100%) !important;
     overflow: hidden !important;
-    min-height: 100vh;
+    /* Remove the 55px padding-bottom PortfolioGallery.css injects — it adds
+       scroll height that combines with the nav to make the page scrollable. */
+    padding-bottom: 0 !important;
+    /* Flex column so nav takes its natural height and cam-page fills the rest,
+       keeping total height exactly 100vh with nothing to scroll. */
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 nav li a { color: #333 !important; }
@@ -34,7 +48,10 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    /* flex:1 + min-height:0 fills the remaining viewport below the nav
+       without ever exceeding it — no scroll space created */
+    flex: 1;
+    min-height: 0;
     gap: 18px;
     padding: 12px 16px;
     box-sizing: border-box;
@@ -1088,8 +1105,8 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     .cf-lens-center { width: 32px; height: 32px; }
 }
 @media (max-width: 700px) {
-    body { overflow-y: hidden !important; padding-top: 48px; }
-    .cam-page { height: calc(100vh - 48px); gap: 12px; }
+    body { padding-top: 48px; }
+    .cam-page { gap: 12px; }
     .cam-flip {
         width: min(96vw, 480px);
         height: calc(min(96vw, 480px) * 0.6315);
