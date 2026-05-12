@@ -1346,9 +1346,10 @@ var designs = [
 ];
 
 /* ── State ── */
-var isPowered = false;
-var isBooting = false;
-var curSlide  = 0;
+var isPowered   = false;
+var isBooting   = false;
+var curSlide    = 0;
+var slideTimer  = null;
 
 /* ── Element refs ── */
 var laptopEl      = document.getElementById('laptopEl');
@@ -1479,6 +1480,7 @@ function powerOn() {
         curSlide  = 0;
         renderSlide(curSlide, false);
         updateControls();
+        startAutoAdvance();
     }, 2400);
 }
 
@@ -1486,6 +1488,7 @@ function powerOn() {
 function powerOff() {
     if (isBooting) return;
     isPowered = false;
+    stopAutoAdvance();
 
     dsgnSlideWrap.classList.remove('visible');
     dsgnWarmth.classList.remove('on');
@@ -1530,6 +1533,20 @@ function updateControls() {
     pjBtnNext.disabled = !isPowered || curSlide >= designs.length - 1;
 }
 
+/* ── Auto-advance ── */
+function startAutoAdvance() {
+    stopAutoAdvance();
+    slideTimer = setInterval(function () {
+        if (!isPowered) return;
+        curSlide = (curSlide + 1) % designs.length;
+        renderSlide(curSlide, true);
+        updateControls();
+    }, 4000);
+}
+function stopAutoAdvance() {
+    if (slideTimer) { clearInterval(slideTimer); slideTimer = null; }
+}
+
 /* ── Projector Power Button ── */
 pjBtnPower.addEventListener('click', function (e) {
     e.stopPropagation();
@@ -1543,6 +1560,7 @@ pjBtnPrev.addEventListener('click', function (e) {
     curSlide--;
     renderSlide(curSlide, true);
     updateControls();
+    startAutoAdvance();
 });
 pjBtnNext.addEventListener('click', function (e) {
     e.stopPropagation();
@@ -1550,6 +1568,7 @@ pjBtnNext.addEventListener('click', function (e) {
     curSlide++;
     renderSlide(curSlide, true);
     updateControls();
+    startAutoAdvance();
 });
 
 /* ── Keyboard ── */
@@ -1557,9 +1576,9 @@ document.addEventListener('keydown', function (e) {
     if (dsgnLightbox.classList.contains('open')) return;
     if (!isPowered) return;
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-        if (curSlide < designs.length - 1) { curSlide++; renderSlide(curSlide, true); updateControls(); }
+        if (curSlide < designs.length - 1) { curSlide++; renderSlide(curSlide, true); updateControls(); startAutoAdvance(); }
     } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-        if (curSlide > 0) { curSlide--; renderSlide(curSlide, true); updateControls(); }
+        if (curSlide > 0) { curSlide--; renderSlide(curSlide, true); updateControls(); startAutoAdvance(); }
     } else if (e.key === 'Escape') {
         closeLightbox();
     }
