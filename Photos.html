@@ -28,6 +28,7 @@ body {
     /* Flex column so nav takes its natural height and cam-page fills the rest,
        keeping total height exactly 100vh with nothing to scroll. */
     height: 100vh;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
 }
@@ -152,6 +153,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     text-shadow: 0 1px 4px rgba(0,0,0,0.6);
     user-select: none;
     pointer-events: none;
+    z-index: 2;
 }
 
 /* Power button — far left */
@@ -344,6 +346,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     top: 14px;
     right: 38px;
     text-align: right;
+    z-index: 1;
 }
 .cf-body-brand-canon {
     display: block;
