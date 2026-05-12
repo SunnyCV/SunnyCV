@@ -28,6 +28,8 @@ body.dark-room {
 }
 
 /* Nav adapts to room state */
+nav { position: relative; }
+nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width: auto; }
 nav li a { color: #333 !important; transition: color 1.4s ease; }
 li a:hover:not(.active) { background-color: rgba(0,0,0,0.06) !important; transition: background-color 1.4s; }
 body.dark-room nav li a { color: #bbb !important; }
