@@ -978,6 +978,8 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     background: #020304;
     position: relative;
     overflow: hidden;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 .lcd-boot.active { display: flex; }
 .lcd-boot-logo {
@@ -989,6 +991,8 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     letter-spacing: 3px;
     opacity: 0;
     transform: scale(0.88);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     transition: opacity 0.55s ease, transform 0.55s ease;
     text-shadow: 0 0 18px rgba(180,0,0,0.4);
 }
@@ -1177,7 +1181,6 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
             <div class="cam-face cam-face-front">
                 <div class="cf-top">
                     <div class="cf-power"></div>
-                    <div class="cf-canon-top">With Love</div>
                     <div class="cf-shutter-group">
                         <div class="cf-zoom"></div>
                         <div class="cf-shutter"></div>
