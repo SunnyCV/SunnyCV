@@ -1386,19 +1386,18 @@ var lbPrev        = document.getElementById('lbPrev');
 var lbNext        = document.getElementById('lbNext');
 var lbClose       = document.getElementById('lbClose');
 
-/* ── Laptop click → room transition + projector boot ── */
-/* Lid starts open, so click directly triggers the sequence */
+/* ── Laptop click → toggle room + projector ── */
 var laptopOpened = false;
 
 laptopEl.addEventListener('click', function (e) {
     e.stopPropagation();
-    if (laptopOpened && isPowered) return;
+    if (isBooting) return;
 
     if (!laptopOpened) {
+        /* ── TURN ON ── */
         laptopOpened = true;
         if (lpHint) lpHint.style.opacity = '0';
 
-        /* Step 1: Laptop screen turns on */
         setTimeout(function () {
             lpWebcam.classList.add('on');
             lpScreenContent.classList.add('visible');
@@ -1409,19 +1408,39 @@ laptopEl.addEventListener('click', function (e) {
             });
         }, 200);
 
-        /* Step 2: Room goes dark */
         setTimeout(function () {
             document.body.classList.add('dark-room');
         }, 500);
 
-        /* Step 3: Status shows + projector boots */
         setTimeout(function () {
             lpStatus.classList.add('show');
             lpScreenLabel.textContent = 'Connected';
             powerOn();
         }, 1100);
-    } else if (!isPowered && !isBooting) {
-        powerOn();
+
+    } else {
+        /* ── TURN OFF ── */
+        laptopOpened = false;
+
+        /* Projector off immediately */
+        powerOff();
+
+        /* Laptop screen fades */
+        lpWebcam.classList.remove('on');
+        lpScreenContent.classList.remove('visible');
+        lpScreenBar.classList.remove('fill');
+        lpStatus.classList.remove('show');
+
+        /* Room brightens */
+        setTimeout(function () {
+            document.body.classList.remove('dark-room');
+        }, 300);
+
+        /* Reset label + hint for next click */
+        setTimeout(function () {
+            lpScreenLabel.textContent = 'Connecting...';
+            if (lpHint) lpHint.style.opacity = '1';
+        }, 600);
     }
 });
 
