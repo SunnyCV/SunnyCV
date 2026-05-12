@@ -1390,6 +1390,14 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     var PER_PAGE       = 9;
     var totalPages     = Math.ceil(photos.length / PER_PAGE);
 
+    var frontFace   = camFlip.querySelector('.cam-face-front');
+    var backFace    = camFlip.querySelector('.cam-face-back');
+    var flipTimeout = null;
+
+    // iOS WebKit ignores backface-visibility on children with transforms;
+    // start with the back face invisible and swap visibility via JS.
+    backFace.style.visibility = 'hidden';
+
     if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
         prompt.textContent = 'Tap the camera to view photos';
     }
@@ -1449,9 +1457,22 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 
     /* Flip camera on body click */
     camFlip.addEventListener('click', function () {
+        if (flipTimeout) { clearTimeout(flipTimeout); flipTimeout = null; }
+
+        // Both faces must be visible during the 3D rotation
+        frontFace.style.visibility = 'visible';
+        backFace.style.visibility  = 'visible';
+
         isFlipped = !isFlipped;
         camFlip.classList.toggle('flipped', isFlipped);
         prompt.style.opacity = isFlipped ? '0' : '1';
+
+        // After the transition, hide the face now pointing away from the viewer
+        var faceToHide = isFlipped ? frontFace : backFace;
+        flipTimeout = setTimeout(function () {
+            faceToHide.style.visibility = 'hidden';
+            flipTimeout = null;
+        }, 1100);
     });
 
     /* Power button */
