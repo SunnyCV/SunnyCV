@@ -619,67 +619,69 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
 <script src="PortfolioGallery.js"></script>
 <script>
 (function () {
 
     /* ── Track list ────────────────────────────────────────────────────────
-       Fill in your tracks below.
-       title : shown on the disc label and LCD display
-       src   : path to audio file, e.g. 'PORTFOLIO/MUSIC/track01.mp3'
-               (leave '' until you add the file)
+       Titles are loaded automatically from each MP3's metadata on page load.
+       The title field here is just the fallback shown while loading.
+       Update the folder path in MUSIC_DIR if your files live elsewhere.
     ────────────────────────────────────────────────────────────────────── */
+    var MUSIC_DIR = 'PORTFOLIO/MUSIC/';
+
     var tracks = [
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
-        { title: 'Insert Track', src: '' },
+        { title: '...', src: MUSIC_DIR + '1.mp3'  },
+        { title: '...', src: MUSIC_DIR + '2.mp3'  },
+        { title: '...', src: MUSIC_DIR + '3.mp3'  },
+        { title: '...', src: MUSIC_DIR + '4.mp3'  },
+        { title: '...', src: MUSIC_DIR + '5.mp3'  },
+        { title: '...', src: MUSIC_DIR + '6.mp3'  },
+        { title: '...', src: MUSIC_DIR + '7.mp3'  },
+        { title: '...', src: MUSIC_DIR + '8.mp3'  },
+        { title: '...', src: MUSIC_DIR + '9.mp3'  },
+        { title: '...', src: MUSIC_DIR + '10.mp3' },
+        { title: '...', src: MUSIC_DIR + '11.mp3' },
+        { title: '...', src: MUSIC_DIR + '12.mp3' },
+        { title: '...', src: MUSIC_DIR + '13.mp3' },
+        { title: '...', src: MUSIC_DIR + '14.mp3' },
+        { title: '...', src: MUSIC_DIR + '15.mp3' },
+        { title: '...', src: MUSIC_DIR + '16.mp3' },
+        { title: '...', src: MUSIC_DIR + '17.mp3' },
+        { title: '...', src: MUSIC_DIR + '18.mp3' },
+        { title: '...', src: MUSIC_DIR + '19.mp3' },
+        { title: '...', src: MUSIC_DIR + '20.mp3' },
+        { title: '...', src: MUSIC_DIR + '21.mp3' },
+        { title: '...', src: MUSIC_DIR + '22.mp3' },
+        { title: '...', src: MUSIC_DIR + '23.mp3' },
+        { title: '...', src: MUSIC_DIR + '24.mp3' },
+        { title: '...', src: MUSIC_DIR + '25.mp3' },
+        { title: '...', src: MUSIC_DIR + '26.mp3' },
+        { title: '...', src: MUSIC_DIR + '27.mp3' },
+        { title: '...', src: MUSIC_DIR + '28.mp3' },
+        { title: '...', src: MUSIC_DIR + '29.mp3' },
+        { title: '...', src: MUSIC_DIR + '30.mp3' },
+        { title: '...', src: MUSIC_DIR + '31.mp3' },
+        { title: '...', src: MUSIC_DIR + '32.mp3' },
+        { title: '...', src: MUSIC_DIR + '33.mp3' },
+        { title: '...', src: MUSIC_DIR + '34.mp3' },
+        { title: '...', src: MUSIC_DIR + '35.mp3' },
+        { title: '...', src: MUSIC_DIR + '36.mp3' },
+        { title: '...', src: MUSIC_DIR + '37.mp3' },
+        { title: '...', src: MUSIC_DIR + '38.mp3' },
+        { title: '...', src: MUSIC_DIR + '39.mp3' },
+        { title: '...', src: MUSIC_DIR + '40.mp3' },
+        { title: '...', src: MUSIC_DIR + '41.mp3' },
+        { title: '...', src: MUSIC_DIR + '42.mp3' },
+        { title: '',    src: '' },
+        { title: '',    src: '' },
+        { title: '',    src: '' },
+        { title: '',    src: '' },
+        { title: '',    src: '' },
+        { title: '',    src: '' },
+        { title: '',    src: '' },
+        { title: '',    src: '' },
     ];
 
     var PER_PAGE     = 6;
@@ -894,8 +896,31 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
         }
     });
 
+    /* ── Read title from each MP3's ID3 metadata ── */
+    function loadMetadata() {
+        tracks.forEach(function (track, idx) {
+            if (!track.src) return;
+            window.jsmediatags.read(track.src, {
+                onSuccess: function (tag) {
+                    var title = tag.tags && tag.tags.title;
+                    if (title) {
+                        tracks[idx].title = title;
+                        var page = Math.floor(idx / PER_PAGE);
+                        if (page === currentPage) renderBinder(currentPage);
+                        if (idx === currentTrack) {
+                            labelTitle.textContent = title;
+                            lcdTrack.textContent   = title;
+                        }
+                    }
+                },
+                onError: function () {}
+            });
+        });
+    }
+
     /* ── Init ── */
     renderBinder(0);
+    loadMetadata();
 
 }());
 </script>
