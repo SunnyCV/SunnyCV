@@ -41,6 +41,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     padding: 10px 16px 14px;
     box-sizing: border-box;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 /* Pushes content to center when it fits; collapses when it doesn't */
 .music-page::before {
@@ -503,27 +504,27 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 }
 
 /* ── Responsive ── */
-@media (max-width: 500px) {
-    body { padding-top: 48px; }
-    .cdp { width: min(92vw, 440px); }
-    .cdp-tray { width: min(46vw, 240px); height: min(46vw, 240px); }
-    .cdp-disc {
-        width: calc(min(46vw, 240px) * 0.883);
-        height: calc(min(46vw, 240px) * 0.883);
-    }
-    .cdp-disc-label { width: 68px; height: 68px; }
-    .binder-page { width: min(calc(92vw - 26px), 414px); }
-    .cd-mini { width: 50px; height: 50px; }
-    .cd-mini-label { width: 22px; height: 22px; }
-    .cd-mini-label span { font-size: 6px; }
-    .cd-sleeve { min-height: 84px; padding: 7px 4px 5px; }
-    .cd-sleeve-title { font-size: 6px; }
-    .binder-page { gap: 6px; padding: 9px; }
-    .binder-spine { width: 20px; padding: 10px 0; }
-    .binder-ring { width: 11px; height: 11px; }
-}
 @media (max-width: 700px) {
     body { padding-top: 48px; }
+    .music-page { gap: 10px; padding: 8px 12px 12px; }
+    .music-page::before { max-height: 12px; }
+    .cdp { width: min(92vw, 400px); }
+    .cdp-top { padding: 12px 12px 10px; }
+    .cdp-tray { width: min(40vw, 160px); height: min(40vw, 160px); }
+    .cdp-disc { width: calc(min(40vw, 160px) * 0.885); height: calc(min(40vw, 160px) * 0.885); }
+    .cdp-disc-label { width: 56px; height: 56px; }
+    .cdp-controls { padding: 8px 12px 10px; gap: 6px; }
+    .cdp-lcd { padding: 5px 8px; min-height: 32px; }
+    .cdp-lcd-time { font-size: 10px; }
+    .cdp-btn { padding: 6px 2px; font-size: 10px; }
+    .binder-page { width: min(calc(92vw - 22px), 374px); gap: 6px; padding: 9px; }
+    .binder-spine { width: 22px; padding: 10px 0; }
+    .binder-ring { width: 12px; height: 12px; }
+    .cd-mini { width: 46px; height: 46px; }
+    .cd-mini-label { width: 20px; height: 20px; }
+    .cd-mini-label span { font-size: 6px; }
+    .cd-sleeve { min-height: 76px; padding: 6px 4px 5px; gap: 4px; }
+    .cd-sleeve-title { font-size: 5.5px; }
 }
 
 </style>
