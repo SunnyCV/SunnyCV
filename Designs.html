@@ -256,6 +256,24 @@ body.dark-room .dsgn-screen-scanlines { opacity: 1; }
 }
 .dsgn-slide-wrap.visible ~ .dsgn-screen-hint { opacity: 1; }
 
+/* Laptop start prompt — sits on the off-white screen surface in light mode */
+.dsgn-laptop-prompt {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 3;
+    pointer-events: none;
+    transition: opacity 0.5s;
+}
+.dsgn-laptop-prompt span {
+    font-family: 'Courier New', monospace;
+    font-size: 10px; letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(80,70,50,0.45);
+    text-align: center;
+    padding: 0 20px;
+}
+.dsgn-laptop-prompt.gone { opacity: 0; }
+
 /* Frame bottom handle (pull-down screen detail) */
 .dsgn-screen-handle {
     display: flex; justify-content: center;
@@ -1107,6 +1125,11 @@ body.dark-room .dsgn-floor-line {
                     <!-- Fabric texture overlay (light mode) -->
                     <div class="dsgn-screen-fabric"></div>
 
+                    <!-- Laptop start prompt (disappears on first laptop click) -->
+                    <div class="dsgn-laptop-prompt" id="dsgnLaptopPrompt">
+                        <span>Click the laptop to start the presentation</span>
+                    </div>
+
                     <!-- Boot overlay -->
                     <div class="dsgn-boot" id="dsgnBoot">
                         <div class="dsgn-boot-logo" id="dsgnBootLogo">With Love</div>
@@ -1407,7 +1430,13 @@ var lbImg         = document.getElementById('lbImg');
 var lbCounter     = document.getElementById('lbCounter');
 var lbPrev        = document.getElementById('lbPrev');
 var lbNext        = document.getElementById('lbNext');
-var lbClose       = document.getElementById('lbClose');
+var lbClose           = document.getElementById('lbClose');
+var dsgnLaptopPrompt  = document.getElementById('dsgnLaptopPrompt');
+
+if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+    var promptSpan = dsgnLaptopPrompt && dsgnLaptopPrompt.querySelector('span');
+    if (promptSpan) promptSpan.textContent = 'Tap the laptop to start the presentation';
+}
 
 /* ── Laptop click → toggle room + projector ── */
 var laptopOpened = false;
@@ -1420,6 +1449,7 @@ laptopEl.addEventListener('click', function (e) {
         /* ── TURN ON ── */
         laptopOpened = true;
         if (lpHint) lpHint.style.opacity = '0';
+        if (dsgnLaptopPrompt) dsgnLaptopPrompt.classList.add('gone');
 
         setTimeout(function () {
             lpWebcam.classList.add('on');
@@ -1642,6 +1672,9 @@ document.addEventListener('keydown', function (e) {
     if (e.key === 'ArrowRight') lbNext.click();
     if (e.key === 'Escape')     closeLightbox();
 });
+
+/* ── Preload all images so slides are ready before the boot animation completes ── */
+designs.forEach(function (d) { var img = new Image(); img.src = d.src; });
 </script>
 </body>
 </html>
