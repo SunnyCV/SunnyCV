@@ -148,8 +148,8 @@ html, body {
     <a class="menu-btn" href="Videos.html"  data-video="PORTFOLIO/Videos.mp4">Videos</a>
     <a class="menu-btn" href="Designs.html" data-video="PORTFOLIO/Designs.mp4">Designs</a>
     <a class="menu-btn" href="Photos.html"  data-video="PORTFOLIO/Photos.mp4">Photos</a>
-    <a class="menu-btn" href="Music.html"   data-video="">Music</a>
-    <a class="menu-btn" href="Info.html"    data-video="">About</a>
+   <!-- <a class="menu-btn" href="Music.html"   data-video="">Music</a> -->
+   <!-- <a class="menu-btn" href="Info.html"    data-video="">About</a> -->
 </div>
 
 <script>
@@ -223,7 +223,6 @@ html, body {
         menuBtns.forEach(function (btn) {
             btn.addEventListener('click', function (e) {
                 e.preventDefault();
-                e.stopPropagation(); // keep document handler from resetting activeBtn
 
                 // Second tap on the already-active button → navigate
                 if (activeBtn === btn) {
@@ -242,6 +241,7 @@ html, body {
         // Tap anywhere outside the buttons cancels selection
         document.addEventListener('click', function (e) {
             if (!entered) return;
+            if (e.target.closest && e.target.closest('.menu-btn')) return;
             menuBtns.forEach(function (b) { b.classList.remove('active'); });
             hideVideo();
             activeBtn = null;
