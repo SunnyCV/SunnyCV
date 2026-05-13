@@ -7,16 +7,8 @@
 <title>Music — Portfolio</title>
 <style>
 
-/* ── Page ── */
-html, body {
-    margin: 0; padding: 0;
-}
-
-html {
-    overflow: hidden !important;
-    height: 100%;
-}
-
+html, body { margin: 0; padding: 0; }
+html { overflow: hidden !important; height: 100%; }
 body {
     background: radial-gradient(ellipse at 50% 30%, #f5f4f2 0%, #dddbd8 100%) !important;
     overflow: hidden !important;
@@ -31,47 +23,504 @@ nav { position: relative; }
 nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width: auto; }
 nav li a { color: #333 !important; }
 li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
-.mobile-header {
-    background-color: #e8e6e3 !important;
-    border-bottom: 1px solid #ccc !important;
-}
+.mobile-header { background-color: #e8e6e3 !important; border-bottom: 1px solid #ccc !important; }
 .mobile-header-hamburger { color: #333 !important; }
-.mobile-nav-menu {
-    background-color: #eeecea !important;
-    border-right: 1px solid #ccc !important;
-}
+.mobile-nav-menu { background-color: #eeecea !important; border-right: 1px solid #ccc !important; }
 .mobile-nav-menu a { color: #333 !important; border-bottom: 1px solid #ddd !important; }
 .mobile-nav-overlay { background: rgba(0,0,0,0.25) !important; }
 
-/* ── Layout ── */
+/* ── Page layout ── */
 .music-page {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
     flex: 1;
     min-height: 0;
+    gap: 28px;
     padding: 12px 16px;
     box-sizing: border-box;
 }
 
-/* ── Mobile ── */
+/* ═══════════════════════════════════════
+   CD PLAYER
+═══════════════════════════════════════ */
+.cdp {
+    flex-shrink: 0;
+    width: 264px;
+    background: linear-gradient(168deg, #272727 0%, #1a1a1a 55%, #222 100%);
+    border-radius: 16px;
+    box-shadow:
+        0 0 0 1px #0e0e0e,
+        0 0 0 2.5px #353535,
+        0 24px 64px rgba(0,0,0,0.58),
+        inset 0 1px 0 rgba(255,255,255,0.055);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Top section — disc bay + transparent lid */
+.cdp-top {
+    position: relative;
+    border-radius: 16px 16px 0 0;
+    overflow: hidden;
+    padding: 20px 20px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Recessed dark tray */
+.cdp-tray {
+    width: 178px; height: 178px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #111 0%, #0a0a0a 100%);
+    box-shadow:
+        inset 0 4px 20px rgba(0,0,0,0.96),
+        0 0 0 2px #080808,
+        0 0 0 4px #2d2d2d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* CD disc */
+.cdp-disc {
+    width: 154px; height: 154px;
+    border-radius: 50%;
+    position: relative;
+    background:
+        conic-gradient(
+            hsla(0,   80%, 76%, 0.40) 0deg 45deg,
+            hsla(48,  88%, 70%, 0.40) 45deg 90deg,
+            hsla(92,  78%, 65%, 0.40) 90deg 135deg,
+            hsla(178, 78%, 65%, 0.40) 135deg 180deg,
+            hsla(218, 78%, 76%, 0.40) 180deg 225deg,
+            hsla(268, 78%, 70%, 0.40) 225deg 270deg,
+            hsla(298, 78%, 70%, 0.40) 270deg 315deg,
+            hsla(332, 78%, 73%, 0.40) 315deg 360deg
+        ),
+        radial-gradient(circle at 47% 43%,
+            #f2f0ee 0%, #e2e0de 30%, #d0cecd 65%, #c0bebd 100%
+        );
+    box-shadow:
+        0 0 0 1.5px rgba(255,255,255,0.22),
+        0 6px 22px rgba(0,0,0,0.75),
+        inset 0 0 28px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.cdp-disc::before {
+    content: '';
+    position: absolute;
+    inset: 22px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.14);
+    pointer-events: none;
+}
+.cdp-disc::after {
+    content: '';
+    position: absolute;
+    inset: 40px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.09);
+    pointer-events: none;
+}
+@keyframes discSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+.cdp-disc.spinning { animation: discSpin 2s linear infinite; }
+
+/* Centre label */
+.cdp-disc-label {
+    position: absolute;
+    width: 62px; height: 62px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 43% 40%, #23233a, #111125);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    z-index: 1;
+}
+.cdp-label-title {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 4.5px;
+    letter-spacing: 0.8px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 52px;
+}
+.cdp-label-num {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    color: rgba(155,185,255,0.8);
+}
+
+/* Spindle hub */
+.cdp-spindle {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 34%, #585858, #222);
+    box-shadow: 0 0 0 2px #0d0d0d, 0 0 0 3.5px #3a3a3a;
+    z-index: 3;
+}
+
+/* Transparent acrylic lid */
+.cdp-lid {
+    position: absolute;
+    inset: 0;
+    border-radius: 16px 16px 0 0;
+    pointer-events: none;
+    z-index: 8;
+}
+.cdp-lid::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px 16px 0 0;
+    background: linear-gradient(148deg,
+        rgba(210, 228, 255, 0.048) 0%,
+        rgba(160, 190, 240, 0.022) 45%,
+        rgba(190, 215, 255, 0.04) 100%
+    );
+    border: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+}
+/* Reflection streak */
+.cdp-lid::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 14%; width: 42%;
+    height: 3px;
+    border-radius: 2px;
+    background: linear-gradient(90deg,
+        transparent, rgba(255,255,255,0.17), rgba(255,255,255,0.09), transparent
+    );
+}
+
+/* ── Controls ── */
+.cdp-controls {
+    background: linear-gradient(180deg, #1d1d1d 0%, #161616 100%);
+    border-top: 1px solid #080808;
+    padding: 9px 13px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.cdp-lcd {
+    background: #050e05;
+    border-radius: 3px;
+    box-shadow:
+        inset 0 2px 10px rgba(0,0,0,0.9),
+        0 0 0 1px #090909,
+        0 0 0 2.5px #252525;
+    padding: 5px 8px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 36px;
+}
+.cdp-lcd-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #0d1a0d;
+    flex-shrink: 0;
+    transition: background 0.3s, box-shadow 0.3s;
+}
+.cdp-lcd-dot.on {
+    background: #44dd66;
+    box-shadow: 0 0 6px rgba(50,220,80,0.88);
+}
+.cdp-lcd-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.cdp-lcd-track {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    color: rgba(45,205,70,0.88);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.cdp-lcd-sub {
+    font-family: 'Courier New', monospace;
+    font-size: 6.5px;
+    color: rgba(45,205,70,0.42);
+    letter-spacing: 0.5px;
+}
+.cdp-lcd-time {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: rgba(45,205,70,0.72);
+    letter-spacing: 2.5px;
+    flex-shrink: 0;
+}
+
+.cdp-btns { display: flex; align-items: center; gap: 5px; }
+.cdp-btn {
+    flex: 1;
+    background: linear-gradient(175deg, #2c2c2c 0%, #1c1c1c 100%);
+    border: none;
+    border-radius: 4px;
+    color: #545454;
+    font-size: 10px;
+    cursor: pointer;
+    padding: 7px 2px;
+    box-shadow:
+        0 3px 0 #080808,
+        0 4px 8px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.04);
+    transition: color 0.14s;
+    user-select: none;
+    line-height: 1;
+    text-align: center;
+}
+.cdp-btn:hover:not(:disabled) { color: #909090; }
+.cdp-btn:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #080808, inset 0 2px 4px rgba(0,0,0,0.4);
+}
+.cdp-btn:disabled { opacity: 0.25; cursor: default; }
+.cdp-btn-pp { color: #3d8050; font-size: 13px; }
+.cdp-btn-pp:hover:not(:disabled) { color: #5fc078; }
+
+.cdp-footer { display: flex; align-items: center; justify-content: space-between; }
+.cdp-brand {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 6px;
+    letter-spacing: 2.5px;
+    color: #2a2a2a;
+    text-transform: uppercase;
+    user-select: none;
+}
+.cdp-led {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #111;
+    transition: background 0.4s, box-shadow 0.4s;
+}
+.cdp-led.on { background: #44dd66; box-shadow: 0 0 7px rgba(50,220,80,0.9); }
+
+/* ═══════════════════════════════════════
+   CD BINDER
+═══════════════════════════════════════ */
+.binder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.binder-book {
+    display: flex;
+    border-radius: 0 7px 7px 0;
+    box-shadow: 5px 8px 32px rgba(0,0,0,0.44), 0 2px 8px rgba(0,0,0,0.28);
+}
+
+.binder-spine {
+    width: 24px;
+    background: linear-gradient(90deg, #07070f 0%, #12121e 50%, #09090f 100%);
+    border-radius: 6px 0 0 6px;
+    box-shadow: inset -3px 0 8px rgba(0,0,0,0.55), inset 1px 0 0 rgba(255,255,255,0.015);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    padding: 14px 0;
+}
+.binder-ring {
+    width: 13px; height: 13px;
+    border: 2px solid #38383e;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #484850, #1c1c24);
+    box-shadow: 0 0 0 1px #141418, inset 0 1px 3px rgba(0,0,0,0.75);
+}
+
+.binder-page {
+    width: 352px;
+    background: linear-gradient(168deg, #141416 0%, #0d0d10 100%);
+    border-radius: 0 7px 7px 0;
+    border: 1px solid #1c1c20;
+    border-left: 1px solid rgba(255,255,255,0.03);
+    padding: 12px;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 8px;
+}
+
+/* CD sleeve pocket */
+.cd-sleeve {
+    background: rgba(255,255,255,0.028);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 5px;
+    padding: 8px 5px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+    transition: background 0.13s, border-color 0.13s;
+    position: relative;
+    overflow: hidden;
+    min-height: 90px;
+}
+.cd-sleeve::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 5px 5px 0 0;
+}
+.cd-sleeve:hover { background: rgba(255,255,255,0.065); border-color: rgba(255,255,255,0.14); }
+.cd-sleeve.active { border-color: rgba(88,162,255,0.44); background: rgba(60,125,255,0.07); }
+.cd-sleeve.empty { cursor: default; opacity: 0.18; pointer-events: none; }
+
+/* Mini CD disc */
+.cd-mini {
+    width: 54px; height: 54px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    position: relative;
+    background:
+        conic-gradient(
+            hsla(0,   75%, 73%, 0.44) 0deg 45deg,
+            hsla(48,  85%, 68%, 0.44) 45deg 90deg,
+            hsla(92,  75%, 62%, 0.44) 90deg 135deg,
+            hsla(175, 75%, 62%, 0.44) 135deg 180deg,
+            hsla(215, 75%, 73%, 0.44) 180deg 225deg,
+            hsla(265, 75%, 67%, 0.44) 225deg 270deg,
+            hsla(295, 75%, 67%, 0.44) 270deg 315deg,
+            hsla(325, 75%, 70%, 0.44) 315deg 360deg
+        ),
+        radial-gradient(circle at 47% 43%, #ececea 0%, #dcdad8 38%, #cccac8 100%);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.68), 0 0 0 1px rgba(255,255,255,0.12);
+}
+.cd-mini::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: #0d0d0d;
+    box-shadow: 0 0 0 2px #1a1a1a;
+    z-index: 2;
+}
+.cd-mini-label {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #181826, #0c0c18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+.cd-mini-label span {
+    font-family: 'Courier New', monospace;
+    font-size: 7px;
+    color: rgba(160,190,255,0.82);
+    font-weight: bold;
+}
+
+.cd-sleeve-title {
+    font-family: 'Courier New', monospace;
+    font-size: 6.5px;
+    letter-spacing: 0.3px;
+    color: rgba(255,255,255,0.28);
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    padding: 0 4px;
+    box-sizing: border-box;
+}
+.cd-sleeve.active .cd-sleeve-title { color: rgba(130,185,255,0.65); }
+
+/* Binder nav */
+.binder-nav { display: flex; align-items: center; gap: 14px; }
+.binder-btn {
+    background: rgba(0,0,0,0.15);
+    border: 1px solid rgba(0,0,0,0.2);
+    color: rgba(90,90,90,0.85);
+    font-size: 11px;
+    cursor: pointer;
+    padding: 4px 14px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    transition: background 0.12s, color 0.12s;
+    user-select: none;
+}
+.binder-btn:hover:not(:disabled) { background: rgba(0,0,0,0.24); color: #555; }
+.binder-btn:disabled { opacity: 0.22; cursor: default; }
+.binder-indicator {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    letter-spacing: 2px;
+    color: rgba(100,100,100,0.75);
+    user-select: none;
+}
+
+/* ── Responsive ── */
+@media (max-width: 860px) {
+    .music-page {
+        flex-direction: column;
+        gap: 16px;
+        overflow-y: auto;
+        justify-content: flex-start;
+        padding-top: 18px;
+    }
+    .binder-page { width: min(78vw, 340px); }
+}
 @media (max-width: 700px) {
     body { padding-top: 48px; }
+    .cdp { width: min(88vw, 264px); }
+    .cdp-tray { width: 148px; height: 148px; }
+    .cdp-disc { width: 126px; height: 126px; }
+    .cdp-disc-label { width: 52px; height: 52px; }
+    .cdp-label-title { font-size: 4px; max-width: 44px; }
+    .binder-page { width: min(72vw, 290px); gap: 6px; padding: 9px; }
+    .binder-spine { width: 20px; padding: 10px 0; }
+    .binder-ring { width: 11px; height: 11px; }
+    .cd-mini { width: 46px; height: 46px; }
+    .cd-mini-label { width: 20px; height: 20px; }
+    .cd-mini-label span { font-size: 6px; }
+    .cd-sleeve { min-height: 76px; padding: 6px 4px 5px; }
+    .cd-sleeve-title { font-size: 5.5px; }
 }
 
 </style>
 </head>
 <body>
 
-<!-- Mobile Header Bar -->
 <div class="mobile-header" id="mobileHeader">
     <button class="mobile-header-hamburger" id="mobileHamburger" aria-label="Menu">&#9776;</button>
     <a href="Portfolio.html" style="display:contents;"><img class="mobile-header-logo" src="PORTFOLIO/portfolio logo.png" alt="Portfolio"></a>
     <div class="mobile-header-spacer"></div>
 </div>
-
-<!-- Mobile Nav -->
 <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
 <div class="mobile-nav-menu" id="mobileNavMenu">
     <a href="Portfolio.html">HOME</a>
@@ -94,11 +543,266 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 </ul>
 </nav>
 
-<!-- Music page content -->
+<audio id="cdpAudio"></audio>
+
 <div class="music-page" id="musicPage">
+
+    <!-- ── CD Player ── -->
+    <div class="cdp">
+        <div class="cdp-top">
+            <div class="cdp-tray">
+                <div class="cdp-disc" id="cdpDisc">
+                    <div class="cdp-disc-label">
+                        <span class="cdp-label-title" id="cdpLabelTitle">NO DISC</span>
+                        <span class="cdp-label-num"   id="cdpLabelNum">—</span>
+                    </div>
+                </div>
+                <div class="cdp-spindle"></div>
+            </div>
+            <div class="cdp-lid" aria-hidden="true"></div>
+        </div>
+        <div class="cdp-controls">
+            <div class="cdp-lcd">
+                <div class="cdp-lcd-dot" id="cdpDot"></div>
+                <div class="cdp-lcd-info">
+                    <div class="cdp-lcd-track" id="cdpLcdTrack">NO DISC</div>
+                    <div class="cdp-lcd-sub"   id="cdpLcdSub">SELECT A TRACK</div>
+                </div>
+                <div class="cdp-lcd-time" id="cdpLcdTime">0:00</div>
+            </div>
+            <div class="cdp-btns">
+                <button class="cdp-btn"     id="cdpPrev"  disabled>&#9664;&#9664;</button>
+                <button class="cdp-btn"     id="cdpStop"  disabled>&#9632;</button>
+                <button class="cdp-btn cdp-btn-pp" id="cdpPP" disabled>&#9654;</button>
+                <button class="cdp-btn"     id="cdpNext"  disabled>&#9654;&#9654;</button>
+            </div>
+            <div class="cdp-footer">
+                <span class="cdp-brand">With Love &middot; CD Player</span>
+                <div class="cdp-led" id="cdpLed"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── CD Binder ── -->
+    <div class="binder">
+        <div class="binder-book">
+            <div class="binder-spine">
+                <div class="binder-ring"></div>
+                <div class="binder-ring"></div>
+                <div class="binder-ring"></div>
+                <div class="binder-ring"></div>
+            </div>
+            <div class="binder-page" id="binderPage"></div>
+        </div>
+        <div class="binder-nav">
+            <button class="binder-btn" id="binderPrev">&#8592;</button>
+            <span class="binder-indicator" id="binderInd">1 / 1</span>
+            <button class="binder-btn" id="binderNext">&#8594;</button>
+        </div>
+    </div>
 
 </div>
 
 <script src="PortfolioGallery.js"></script>
+<script>
+(function () {
+
+    /* ── Track list ────────────────────────────────────────────────────────
+       Fill in your tracks below.
+       title : shown on the disc label and LCD display
+       src   : path to audio file, e.g. 'PORTFOLIO/MUSIC/track01.mp3'
+               (leave '' until you add the file)
+    ────────────────────────────────────────────────────────────────────── */
+    var tracks = [
+        { title: 'Insert Track', src: '' },
+        { title: 'Insert Track', src: '' },
+        { title: 'Insert Track', src: '' },
+        { title: 'Insert Track', src: '' },
+        { title: 'Insert Track', src: '' },
+        { title: 'Insert Track', src: '' },
+        { title: 'Insert Track', src: '' },
+        { title: 'Insert Track', src: '' },
+        { title: 'Insert Track', src: '' },
+        { title: 'Insert Track', src: '' },
+        { title: 'Insert Track', src: '' },
+        { title: 'Insert Track', src: '' },
+    ];
+
+    var PER_PAGE     = 6;
+    var totalPages   = Math.ceil(tracks.length / PER_PAGE);
+    var currentPage  = 0;
+    var currentTrack = null;
+    var isPlaying    = false;
+    var elapsed      = 0;
+    var timerID      = null;
+
+    var disc         = document.getElementById('cdpDisc');
+    var labelTitle   = document.getElementById('cdpLabelTitle');
+    var labelNum     = document.getElementById('cdpLabelNum');
+    var dot          = document.getElementById('cdpDot');
+    var lcdTrack     = document.getElementById('cdpLcdTrack');
+    var lcdSub       = document.getElementById('cdpLcdSub');
+    var lcdTime      = document.getElementById('cdpLcdTime');
+    var btnPrev      = document.getElementById('cdpPrev');
+    var btnStop      = document.getElementById('cdpStop');
+    var btnPP        = document.getElementById('cdpPP');
+    var btnNext      = document.getElementById('cdpNext');
+    var led          = document.getElementById('cdpLed');
+    var audio        = document.getElementById('cdpAudio');
+    var binderPage   = document.getElementById('binderPage');
+    var btnBPrev     = document.getElementById('binderPrev');
+    var btnBNext     = document.getElementById('binderNext');
+    var binderInd    = document.getElementById('binderInd');
+
+    /* ── Helpers ── */
+    function fmt(s) {
+        var m = Math.floor(s / 60);
+        var sec = Math.floor(s % 60);
+        return m + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+
+    /* ── Binder rendering ── */
+    function renderBinder(page) {
+        binderPage.innerHTML = '';
+        var start = page * PER_PAGE;
+        var end   = Math.min(start + PER_PAGE, tracks.length);
+
+        for (var i = start; i < end; i++) {
+            (function (idx) {
+                var sleeve = document.createElement('div');
+                sleeve.className = 'cd-sleeve' + (idx === currentTrack ? ' active' : '');
+
+                var mini = document.createElement('div');
+                mini.className = 'cd-mini';
+
+                var lbl = document.createElement('div');
+                lbl.className = 'cd-mini-label';
+                var sp = document.createElement('span');
+                sp.textContent = String(idx + 1).padStart(2, '0');
+                lbl.appendChild(sp);
+                mini.appendChild(lbl);
+
+                var title = document.createElement('div');
+                title.className = 'cd-sleeve-title';
+                title.textContent = tracks[idx].title;
+
+                sleeve.appendChild(mini);
+                sleeve.appendChild(title);
+                sleeve.addEventListener('click', function () { loadTrack(idx); });
+                binderPage.appendChild(sleeve);
+            })(i);
+        }
+
+        for (var j = end; j < start + PER_PAGE; j++) {
+            var empty = document.createElement('div');
+            empty.className = 'cd-sleeve empty';
+            binderPage.appendChild(empty);
+        }
+
+        binderInd.textContent = (page + 1) + ' / ' + totalPages;
+        btnBPrev.disabled = page === 0;
+        btnBNext.disabled = page === totalPages - 1;
+    }
+
+    btnBPrev.addEventListener('click', function () {
+        if (currentPage > 0) { currentPage--; renderBinder(currentPage); }
+    });
+    btnBNext.addEventListener('click', function () {
+        if (currentPage < totalPages - 1) { currentPage++; renderBinder(currentPage); }
+    });
+
+    /* ── Load track ── */
+    function loadTrack(idx) {
+        stopPlayback();
+        currentTrack = idx;
+        elapsed = 0;
+        lcdTime.textContent = '0:00';
+
+        var t   = tracks[idx];
+        var num = String(idx + 1).padStart(2, '0');
+
+        labelTitle.textContent = t.title;
+        labelNum.textContent   = num;
+        lcdTrack.textContent   = t.title;
+        lcdSub.textContent     = 'TRACK ' + num;
+
+        if (t.src) { audio.src = t.src; audio.load(); } else { audio.src = ''; }
+
+        btnPP.disabled   = false;
+        btnStop.disabled = false;
+        btnPrev.disabled = idx === 0;
+        btnNext.disabled = idx === tracks.length - 1;
+        led.classList.add('on');
+
+        renderBinder(currentPage);
+    }
+
+    /* ── Playback ── */
+    function play() {
+        if (currentTrack === null) return;
+        isPlaying = true;
+        disc.classList.add('spinning');
+        dot.classList.add('on');
+        btnPP.innerHTML = '&#9646;&#9646;';
+        if (audio.src) audio.play().catch(function () {});
+        clearInterval(timerID);
+        timerID = setInterval(function () {
+            elapsed = audio.src && !isNaN(audio.currentTime) ? audio.currentTime : elapsed + 1;
+            lcdTime.textContent = fmt(elapsed);
+        }, 1000);
+    }
+
+    function pause() {
+        isPlaying = false;
+        disc.classList.remove('spinning');
+        dot.classList.remove('on');
+        btnPP.innerHTML = '&#9654;';
+        if (audio.src) audio.pause();
+        clearInterval(timerID);
+    }
+
+    function stopPlayback() {
+        isPlaying = false;
+        elapsed = 0;
+        disc.classList.remove('spinning');
+        dot.classList.remove('on');
+        btnPP.innerHTML = '&#9654;';
+        lcdTime.textContent = '0:00';
+        if (audio.src) { audio.pause(); audio.currentTime = 0; }
+        clearInterval(timerID);
+    }
+
+    btnPP.addEventListener('click', function () {
+        if (currentTrack === null) return;
+        isPlaying ? pause() : play();
+    });
+    btnStop.addEventListener('click', stopPlayback);
+    btnPrev.addEventListener('click', function () {
+        if (currentTrack === null || currentTrack === 0) return;
+        var wasPlaying = isPlaying;
+        loadTrack(currentTrack - 1);
+        if (wasPlaying) play();
+    });
+    btnNext.addEventListener('click', function () {
+        if (currentTrack === null || currentTrack === tracks.length - 1) return;
+        var wasPlaying = isPlaying;
+        loadTrack(currentTrack + 1);
+        if (wasPlaying) play();
+    });
+
+    audio.addEventListener('ended', function () {
+        if (currentTrack !== null && currentTrack < tracks.length - 1) {
+            loadTrack(currentTrack + 1);
+            play();
+        } else {
+            stopPlayback();
+        }
+    });
+
+    /* ── Init ── */
+    renderBinder(0);
+
+}());
+</script>
 </body>
 </html>
