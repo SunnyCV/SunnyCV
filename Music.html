@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" type="text/css" href="PortfolioGallery.css">
+<title>Music — Portfolio</title>
+<style>
+
+/* ── Page ── */
+html, body {
+    margin: 0; padding: 0;
+}
+
+html {
+    overflow: hidden !important;
+    height: 100%;
+}
+
+body {
+    background: radial-gradient(ellipse at 50% 30%, #f5f4f2 0%, #dddbd8 100%) !important;
+    overflow: hidden !important;
+    padding-bottom: 0 !important;
+    height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+nav { position: relative; }
+nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width: auto; }
+nav li a { color: #333 !important; }
+li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
+.mobile-header {
+    background-color: #e8e6e3 !important;
+    border-bottom: 1px solid #ccc !important;
+}
+.mobile-header-hamburger { color: #333 !important; }
+.mobile-nav-menu {
+    background-color: #eeecea !important;
+    border-right: 1px solid #ccc !important;
+}
+.mobile-nav-menu a { color: #333 !important; border-bottom: 1px solid #ddd !important; }
+.mobile-nav-overlay { background: rgba(0,0,0,0.25) !important; }
+
+/* ── Layout ── */
+.music-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-height: 0;
+    padding: 12px 16px;
+    box-sizing: border-box;
+}
+
+/* ── Mobile ── */
+@media (max-width: 700px) {
+    body { padding-top: 48px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- Mobile Header Bar -->
+<div class="mobile-header" id="mobileHeader">
+    <button class="mobile-header-hamburger" id="mobileHamburger" aria-label="Menu">&#9776;</button>
+    <a href="Portfolio.html" style="display:contents;"><img class="mobile-header-logo" src="PORTFOLIO/portfolio logo.png" alt="Portfolio"></a>
+    <div class="mobile-header-spacer"></div>
+</div>
+
+<!-- Mobile Nav -->
+<div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+<div class="mobile-nav-menu" id="mobileNavMenu">
+    <a href="Portfolio.html">HOME</a>
+    <a href="Videos.html">VIDEOS</a>
+    <a href="Designs.html">DESIGNS</a>
+    <a href="Photos.html">PHOTOS</a>
+    <a class="active" href="Music.html">MUSIC</a>
+    <a href="Info.html">INFO</a>
+</div>
+
+<nav>
+<a href="Portfolio.html" style="display:contents;"><img src="PORTFOLIO/portfolio logo.png" alt=""></a>
+<ul>
+    <li><a href="Videos.html">Videos</a></li>
+    <li><a href="Designs.html">Designs</a></li>
+    <li><a href="Photos.html">Photos</a></li>
+    <li><a class="active" href="Music.html">Music</a></li>
+    <li><a href="Info.html">Info</a></li>
+    <li><a href="Portfolio.html">Home</a></li>
+</ul>
+</nav>
+
+<!-- Music page content -->
+<div class="music-page" id="musicPage">
+
+</div>
+
+<script src="PortfolioGallery.js"></script>
+</body>
+</html>
