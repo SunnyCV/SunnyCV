@@ -5,190 +5,223 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Portfolio</title>
 <style>
-html {overflow-y: scroll;}
-body {background-color: black; overflow: hidden; padding-bottom: 55px;}
-nav ul {list-style-type: none; margin: 0; padding: 0; overflow: hidden;}
-nav li {float: right;}
-nav img {position: absolute; float: left; margin: -50%, -50%; overflow: hidden; width: 225px;}
-li a {display: block; padding: 9px; background-color: rgb(from color r g b);
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-weight: 600; text-decoration: none; color: white;}
-li a:hover:not(.active) {background-color: #111;}
-.active {opacity: 75%;}
 
-/* ── Mobile nav panel ── */
-.mobile-nav-overlay {
-    display: none;
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+    margin: 0; padding: 0;
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #000;
+}
+
+/* ── Background video ── */
+#bgVideo {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 1050;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+    pointer-events: none;
 }
-.mobile-nav-overlay.open { display: block; }
-.mobile-nav-menu {
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 230px;
-    height: 100%;
-    background-color: #000;
-    z-index: 1080;
-    padding: 64px 0 20px;
-    flex-direction: column;
-    border-right: 1px solid #222;
-}
-.mobile-nav-menu.open { display: flex; }
-.mobile-nav-menu a {
-    color: white;
-    text-decoration: none;
-    padding: 16px 28px;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    border-bottom: 1px solid #222;
-    display: block;
-}
-.mobile-nav-menu a:hover, .mobile-nav-menu a.active { background-color: #111; }
+#bgVideo.visible { opacity: 1; }
 
-/* ── Mobile header bar ── */
-.mobile-header {
-    display: none;
+/* ── Screens (intro + menu share the same full-screen layer) ── */
+.screen {
     position: fixed;
-    top: 0; left: 0;
-    width: 100%;
-    height: 48px;
-    background-color: #000;
-    border-bottom: 1px solid #222;
-    z-index: 1090;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 8px;
-    box-sizing: border-box;
-}
-.mobile-header-hamburger {
-    background: none; border: none;
-    font-size: 26px; cursor: pointer;
-    padding: 4px 8px; color: #fff;
-    font-family: Arial, sans-serif; line-height: 1;
-}
-.mobile-header-logo {
-    position: absolute; left: 50%; transform: translateX(-50%);
-    height: 34px; width: auto;
-}
-.mobile-header-spacer {
-    width: 46px;
-}
-
-/* ── Welcome section ── */
-.welcome-section {
+    inset: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 48px;
-    padding: 0 20px;
-}
-.welcome-heading {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 96px;
-    font-weight: 900;
-    color: white;
-    margin: 0 0 36px 0;
-    letter-spacing: 2px;
-    text-align: center;
-}
-.portfolio-buttons {
-    display: flex;
-    flex-wrap: wrap;
     justify-content: center;
-    gap: 14px;
+    z-index: 1;
+    transition: opacity 0.9s ease;
 }
-.portfolio-btn {
+.screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ── Intro ── */
+#introScreen { cursor: pointer; }
+
+.intro-logo {
+    height: 72px;
+    width: auto;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+    pointer-events: none;
+    user-select: none;
+}
+.intro-logo.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.intro-enter {
+    margin-top: 26px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    opacity: 0;
+    transition: opacity 0.7s ease;
+    pointer-events: none;
+    user-select: none;
+}
+.intro-enter.show { opacity: 1; }
+
+/* ── Menu ── */
+.menu-btn {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 13px;
     font-weight: 700;
-    letter-spacing: 3px;
+    letter-spacing: 6px;
     text-transform: uppercase;
-    color: white;
+    color: rgba(255,255,255,0.55);
     text-decoration: none;
-    border: 1px solid rgba(255,255,255,0.5);
-    padding: 14px 32px;
-    background: rgba(255,255,255,0.05);
-    transition: background 0.2s, border-color 0.2s;
-    border-radius: 2px;
+    padding: 15px 52px;
+    display: block;
+    transition: color 0.25s ease, letter-spacing 0.25s ease;
+    user-select: none;
+    -webkit-user-select: none;
 }
-.portfolio-btn:hover {
-    background: rgba(255,255,255,0.15);
-    border-color: white;
+.menu-btn:hover,
+.menu-btn.active {
+    color: #fff;
+    letter-spacing: 8px;
 }
 
+/* ── Mobile ── */
 @media (max-width: 768px) {
-    nav { display: none; }
-    .mobile-header { display: flex; }
-    body { overflow-y: auto; padding-top: 48px; }
-    .welcome-heading { font-size: 56px; }
-    .welcome-section { margin-top: 32px; }
-    .portfolio-btn { padding: 12px 22px; }
+    .intro-logo   { height: 52px; }
+    .intro-enter  { font-size: 9px; letter-spacing: 4px; margin-top: 22px; }
+    .menu-btn     { font-size: 12px; letter-spacing: 5px; padding: 14px 36px; }
+    .menu-btn:hover, .menu-btn.active { letter-spacing: 5px; }
 }
+
 </style>
 </head>
 <body>
 
-<!-- Background video -->
-<video autoplay muted loop playsinline
-    style="position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:-1;transform:translateZ(0);will-change:transform;">
-    <source src="" type="video/mp4">
-</video>
+<!-- Background video — fill in data-video on each .menu-btn to hook up -->
+<video id="bgVideo" autoplay muted loop playsinline></video>
 
-<!-- Mobile Header Bar -->
-<div class="mobile-header" id="mobileHeader">
-    <button class="mobile-header-hamburger" id="mobileHamburger" aria-label="Menu">&#9776;</button>
-    <a href="Portfolio.html" style="display:contents;"><img class="mobile-header-logo" src="PORTFOLIO/portfolio logo inv.png" alt="Portfolio"></a>
-    <div class="mobile-header-spacer"></div>
+<!-- Intro screen -->
+<div id="introScreen" class="screen">
+    <img class="intro-logo" id="introLogo" src="PORTFOLIO/portfolio logo inv.png" alt="Portfolio">
+    <p class="intro-enter" id="introEnter">Click to enter</p>
 </div>
 
-<!-- Mobile Nav -->
-<div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
-<div class="mobile-nav-menu" id="mobileNavMenu">
-    <a href="Videos.html">VIDEOS</a>
-    <a href="Designs.html">DESIGNS</a>
-    <a href="Photos.html">PHOTOS</a>
-    <a href="Info.html">INFO</a>
-</div>
-
-<nav>
-<a href="Portfolio.html" style="display:contents;"><img src="PORTFOLIO/portfolio logo inv.png" alt=""></a>
-    <ul>
-        <li><a href="Videos.html">Videos</a></li>
-        <li><a href="Designs.html">Designs</a></li>
-        <li><a href="Photos.html">Photos</a></li>
-        <li><a href="Info.html">Info</a></li>
-    </ul>
-</nav>
-
-
-
-<div class="welcome-section">
-    <h1 class="welcome-heading">Welcome</h1>
-    <div class="portfolio-buttons">
-        <a class="portfolio-btn" href="Videos.html">Videos</a>
-        <a class="portfolio-btn" href="Designs.html">Designs</a>
-        <a class="portfolio-btn" href="Photos.html">Photos</a>
-        <a class="portfolio-btn" href="Music.html">Music</a>
-        <a class="portfolio-btn" href="Info.html">About</a>
-    </div>
+<!-- Menu screen -->
+<div id="menuScreen" class="screen hidden">
+    <a class="menu-btn" href="Videos.html"  data-video="">Videos</a>
+    <a class="menu-btn" href="Designs.html" data-video="">Designs</a>
+    <a class="menu-btn" href="Photos.html"  data-video="">Photos</a>
+    <a class="menu-btn" href="Music.html"   data-video="">Music</a>
+    <a class="menu-btn" href="Info.html"    data-video="">About</a>
 </div>
 
 <script>
-(function(){
-    var btn     = document.getElementById('mobileHamburger');
-    var menu    = document.getElementById('mobileNavMenu');
-    var overlay = document.getElementById('mobileNavOverlay');
-    function toggleNav() { menu.classList.toggle('open'); overlay.classList.toggle('open'); }
-    btn.addEventListener('click', toggleNav);
-    overlay.addEventListener('click', toggleNav);
-})();
+(function () {
+
+    var introScreen = document.getElementById('introScreen');
+    var introLogo   = document.getElementById('introLogo');
+    var introEnter  = document.getElementById('introEnter');
+    var menuScreen  = document.getElementById('menuScreen');
+    var bgVideo     = document.getElementById('bgVideo');
+    var menuBtns    = Array.prototype.slice.call(
+                          document.querySelectorAll('.menu-btn'));
+
+    var isMobile = ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    var entered  = false;
+    var fadeOutTimer = null;
+    var lastTap  = { btn: null, time: 0 };
+    var TAP_WINDOW = 500; // ms between two taps to count as double-tap
+
+    if (isMobile) introEnter.textContent = 'Tap to enter';
+
+    /* ── Intro animation ── */
+    setTimeout(function () { introLogo.classList.add('show'); }, 400);
+    setTimeout(function () { introEnter.classList.add('show'); }, 1500);
+
+    introScreen.addEventListener('click', function () {
+        if (entered) return;
+        entered = true;
+        introScreen.classList.add('hidden');
+        menuScreen.classList.remove('hidden');
+    });
+
+    /* ── Video helpers ── */
+    function showVideo(src) {
+        if (!src) return;
+        if (fadeOutTimer) { clearTimeout(fadeOutTimer); fadeOutTimer = null; }
+        if (bgVideo.dataset.current !== src) {
+            bgVideo.src = src;
+            bgVideo.dataset.current = src;
+            bgVideo.play().catch(function () {});
+        }
+        bgVideo.classList.add('visible');
+    }
+
+    function hideVideo() {
+        bgVideo.classList.remove('visible');
+        // Wait for the CSS fade before stopping playback
+        fadeOutTimer = setTimeout(function () {
+            bgVideo.pause();
+            bgVideo.removeAttribute('src');
+            bgVideo.load();
+            bgVideo.dataset.current = '';
+            fadeOutTimer = null;
+        }, 700);
+    }
+
+    /* ── Desktop: hover to show/hide video, click navigates normally ── */
+    if (!isMobile) {
+        menuBtns.forEach(function (btn) {
+            btn.addEventListener('mouseenter', function () {
+                showVideo(btn.dataset.video);
+            });
+            btn.addEventListener('mouseleave', function () {
+                hideVideo();
+            });
+        });
+    }
+
+    /* ── Mobile: single tap shows video, double-tap navigates ── */
+    if (isMobile) {
+        menuBtns.forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                var now = Date.now();
+
+                if (lastTap.btn === btn && now - lastTap.time < TAP_WINDOW) {
+                    window.location.href = btn.getAttribute('href');
+                    return;
+                }
+
+                menuBtns.forEach(function (b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                showVideo(btn.dataset.video);
+                lastTap = { btn: btn, time: now };
+            });
+        });
+
+        // Tap anywhere outside the buttons collapses the video
+        document.addEventListener('click', function (e) {
+            if (!entered) return;
+            if (e.target.closest && e.target.closest('.menu-btn')) return;
+            menuBtns.forEach(function (b) { b.classList.remove('active'); });
+            hideVideo();
+            lastTap = { btn: null, time: 0 };
+        });
+    }
+
+}());
 </script>
 </body>
 </html>
