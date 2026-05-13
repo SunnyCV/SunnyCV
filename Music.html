@@ -34,13 +34,19 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     flex: 1;
     min-height: 0;
-    gap: 18px;
-    padding: 12px 16px;
+    gap: 14px;
+    padding: 10px 16px 14px;
     box-sizing: border-box;
     overflow-y: auto;
+}
+/* Pushes content to center when it fits; collapses when it doesn't */
+.music-page::before {
+    content: '';
+    flex: 1;
+    max-height: 40px;
 }
 
 /* ═══════════════════════════════════════
@@ -48,7 +54,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 ═══════════════════════════════════════ */
 .cdp {
     flex-shrink: 0;
-    width: 440px;
+    width: 400px;
     background: linear-gradient(168deg, #272727 0%, #1a1a1a 55%, #222 100%);
     border-radius: 16px;
     box-shadow:
@@ -66,7 +72,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     position: relative;
     border-radius: 16px 16px 0 0;
     overflow: hidden;
-    padding: 20px 20px 16px;
+    padding: 16px 16px 12px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -74,7 +80,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 
 /* Recessed tray */
 .cdp-tray {
-    width: 240px; height: 240px;
+    width: 192px; height: 192px;
     border-radius: 50%;
     background: radial-gradient(circle, #111 0%, #0a0a0a 100%);
     box-shadow:
@@ -89,7 +95,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 
 /* CD disc */
 .cdp-disc {
-    width: 212px; height: 212px;
+    width: 170px; height: 170px;
     border-radius: 50%;
     position: relative;
     background:
@@ -117,7 +123,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 .cdp-disc::before {
     content: '';
     position: absolute;
-    inset: 28px;
+    inset: 22px;
     border-radius: 50%;
     border: 1px solid rgba(255,255,255,0.14);
     pointer-events: none;
@@ -125,7 +131,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 .cdp-disc::after {
     content: '';
     position: absolute;
-    inset: 52px;
+    inset: 40px;
     border-radius: 50%;
     border: 1px solid rgba(255,255,255,0.09);
     pointer-events: none;
@@ -139,7 +145,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 /* Centre label */
 .cdp-disc-label {
     position: absolute;
-    width: 86px; height: 86px;
+    width: 70px; height: 70px;
     border-radius: 50%;
     background: radial-gradient(circle at 43% 40%, #23233a, #111125);
     display: flex;
@@ -151,19 +157,19 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 }
 .cdp-label-title {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 6px;
-    letter-spacing: 1px;
+    font-size: 5px;
+    letter-spacing: 0.8px;
     color: rgba(255,255,255,0.52);
     text-transform: uppercase;
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 72px;
+    max-width: 60px;
 }
 .cdp-label-num {
     font-family: 'Courier New', monospace;
-    font-size: 11px;
+    font-size: 9px;
     color: rgba(155,185,255,0.82);
 }
 
@@ -172,10 +178,10 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    width: 14px; height: 14px;
+    width: 12px; height: 12px;
     border-radius: 50%;
     background: radial-gradient(circle at 38% 34%, #585858, #222);
-    box-shadow: 0 0 0 2px #0d0d0d, 0 0 0 4px #3a3a3a;
+    box-shadow: 0 0 0 2px #0d0d0d, 0 0 0 3.5px #3a3a3a;
     z-index: 3;
 }
 
@@ -362,7 +368,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 }
 
 .binder-page {
-    width: 414px;
+    width: 374px;
     background: linear-gradient(168deg, #141416 0%, #0d0d10 100%);
     border-radius: 0 7px 7px 0;
     border: 1px solid #1c1c20;
@@ -383,17 +389,17 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     background: rgba(255,255,255,0.028);
     border: 1px solid rgba(255,255,255,0.06);
     border-radius: 5px;
-    padding: 10px 6px 7px;
+    padding: 8px 5px 6px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 5px;
     cursor: pointer;
     transition: background 0.13s, border-color 0.13s;
     position: relative;
     overflow: hidden;
-    min-height: 106px;
+    min-height: 96px;
 }
 .cd-sleeve::before {
     content: '';
@@ -409,7 +415,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 
 /* Mini CD */
 .cd-mini {
-    width: 66px; height: 66px;
+    width: 60px; height: 60px;
     border-radius: 50%;
     flex-shrink: 0;
     position: relative;
