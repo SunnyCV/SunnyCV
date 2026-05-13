@@ -1441,9 +1441,19 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
         lcdPageNext.disabled = page === totalPages - 1;
     }
 
+    function preloadPage(page) {
+        var start = page * PER_PAGE;
+        var end   = Math.min(start + PER_PAGE, photos.length);
+        for (var i = start; i < end; i++) {
+            var img = new Image();
+            img.src = photos[i].src;
+        }
+    }
+
     function goToPage(page) {
         currentPage = page;
         renderPage(currentPage);
+        if (currentPage < totalPages - 1) preloadPage(currentPage + 1);
     }
 
     lcdPagePrev.addEventListener('click', function (e) {
@@ -1466,6 +1476,9 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
         isFlipped = !isFlipped;
         camFlip.classList.toggle('flipped', isFlipped);
         prompt.style.opacity = isFlipped ? '0' : '1';
+
+        // Use the flip/boot delay as free preload time for the first page
+        if (isFlipped) preloadPage(0);
 
         // Hide at the midpoint (~480ms) when the camera is edge-on —
         // before iOS WebKit can render the source face on the far side.
