@@ -166,8 +166,7 @@ html, body {
     var isMobile = ('ontouchstart' in window || navigator.maxTouchPoints > 0);
     var entered  = false;
     var fadeOutTimer = null;
-    var lastTap  = { btn: null, time: 0 };
-    var TAP_WINDOW = 500; // ms between two taps to count as double-tap
+    var activeBtn = null;
 
     if (isMobile) introEnter.textContent = 'Tap to enter';
 
@@ -219,32 +218,33 @@ html, body {
         });
     }
 
-    /* ── Mobile: single tap shows video, double-tap navigates ── */
+    /* ── Mobile: first tap previews video, second tap navigates ── */
     if (isMobile) {
         menuBtns.forEach(function (btn) {
             btn.addEventListener('click', function (e) {
                 e.preventDefault();
-                var now = Date.now();
 
-                if (lastTap.btn === btn && now - lastTap.time < TAP_WINDOW) {
+                // Second tap on the already-active button → navigate
+                if (activeBtn === btn) {
                     window.location.href = btn.getAttribute('href');
                     return;
                 }
 
+                // First tap → activate and show video
                 menuBtns.forEach(function (b) { b.classList.remove('active'); });
                 btn.classList.add('active');
                 showVideo(btn.dataset.video);
-                lastTap = { btn: btn, time: now };
+                activeBtn = btn;
             });
         });
 
-        // Tap anywhere outside the buttons collapses the video
+        // Tap anywhere outside the buttons cancels selection
         document.addEventListener('click', function (e) {
             if (!entered) return;
             if (e.target.closest && e.target.closest('.menu-btn')) return;
             menuBtns.forEach(function (b) { b.classList.remove('active'); });
             hideVideo();
-            lastTap = { btn: null, time: 0 };
+            activeBtn = null;
         });
     }
 
