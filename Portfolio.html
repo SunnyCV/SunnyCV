@@ -223,6 +223,7 @@ html, body {
         menuBtns.forEach(function (btn) {
             btn.addEventListener('click', function (e) {
                 e.preventDefault();
+                e.stopPropagation(); // keep document handler from resetting activeBtn
 
                 // Second tap on the already-active button → navigate
                 if (activeBtn === btn) {
@@ -241,7 +242,6 @@ html, body {
         // Tap anywhere outside the buttons cancels selection
         document.addEventListener('click', function (e) {
             if (!entered) return;
-            if (e.target.closest && e.target.closest('.menu-btn')) return;
             menuBtns.forEach(function (b) { b.classList.remove('active'); });
             hideVideo();
             activeBtn = null;
