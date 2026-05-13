@@ -1299,7 +1299,6 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
         { src: 'PORTFOLIO/PICS/6.jpg', caption: '' },
         { src: 'PORTFOLIO/PICS/7.jpg', caption: '' },
         { src: 'PORTFOLIO/PICS/8.jpg', caption: '' },
-        { src: 'PORTFOLIO/PICS/9.jpg', caption: '' },
         { src: 'PORTFOLIO/PICS/10.jpg', caption: '' },
         { src: 'PORTFOLIO/PICS/11.jpg', caption: '' },
         { src: 'PORTFOLIO/PICS/12.jpg', caption: '' },
@@ -1359,6 +1358,9 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
         { src: 'PORTFOLIO/PICS/66.jpg', caption: '' },
         { src: 'PORTFOLIO/PICS/67.jpg', caption: '' },
     ];
+
+    // Preload every photo up front so the grid never waits on the network
+    photos.forEach(function (p) { var img = new Image(); img.src = p.src; });
 
     var camFlip        = document.getElementById('camFlip');
     var prompt         = document.getElementById('camPrompt');
