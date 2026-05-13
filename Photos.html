@@ -1467,12 +1467,13 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
         camFlip.classList.toggle('flipped', isFlipped);
         prompt.style.opacity = isFlipped ? '0' : '1';
 
-        // After the transition, hide the face now pointing away from the viewer
+        // Hide at the midpoint (~480ms) when the camera is edge-on —
+        // before iOS WebKit can render the source face on the far side.
         var faceToHide = isFlipped ? frontFace : backFace;
         flipTimeout = setTimeout(function () {
             faceToHide.style.visibility = 'hidden';
             flipTimeout = null;
-        }, 1100);
+        }, 480);
     });
 
     /* Power button */
