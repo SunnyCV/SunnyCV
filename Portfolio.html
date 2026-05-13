@@ -47,18 +47,39 @@ html, body {
 /* ── Intro ── */
 #introScreen { cursor: pointer; }
 
-.intro-logo {
+/* Logo is a fixed overlay so it can animate independently of the intro screen */
+#portfolioLogo {
+    position: fixed;
+    left: 50%;
+    top: 50%;
     height: 72px;
     width: auto;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: opacity 0.9s ease, transform 0.9s ease;
+    z-index: 2;
     pointer-events: none;
     user-select: none;
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 10px));
+    transition: opacity 0.9s ease,
+                top 0.85s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.85s cubic-bezier(0.4, 0, 0.2, 1),
+                height 0.85s ease;
 }
-.intro-logo.show {
+#portfolioLogo.show {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate(-50%, -50%);
+}
+#portfolioLogo.at-top {
+    top: 22px;
+    transform: translateX(-50%);
+    height: 34px;
+}
+
+/* Placeholder that reserves the logo's vertical space so "click to enter"
+   stays correctly positioned below it */
+.logo-spacer {
+    height: 72px;
+    flex-shrink: 0;
+    pointer-events: none;
 }
 
 .intro-enter {
@@ -98,7 +119,9 @@ html, body {
 
 /* ── Mobile ── */
 @media (max-width: 768px) {
-    .intro-logo   { height: 52px; }
+    #portfolioLogo        { height: 52px; }
+    #portfolioLogo.at-top { height: 28px; top: 16px; }
+    .logo-spacer          { height: 52px; }
     .intro-enter  { font-size: 9px; letter-spacing: 4px; margin-top: 22px; }
     .menu-btn     { font-size: 12px; letter-spacing: 5px; padding: 14px 36px; }
     .menu-btn:hover, .menu-btn.active { letter-spacing: 5px; }
@@ -111,9 +134,12 @@ html, body {
 <!-- Background video — fill in data-video on each .menu-btn to hook up -->
 <video id="bgVideo" autoplay muted loop playsinline></video>
 
+<!-- Logo: fixed overlay, animates from center to top on enter -->
+<img id="portfolioLogo" src="PORTFOLIO/portfolio logo inv.png" alt="Portfolio">
+
 <!-- Intro screen -->
 <div id="introScreen" class="screen">
-    <img class="intro-logo" id="introLogo" src="PORTFOLIO/portfolio logo inv.png" alt="Portfolio">
+    <div class="logo-spacer"></div>
     <p class="intro-enter" id="introEnter">Click to enter</p>
 </div>
 
@@ -129,9 +155,9 @@ html, body {
 <script>
 (function () {
 
-    var introScreen = document.getElementById('introScreen');
-    var introLogo   = document.getElementById('introLogo');
-    var introEnter  = document.getElementById('introEnter');
+    var introScreen   = document.getElementById('introScreen');
+    var portfolioLogo = document.getElementById('portfolioLogo');
+    var introEnter    = document.getElementById('introEnter');
     var menuScreen  = document.getElementById('menuScreen');
     var bgVideo     = document.getElementById('bgVideo');
     var menuBtns    = Array.prototype.slice.call(
@@ -146,13 +172,14 @@ html, body {
     if (isMobile) introEnter.textContent = 'Tap to enter';
 
     /* ── Intro animation ── */
-    setTimeout(function () { introLogo.classList.add('show'); }, 400);
+    setTimeout(function () { portfolioLogo.classList.add('show'); }, 400);
     setTimeout(function () { introEnter.classList.add('show'); }, 1500);
 
     introScreen.addEventListener('click', function () {
         if (entered) return;
         entered = true;
         introScreen.classList.add('hidden');
+        portfolioLogo.classList.add('at-top');
         menuScreen.classList.remove('hidden');
     });
 
