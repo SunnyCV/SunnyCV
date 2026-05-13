@@ -619,7 +619,6 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.5/jsmediatags.min.js"></script>
 <script src="PortfolioGallery.js"></script>
 <script>
 (function () {
@@ -896,24 +895,68 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
         }
     });
 
-    /* ── Read title from each MP3's ID3 metadata ── */
+    /* ── ID3v2 title reader (no external library) ── */
+    function readID3Title(url, cb) {
+        fetch(url, { headers: { 'Range': 'bytes=0-65535' } })
+            .then(function (r) { return r.arrayBuffer(); })
+            .then(function (buf) { cb(parseID3Title(new Uint8Array(buf))); })
+            .catch(function () { cb(null); });
+    }
+
+    function parseID3Title(u8) {
+        if (u8[0] !== 73 || u8[1] !== 68 || u8[2] !== 51) return null; // "ID3"
+        var ver  = u8[3];
+        var tagSize = ((u8[6] & 0x7f) << 21) | ((u8[7] & 0x7f) << 14) |
+                      ((u8[8] & 0x7f) << 7)  |  (u8[9] & 0x7f);
+        var pos  = 10;
+        var limit = Math.min(10 + tagSize, u8.length);
+
+        function fstr(off, len) {
+            var s = ''; for (var i = 0; i < len; i++) s += String.fromCharCode(u8[off + i]); return s;
+        }
+        function decodeText(off, size) {
+            if (size <= 0) return null;
+            var enc  = u8[off];
+            var data = u8.slice(off + 1, off + size);
+            try {
+                return new TextDecoder(enc === 1 || enc === 2 ? 'utf-16' : 'utf-8')
+                    .decode(data).replace(/\0/g, '').trim() || null;
+            } catch (e) { return null; }
+        }
+
+        while (pos + 6 < limit) {
+            if (ver <= 2) {
+                var id3 = fstr(pos, 3);
+                var sz3 = (u8[pos+3] << 16) | (u8[pos+4] << 8) | u8[pos+5];
+                pos += 6;
+                if (id3 === 'TT2') return decodeText(pos, sz3);
+                pos += sz3;
+            } else {
+                if (pos + 10 > limit) break;
+                var id4 = fstr(pos, 4);
+                var sz4 = ver >= 4
+                    ? ((u8[pos+4] & 0x7f) << 21) | ((u8[pos+5] & 0x7f) << 14) |
+                      ((u8[pos+6] & 0x7f) << 7)  |  (u8[pos+7] & 0x7f)
+                    : (u8[pos+4] << 24) | (u8[pos+5] << 16) | (u8[pos+6] << 8) | u8[pos+7];
+                pos += 10;
+                if (id4 === 'TIT2') return decodeText(pos, sz4);
+                pos += sz4;
+            }
+        }
+        return null;
+    }
+
     function loadMetadata() {
         tracks.forEach(function (track, idx) {
             if (!track.src) return;
-            window.jsmediatags.read(track.src, {
-                onSuccess: function (tag) {
-                    var title = tag.tags && tag.tags.title;
-                    if (title) {
-                        tracks[idx].title = title;
-                        var page = Math.floor(idx / PER_PAGE);
-                        if (page === currentPage) renderBinder(currentPage);
-                        if (idx === currentTrack) {
-                            labelTitle.textContent = title;
-                            lcdTrack.textContent   = title;
-                        }
-                    }
-                },
-                onError: function () {}
+            readID3Title(track.src, function (title) {
+                if (!title) return;
+                tracks[idx].title = title;
+                if (Math.floor(idx / PER_PAGE) === currentPage) renderBinder(currentPage);
+                if (idx === currentTrack) {
+                    labelTitle.textContent = title;
+                    lcdTrack.textContent   = title;
+                }
             });
         });
     }
