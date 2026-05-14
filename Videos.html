@@ -737,10 +737,6 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
     // Belt-and-suspenders inline playback for iOS:
     // The HTML attribute alone isn't always enough — set the property too.
     video.playsInline = true;
-    // If iOS still forces fullscreen, exit it immediately.
-    video.addEventListener('webkitbeginfullscreen', function () {
-        if (video.webkitExitFullscreen) video.webkitExitFullscreen();
-    });
     var tapeLabel    = document.getElementById('vhsTapeLabel');
     var display      = document.getElementById('vhsDisplay');
     var drawer       = document.getElementById('tapeDrawer');
@@ -923,26 +919,37 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
 (function () {
     var btn    = document.getElementById('tvFullscreenBtn');
     var screen = document.getElementById('tvScreen');
+    var video  = document.getElementById('tvVideo');
     var fsPath = document.getElementById('fsPath');
     var expand   = 'M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z';
     var compress = 'M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z';
 
     btn.addEventListener('click', function () {
-        if (!document.fullscreenElement) {
-            screen.requestFullscreen();
-        } else {
+        if (document.fullscreenElement) {
             document.exitFullscreen();
+        } else if (screen.requestFullscreen) {
+            screen.requestFullscreen();
+        } else if (video.webkitEnterFullscreen) {
+            // iOS Safari: requestFullscreen only works on <video>, not divs
+            video.webkitEnterFullscreen();
         }
     });
 
+    // Standard fullscreen change (desktop + Android)
     document.addEventListener('fullscreenchange', function () {
-        if (document.fullscreenElement) {
-            fsPath.setAttribute('d', compress);
-            btn.title = 'Exit Fullscreen';
-        } else {
-            fsPath.setAttribute('d', expand);
-            btn.title = 'Fullscreen';
-        }
+        var full = !!document.fullscreenElement;
+        fsPath.setAttribute('d', full ? compress : expand);
+        btn.title = full ? 'Exit Fullscreen' : 'Fullscreen';
+    });
+
+    // iOS fullscreen change events on the video element
+    video.addEventListener('webkitbeginfullscreen', function () {
+        fsPath.setAttribute('d', compress);
+        btn.title = 'Exit Fullscreen';
+    });
+    video.addEventListener('webkitendfullscreen', function () {
+        fsPath.setAttribute('d', expand);
+        btn.title = 'Fullscreen';
     });
 }());
 </script>
