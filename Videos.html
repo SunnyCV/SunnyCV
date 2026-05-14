@@ -861,15 +861,18 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
 
         video.pause();
         hidePlayOverlay();
-        showBuffer();
         video.src = tape.src;
         video.style.display = 'block';
         canvas.style.display = 'none';
-        var p = video.play();
-        if (p && p.catch) p.catch(function () {
+        if (window.innerWidth <= 768) {
+            // On mobile skip auto-play entirely — show overlay for guaranteed user tap
             hideBuffer();
-            if (window.innerWidth <= 768) showPlayOverlay();
-        });
+            showPlayOverlay();
+        } else {
+            showBuffer();
+            var p = video.play();
+            if (p && p.catch) p.catch(hideBuffer);
+        }
 
         drawer.classList.remove('open');
         vhsBody.classList.remove('drawer-open');
