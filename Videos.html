@@ -744,6 +744,21 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
     var vhsBody      = document.getElementById('vhsBody');
     var timerInterval = null;
 
+    /* Hidden preload buffer — starts downloading a video before the user clicks */
+    var preloadBuf = document.createElement('video');
+    preloadBuf.preload = 'auto';
+    preloadBuf.playsInline = true;
+    preloadBuf.muted = true;
+    preloadBuf.style.cssText = 'display:none;position:absolute;width:0;height:0;';
+    document.body.appendChild(preloadBuf);
+
+    function preloadTape(src) {
+        if (preloadBuf.src !== src) {
+            preloadBuf.src = src;
+            preloadBuf.load();
+        }
+    }
+
     /* Build cassettes */
     var tapeRow = document.getElementById('tapeRow');
     tapes.forEach(function (tape, i) {
@@ -758,14 +773,19 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
                 '<span class="cassette-label-text" style="color:' + tape.labelColor + '">' + tape.title + '</span>' +
             '</div>';
         el.addEventListener('click', function () { insertTape(i, el); });
+        // Desktop: start downloading on hover so it's buffered before click
+        el.addEventListener('mouseenter', function () { preloadTape(tape.src); });
         tapeRow.appendChild(el);
     });
 
     /* Toggle drawer */
     tapesBtn.addEventListener('click', function () {
+        var opening = !drawer.classList.contains('open');
         drawer.classList.toggle('open');
         vhsBody.classList.toggle('drawer-open');
         tapesBtn.classList.toggle('active');
+        // Mobile: preload first tape as soon as drawer opens
+        if (opening) preloadTape(tapes[0].src);
     });
 
     function pad(n) { return n < 10 ? '0' + n : '' + n; }
@@ -779,6 +799,7 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
         labelText.style.color = tape.labelColor;
         tapeLabel.style.background = tape.labelBg;
 
+        video.preload = 'auto';
         video.src = tape.src;
         video.style.display = 'block';
         canvas.style.display = 'none';
