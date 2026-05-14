@@ -924,25 +924,40 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
     var expand   = 'M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z';
     var compress = 'M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z';
 
-    btn.addEventListener('click', function () {
-        if (document.fullscreenElement) {
-            document.exitFullscreen();
-        } else if (screen.requestFullscreen) {
-            screen.requestFullscreen();
+    function enterFullscreen() {
+        if (screen.requestFullscreen) {
+            screen.requestFullscreen().catch(function () {
+                // requestFullscreen failed (older iOS can't fullscreen divs)
+                if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+            });
         } else if (video.webkitEnterFullscreen) {
-            // iOS Safari: requestFullscreen only works on <video>, not divs
             video.webkitEnterFullscreen();
+        }
+    }
+
+    function exitFullscreen() {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }
+
+    btn.addEventListener('click', function () {
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+            exitFullscreen();
+        } else {
+            enterFullscreen();
         }
     });
 
     // Standard fullscreen change (desktop + Android)
-    document.addEventListener('fullscreenchange', function () {
-        var full = !!document.fullscreenElement;
-        fsPath.setAttribute('d', full ? compress : expand);
-        btn.title = full ? 'Exit Fullscreen' : 'Fullscreen';
+    ['fullscreenchange', 'webkitfullscreenchange'].forEach(function (ev) {
+        document.addEventListener(ev, function () {
+            var full = !!(document.fullscreenElement || document.webkitFullscreenElement);
+            fsPath.setAttribute('d', full ? compress : expand);
+            btn.title = full ? 'Exit Fullscreen' : 'Fullscreen';
+        });
     });
 
-    // iOS fullscreen change events on the video element
+    // iOS video-level fullscreen events
     video.addEventListener('webkitbeginfullscreen', function () {
         fsPath.setAttribute('d', compress);
         btn.title = 'Exit Fullscreen';
