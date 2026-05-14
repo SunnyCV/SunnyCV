@@ -733,6 +733,14 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
     var video        = document.getElementById('tvVideo');
     var canvas       = document.getElementById('staticCanvas');
     var labelText    = document.getElementById('vhsLabelText');
+
+    // Belt-and-suspenders inline playback for iOS:
+    // The HTML attribute alone isn't always enough — set the property too.
+    video.playsInline = true;
+    // If iOS still forces fullscreen, exit it immediately.
+    video.addEventListener('webkitbeginfullscreen', function () {
+        if (video.webkitExitFullscreen) video.webkitExitFullscreen();
+    });
     var tapeLabel    = document.getElementById('vhsTapeLabel');
     var display      = document.getElementById('vhsDisplay');
     var drawer       = document.getElementById('tapeDrawer');
