@@ -347,6 +347,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     right: 38px;
     text-align: right;
     z-index: 1;
+    transition: opacity 0.2s ease;
 }
 .cf-body-brand-canon {
     display: block;
@@ -1119,7 +1120,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 }
 @media (max-width: 700px) {
     body { padding-top: 48px; }
-    .cam-page { gap: 12px; }
+    .cam-page { gap: 12px; justify-content: flex-start; padding-top: 14px; }
     .cam-flip {
         width: min(96vw, 480px);
         height: calc(min(96vw, 480px) * 0.6315);
@@ -1394,9 +1395,11 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     var PER_PAGE       = 9;
     var totalPages     = Math.ceil(photos.length / PER_PAGE);
 
-    var frontFace   = camFlip.querySelector('.cam-face-front');
-    var backFace    = camFlip.querySelector('.cam-face-back');
-    var flipTimeout = null;
+    var frontFace    = camFlip.querySelector('.cam-face-front');
+    var backFace     = camFlip.querySelector('.cam-face-back');
+    var bodyBrand    = camFlip.querySelector('.cf-body-brand');
+    var flipTimeout  = null;
+    var brandTimeout = null;
 
     // iOS WebKit ignores backface-visibility on children with transforms;
     // start with the back face invisible and swap visibility via JS.
@@ -1471,7 +1474,8 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 
     /* Flip camera on body click */
     camFlip.addEventListener('click', function () {
-        if (flipTimeout) { clearTimeout(flipTimeout); flipTimeout = null; }
+        if (flipTimeout)  { clearTimeout(flipTimeout);  flipTimeout  = null; }
+        if (brandTimeout) { clearTimeout(brandTimeout); brandTimeout = null; }
 
         // Both faces must be visible during the 3D rotation
         frontFace.style.visibility = 'visible';
@@ -1481,8 +1485,17 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
         camFlip.classList.toggle('flipped', isFlipped);
         prompt.style.opacity = isFlipped ? '0' : '1';
 
-        // Use the flip/boot delay as free preload time for the first page
-        if (isFlipped) preloadPage(0);
+        if (isFlipped) {
+            // Fade brand text out immediately so it doesn't visibly rotate
+            bodyBrand.style.opacity = '0';
+            preloadPage(0);
+        } else {
+            // Fade brand text back in near the end of the return animation
+            brandTimeout = setTimeout(function () {
+                bodyBrand.style.opacity = '1';
+                brandTimeout = null;
+            }, 900);
+        }
 
         // Hide at the midpoint (~480ms) when the camera is edge-on —
         // before iOS WebKit can render the source face on the far side.
