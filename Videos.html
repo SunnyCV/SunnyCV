@@ -100,29 +100,6 @@
     transition: opacity 0.05s;
 }
 
-/* Buffer spinner */
-.tv-buffer {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.25s;
-}
-.tv-buffer.visible { opacity: 1; }
-.tv-buffer-ring {
-    width: 38px;
-    height: 38px;
-    border: 3px solid rgba(255,255,255,0.12);
-    border-top-color: rgba(255,255,255,0.75);
-    border-radius: 50%;
-    animation: tvSpin 0.75s linear infinite;
-}
-@keyframes tvSpin { to { transform: rotate(360deg); } }
-
 /* Fullscreen button */
 .tv-fullscreen-btn {
     position: absolute;
@@ -590,7 +567,6 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
     <a class="active" href="Videos.html">VIDEOS</a>
     <a href="Designs.html">DESIGNS</a>
     <a href="Photos.html">PHOTOS</a>
-    <a href="Music.html">MUSIC</a>
  <!--   <a href="Info.html">INFO</a> -->
 </div>
 
@@ -600,7 +576,6 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
     <li><a class="active" href="Videos.html">Videos</a></li>
     <li><a href="Designs.html">Designs</a></li>
     <li><a href="Photos.html">Photos</a></li>
-    <li><a href="Music.html">Music</a></li>
  <!--   <li><a href="Info.html">Info</a></li> -->
     <li><a href="Portfolio.html">Home</a></li>
 </ul>
@@ -622,10 +597,6 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
                 <div class="vol-meter" id="volMeter">
                     <div class="vol-meter-label">VOL</div>
                     <div class="vol-meter-bars" id="volBars"></div>
-                </div>
-                <!-- Buffer spinner -->
-                <div class="tv-buffer" id="tvBuffer">
-                    <div class="tv-buffer-ring"></div>
                 </div>
                 <!-- Fullscreen button -->
                 <button class="tv-fullscreen-btn" id="tvFullscreenBtn" title="Fullscreen">
@@ -760,15 +731,6 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
     var video        = document.getElementById('tvVideo');
     var canvas       = document.getElementById('staticCanvas');
     var labelText    = document.getElementById('vhsLabelText');
-
-    /* Buffer spinner */
-    var bufferEl = document.getElementById('tvBuffer');
-    function showBuffer() { bufferEl.classList.add('visible'); }
-    function hideBuffer() { bufferEl.classList.remove('visible'); }
-    video.addEventListener('waiting', showBuffer);
-    video.addEventListener('playing', hideBuffer);
-    video.addEventListener('error',   hideBuffer);
-
     var tapeLabel    = document.getElementById('vhsTapeLabel');
     var display      = document.getElementById('vhsDisplay');
     var drawer       = document.getElementById('tapeDrawer');
@@ -811,14 +773,10 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
         labelText.style.color = tape.labelColor;
         tapeLabel.style.background = tape.labelBg;
 
-        video.pause();
-        hidePlayOverlay();
         video.src = tape.src;
         video.style.display = 'block';
         canvas.style.display = 'none';
-        showBuffer();
-        var p = video.play();
-        if (p && p.catch) p.catch(hideBuffer);
+        video.play();
 
         drawer.classList.remove('open');
         vhsBody.classList.remove('drawer-open');
@@ -834,7 +792,6 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
     }
 
     function eject() {
-        hideBuffer();
         video.pause();
         video.src = '';
         video.style.display = 'none';
@@ -956,52 +913,26 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
 (function () {
     var btn    = document.getElementById('tvFullscreenBtn');
     var screen = document.getElementById('tvScreen');
-    var video  = document.getElementById('tvVideo');
     var fsPath = document.getElementById('fsPath');
     var expand   = 'M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z';
     var compress = 'M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z';
 
-    function enterFullscreen() {
-        if (screen.requestFullscreen) {
-            screen.requestFullscreen().catch(function () {
-                // requestFullscreen failed (older iOS can't fullscreen divs)
-                if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
-            });
-        } else if (video.webkitEnterFullscreen) {
-            video.webkitEnterFullscreen();
-        }
-    }
-
-    function exitFullscreen() {
-        if (document.exitFullscreen) document.exitFullscreen();
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-    }
-
     btn.addEventListener('click', function () {
-        if (document.fullscreenElement || document.webkitFullscreenElement) {
-            exitFullscreen();
+        if (!document.fullscreenElement) {
+            screen.requestFullscreen();
         } else {
-            enterFullscreen();
+            document.exitFullscreen();
         }
     });
 
-    // Standard fullscreen change (desktop + Android)
-    ['fullscreenchange', 'webkitfullscreenchange'].forEach(function (ev) {
-        document.addEventListener(ev, function () {
-            var full = !!(document.fullscreenElement || document.webkitFullscreenElement);
-            fsPath.setAttribute('d', full ? compress : expand);
-            btn.title = full ? 'Exit Fullscreen' : 'Fullscreen';
-        });
-    });
-
-    // iOS video-level fullscreen events
-    video.addEventListener('webkitbeginfullscreen', function () {
-        fsPath.setAttribute('d', compress);
-        btn.title = 'Exit Fullscreen';
-    });
-    video.addEventListener('webkitendfullscreen', function () {
-        fsPath.setAttribute('d', expand);
-        btn.title = 'Fullscreen';
+    document.addEventListener('fullscreenchange', function () {
+        if (document.fullscreenElement) {
+            fsPath.setAttribute('d', compress);
+            btn.title = 'Exit Fullscreen';
+        } else {
+            fsPath.setAttribute('d', expand);
+            btn.title = 'Fullscreen';
+        }
     });
 }());
 </script>
