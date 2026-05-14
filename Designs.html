@@ -207,12 +207,19 @@ body.dark-room .dsgn-screen-off { opacity: 1; }
 .dsgn-slide-wrap.visible { opacity: 1; }
 
 .dsgn-slide-img {
+    position: absolute;
+    inset: 0;
     width: 100%; height: 100%;
     object-fit: contain;
     display: block;
-    transition: opacity 0.1s ease;
+    opacity: 0;
+    transition: opacity 0.28s ease;
+    pointer-events: none;
 }
-.dsgn-slide-img.flash { opacity: 0; }
+.dsgn-slide-img.active {
+    opacity: 1;
+    pointer-events: auto;
+}
 
 /* Warm glow overlay when projector is on */
 .dsgn-screen-warmth {
@@ -1144,9 +1151,10 @@ body.dark-room .dsgn-floor-line {
                     <!-- Off state -->
                     <div class="dsgn-screen-off" id="dsgnScreenOff"></div>
 
-                    <!-- Slide content -->
+                    <!-- Slide content (double-buffered for instant transitions) -->
                     <div class="dsgn-slide-wrap" id="dsgnSlideWrap">
-                        <img class="dsgn-slide-img" id="dsgnSlideImg" src="" alt="">
+                        <img class="dsgn-slide-img" id="dsgnSlideImgA" src="" alt="">
+                        <img class="dsgn-slide-img" id="dsgnSlideImgB" src="" alt="">
                     </div>
 
                     <!-- Warm glow -->
@@ -1415,7 +1423,11 @@ var dsgnBootModel = document.getElementById('dsgnBootModel');
 var dsgnBootBar   = document.getElementById('dsgnBootBar');
 var dsgnScreenOff = document.getElementById('dsgnScreenOff');
 var dsgnSlideWrap = document.getElementById('dsgnSlideWrap');
-var dsgnSlideImg  = document.getElementById('dsgnSlideImg');
+var imgA          = document.getElementById('dsgnSlideImgA');
+var imgB          = document.getElementById('dsgnSlideImgB');
+var activeImg     = imgA;
+var inactiveImg   = imgB;
+var pendingSwap   = null;
 var dsgnWarmth    = document.getElementById('dsgnWarmth');
 var dsgnBeam      = document.getElementById('dsgnBeam');
 
@@ -1554,7 +1566,9 @@ function powerOff() {
 
     setTimeout(function () {
         dsgnScreenOff.style.opacity = '1';
-        dsgnSlideImg.src = '';
+        imgA.src = ''; imgA.classList.remove('active');
+        imgB.src = ''; imgB.classList.remove('active');
+        activeImg = imgA; inactiveImg = imgB;
         pjCounterText.textContent = '— / —';
     }, 300);
 
@@ -1568,15 +1582,41 @@ function renderSlide(index, animate) {
     pjCounterText.textContent = (index + 1) + ' / ' + designs.length;
 
     if (animate) {
-        dsgnSlideImg.classList.add('flash');
-        setTimeout(function () {
-            dsgnSlideImg.src = d.src;
-            dsgnSlideImg.alt = d.title;
-            dsgnSlideImg.classList.remove('flash');
-        }, 110);
+        // Cancel any swap that hasn't fired yet
+        if (pendingSwap) {
+            pendingSwap.img.removeEventListener('load', pendingSwap.fn);
+            pendingSwap = null;
+        }
+
+        var nextImg = inactiveImg;
+        var prevImg = activeImg;
+        nextImg.src = d.src;
+        nextImg.alt = d.title;
+
+        var doSwap = function () {
+            nextImg.classList.add('active');
+            prevImg.classList.remove('active');
+            activeImg   = nextImg;
+            inactiveImg = prevImg;
+            pendingSwap = null;
+        };
+
+        // Use the cached image to detect whether the file is already decoded
+        var cached = imageCache[index];
+        if (cached && cached.complete && cached.naturalWidth > 0) {
+            doSwap();
+        } else {
+            var fn = function () {
+                nextImg.removeEventListener('load', fn);
+                doSwap();
+            };
+            pendingSwap = { img: nextImg, fn: fn };
+            nextImg.addEventListener('load', fn);
+        }
     } else {
-        dsgnSlideImg.src = d.src;
-        dsgnSlideImg.alt = d.title;
+        activeImg.src = d.src;
+        activeImg.alt = d.title;
+        activeImg.classList.add('active');
         dsgnSlideWrap.classList.add('visible');
     }
 }
@@ -1675,8 +1715,12 @@ document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape')     closeLightbox();
 });
 
-/* ── Preload all images so slides are ready before the boot animation completes ── */
-designs.forEach(function (d) { var img = new Image(); img.src = d.src; });
+/* ── Preload all images — hold references so the browser doesn't GC them ── */
+var imageCache = designs.map(function (d) {
+    var img = new Image();
+    img.src = d.src;
+    return img;
+});
 </script>
 </body>
 </html>
