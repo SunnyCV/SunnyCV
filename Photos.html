@@ -1138,6 +1138,15 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     .lcd-mode, .lcd-count { font-size: 7.5px; }
 }
 
+@media (orientation: landscape) and (max-height: 500px) {
+    .cam-page { padding-top: 18px; gap: 6px; }
+    .cam-flip {
+        height: min(calc(100svh - 78px), 250px);
+        width: calc(min(calc(100svh - 78px), 250px) / 0.6315);
+        max-width: 88vw;
+    }
+}
+
 </style>
 </head>
 <body>
