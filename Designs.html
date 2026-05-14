@@ -1688,6 +1688,7 @@ dsgnScreen.addEventListener('click', function () {
 
 /* ── Lightbox ── */
 function openLightbox(index) {
+    stopAutoAdvance();
     lbImg.src  = designs[index].src;
     lbImg.alt  = designs[index].title;
     lbCounter.textContent = (index + 1) + ' / ' + designs.length;
@@ -1697,6 +1698,7 @@ function openLightbox(index) {
 }
 function closeLightbox() {
     dsgnLightbox.classList.remove('open');
+    if (isPowered) startAutoAdvance();
 }
 lbClose.addEventListener('click', closeLightbox);
 dsgnLightbox.addEventListener('click', function (e) {
