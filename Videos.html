@@ -814,26 +814,19 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
         labelText.style.color = tape.labelColor;
         tapeLabel.style.background = tape.labelBg;
 
+        // Reset the video element fully before switching src — iOS requires this
+        // to reliably allow play() on a subsequent user tap
+        video.pause();
+        video.removeAttribute('src');
+        video.load();
+
         showBuffer();
-        video.preload = 'auto';
         video.src = tape.src;
         video.load();
         video.style.display = 'block';
         canvas.style.display = 'none';
         var p = video.play();
-        if (p && p.catch) {
-            p.catch(function () {
-                // iOS may reject play() before enough data has arrived — retry on canplay
-                var retried = false;
-                video.addEventListener('canplay', function retry() {
-                    if (retried) return;
-                    retried = true;
-                    video.removeEventListener('canplay', retry);
-                    var p2 = video.play();
-                    if (p2 && p2.catch) p2.catch(hideBuffer);
-                });
-            });
-        }
+        if (p && p.catch) p.catch(hideBuffer);
 
         drawer.classList.remove('open');
         vhsBody.classList.remove('drawer-open');
