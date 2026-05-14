@@ -769,9 +769,9 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
     var bufferEl = document.getElementById('tvBuffer');
     function showBuffer() { bufferEl.classList.add('visible'); }
     function hideBuffer() { bufferEl.classList.remove('visible'); }
-    video.addEventListener('waiting',  showBuffer);
-    video.addEventListener('playing',  hideBuffer);
-    video.addEventListener('canplay',  hideBuffer);
+    video.addEventListener('waiting', showBuffer);
+    video.addEventListener('playing', hideBuffer);
+    video.addEventListener('error',   hideBuffer);
     var tapeLabel    = document.getElementById('vhsTapeLabel');
     var display      = document.getElementById('vhsDisplay');
     var drawer       = document.getElementById('tapeDrawer');
@@ -839,7 +839,8 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
         video.src = tape.src;
         video.style.display = 'block';
         canvas.style.display = 'none';
-        video.play();
+        var p = video.play();
+        if (p && p.catch) p.catch(hideBuffer);
 
         drawer.classList.remove('open');
         vhsBody.classList.remove('drawer-open');
