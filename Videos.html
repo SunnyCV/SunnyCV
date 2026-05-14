@@ -814,15 +814,9 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
         labelText.style.color = tape.labelColor;
         tapeLabel.style.background = tape.labelBg;
 
-        // Reset the video element fully before switching src — iOS requires this
-        // to reliably allow play() on a subsequent user tap
         video.pause();
-        video.removeAttribute('src');
-        video.load();
-
         showBuffer();
         video.src = tape.src;
-        video.load();
         video.style.display = 'block';
         canvas.style.display = 'none';
         var p = video.play();
