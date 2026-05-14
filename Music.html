@@ -527,13 +527,16 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     .cd-sleeve-title { font-size: 5.5px; }
 }
 
-@media (orientation: landscape) and (max-height: 500px) {
+@media (orientation: landscape) and (max-height: 800px) {
+    html { overflow: auto !important; height: auto !important; }
+    body { overflow-y: auto !important; height: auto !important; }
     .music-page {
         flex-direction: row;
         align-items: flex-start;
         padding: 8px 12px;
         gap: 14px;
-        overflow-y: auto;
+        overflow-y: visible;
+        height: auto;
     }
     .music-page::before { display: none; }
     .cdp { width: min(38vw, 220px); flex-shrink: 0; }
