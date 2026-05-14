@@ -1601,9 +1601,7 @@ function renderSlide(index, animate) {
             pendingSwap = null;
         };
 
-        // Use the cached image to detect whether the file is already decoded
-        var cached = imageCache[index];
-        if (cached && cached.complete && cached.naturalWidth > 0) {
+        if (nextImg.complete && nextImg.naturalWidth > 0) {
             doSwap();
         } else {
             var fn = function () {
@@ -1618,6 +1616,13 @@ function renderSlide(index, animate) {
         activeImg.alt = d.title;
         activeImg.classList.add('active');
         dsgnSlideWrap.classList.add('visible');
+    }
+
+    // Quietly preload the next two slides into browser cache
+    for (var i = 1; i <= 2; i++) {
+        if (index + i < designs.length) {
+            (new Image()).src = designs[index + i].src;
+        }
     }
 }
 
@@ -1717,12 +1722,10 @@ document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape')     closeLightbox();
 });
 
-/* ── Preload all images — hold references so the browser doesn't GC them ── */
-var imageCache = designs.map(function (d) {
-    var img = new Image();
-    img.src = d.src;
-    return img;
-});
+/* ── Preload the first few slides so they're ready when the projector boots ── */
+for (var i = 0; i < Math.min(4, designs.length); i++) {
+    (new Image()).src = designs[i].src;
+}
 </script>
 </body>
 </html>
