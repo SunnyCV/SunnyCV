@@ -75,6 +75,20 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     transition: opacity 0.4s;
 }
 
+.cam-hint {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #999;
+    margin: 0;
+    user-select: none;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+}
+.cam-hint.visible { opacity: 1; }
+
 /* ── 3D Flip Scene ── */
 .cam-scene { perspective: 2000px; }
 
@@ -1297,6 +1311,8 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
         </div>
     </div>
 
+    <p class="cam-hint" id="camHint">Press Power Button</p>
+
 </div>
 
 <!-- Full-screen lightbox -->
@@ -1388,6 +1404,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 
     var camFlip        = document.getElementById('camFlip');
     var prompt         = document.getElementById('camPrompt');
+    var hint           = document.getElementById('camHint');
     var lcdOff         = document.getElementById('lcdOff');
     var lcdBoot        = document.getElementById('lcdBoot');
     var lcdBootLogo    = document.getElementById('lcdBootLogo');
@@ -1505,6 +1522,8 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
         isFlipped = !isFlipped;
         camFlip.classList.toggle('flipped', isFlipped);
         prompt.style.opacity = isFlipped ? '0' : '1';
+        if (isFlipped && !isPowered) hint.classList.add('visible');
+        if (!isFlipped) hint.classList.remove('visible');
 
         if (isFlipped) {
             // Fade brand text out immediately so it doesn't visibly rotate
@@ -1536,6 +1555,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 
     function powerOn() {
         isBooting = true;
+        hint.classList.remove('visible');
         powerBtn.classList.add('on');
         lcdOff.style.display = 'none';
         lcdBoot.classList.add('active');
@@ -1562,6 +1582,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 
     function powerOff() {
         isPowered = false;
+        hint.classList.add('visible');
         powerBtn.classList.remove('on');
         closeLightbox();
         lcdHeader.style.display = 'none';
