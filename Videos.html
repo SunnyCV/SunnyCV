@@ -543,60 +543,10 @@
     .cassette-label-text { font-size: 8px; }
 }
 
-@media (orientation: landscape) and (max-height: 800px) {
-    body { overflow-y: auto; }
-    .setup-container {
-        flex-direction: row !important;
-        align-items: flex-start;
-        padding: 8px 12px;
-        gap: 10px;
-        min-height: 0;
-        box-sizing: border-box;
-    }
-    .tv-body {
-        flex-shrink: 0;
-        width: min(52vw, 320px) !important;
-        max-width: none;
-        padding: 8px 8px 6px;
-    }
-    .tv-screen { aspect-ratio: 16 / 9; }
-    .vhs-body {
-        flex: 1 1 0% !important;
-        flex-direction: column !important;
-        flex-wrap: nowrap !important;
-        align-items: stretch !important;
-        width: auto !important;
-        max-width: none !important;
-        height: auto !important;
-        margin-top: 0 !important;
-        padding: 8px 10px;
-        gap: 6px;
-        min-width: 0;
-    }
-    .vhs-left { gap: 8px; }
-    .vhs-center { width: 100%; }
-    .vhs-slot { width: 100% !important; height: 40px; }
-    .vhs-right { justify-content: flex-start; width: 100%; }
-    .vhs-controls { flex-wrap: wrap; gap: 6px; }
-    .vhs-btn { width: 28px; height: 28px; font-size: 11px; }
-    .vhs-display { font-size: 10px; padding: 4px 8px; letter-spacing: 1px; }
-    .vhs-vol-btn { width: 22px; height: 22px; font-size: 13px; }
-    .vhs-divider { display: none; }
-    .vhs-btn-tapes { padding: 0 10px; }
-    .tape-drawer {
-        width: min(46vw, 300px) !important;
-        position: fixed !important;
-        top: auto;
-        bottom: 0;
-        right: 12px;
-        border-radius: 8px 8px 0 0;
-    }
-    .tape-drawer.open { max-height: 55vh; padding: 12px 14px; overflow-y: auto; }
-    .vhs-cassette { width: 120px; height: 76px; }
-    .cassette-window { height: 24px; top: 7px; left: 7px; right: 7px; padding: 0 10px; }
-    .cassette-reel { width: 14px; height: 14px; }
-    .cassette-label { height: 26px; bottom: 6px; left: 5px; right: 5px; }
-    .cassette-label-text { font-size: 7px; }
+@media (max-width: 768px) and (orientation: landscape) {
+    .vhs-btn { width: 24px; height: 24px; font-size: 10px; }
+    .vhs-controls { gap: 4px; }
+    .vhs-btn-tapes { padding: 0 6px; letter-spacing: 1px; }
 }
 
 nav { position: relative; }
