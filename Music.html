@@ -504,6 +504,11 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 }
 
 /* ── Responsive ── */
+@media (orientation: landscape) and (max-height: 450px) {
+    html { overflow-y: auto !important; height: auto !important; }
+    body { overflow-y: auto !important; height: auto !important; }
+}
+
 @media (max-width: 700px) {
     body { padding-top: 48px; }
     .music-page { gap: 10px; padding: 8px 12px 12px; }
