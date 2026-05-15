@@ -553,6 +553,18 @@
 
 nav { position: relative; }
 nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width: auto; }
+
+.vhs-hint {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #444;
+    margin: 10px 0 0;
+    user-select: none;
+    transition: opacity 0.3s;
+}
+.vhs-hint.hidden { opacity: 0; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -665,6 +677,8 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
         <div class="tape-row" id="tapeRow"></div>
     </div>
 
+    <p class="vhs-hint" id="vhsHint">Click TAPES to view videos</p>
+
 </div>
 
 <script src="PortfolioGallery.js"></script>
@@ -747,7 +761,12 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
     var drawer       = document.getElementById('tapeDrawer');
     var tapesBtn     = document.getElementById('vhsTapesBtn');
     var vhsBody      = document.getElementById('vhsBody');
+    var vhsHint      = document.getElementById('vhsHint');
     var timerInterval = null;
+
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        vhsHint.textContent = 'Tap TAPES to view videos';
+    }
 
     /* Build cassettes */
     var tapeRow = document.getElementById('tapeRow');
@@ -771,6 +790,7 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
         drawer.classList.toggle('open');
         vhsBody.classList.toggle('drawer-open');
         tapesBtn.classList.toggle('active');
+        vhsHint.classList.toggle('hidden', drawer.classList.contains('open'));
     });
 
     function pad(n) { return n < 10 ? '0' + n : '' + n; }
@@ -792,6 +812,7 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
         drawer.classList.remove('open');
         vhsBody.classList.remove('drawer-open');
         tapesBtn.classList.remove('active');
+        vhsHint.classList.remove('hidden');
 
         clearInterval(timerInterval);
         timerInterval = setInterval(function () {
