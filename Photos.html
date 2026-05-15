@@ -1138,6 +1138,25 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     .lcd-mode, .lcd-count { font-size: 7.5px; }
 }
 
+@media (orientation: landscape) and (max-height: 450px) {
+    .cam-page { gap: 6px; }
+    .cam-flip {
+        height: min(calc(100svh - 80px), 260px);
+        width: calc(min(calc(100svh - 80px), 260px) / 0.6315);
+        max-width: 90vw;
+    }
+    .cf-body-brand-canon { font-size: 16px; }
+    .cf-lens-ring-outer { width: 118px; height: 118px; }
+    .cf-lens-barrel { width: 84px; height: 84px; }
+    .cf-lens-glass { width: 54px; height: 54px; }
+    .cf-lens-center { width: 22px; height: 22px; }
+    .cb-controls { width: 78px; gap: 6px; }
+    .cb-control-ring { width: 58px; height: 58px; }
+    .cb-ring-center { width: 32px; height: 32px; }
+    .cb-thumb-grip { display: none; }
+    .cb-btn { font-size: 5.5px; padding: 5px 2px; }
+}
+
 </style>
 </head>
 <body>
