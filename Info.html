@@ -41,8 +41,7 @@ html, body {
     height: 64px;
     z-index: 200;
 }
-.nav-hover-zone:hover nav,
-.nav-hover-zone:hover .mobile-header {
+.nav-hover-zone:hover nav {
     opacity: 1;
     pointer-events: auto;
     transform: translateY(0);
@@ -357,15 +356,15 @@ nav .active { color: #fff !important; opacity: 1 !important; }
 </video>
 <div class="bg-overlay"></div>
 
-<!-- Nav hover zone -->
-<div class="nav-hover-zone">
+<!-- Mobile Header (outside hover zone so it has its own z-index) -->
+<div class="mobile-header" id="mobileHeader">
+    <button class="mobile-header-hamburger" id="mobileHamburger" aria-label="Menu">&#9776;</button>
+    <a href="Portfolio.html" style="display:contents;"><img class="mobile-header-logo" src="PORTFOLIO/portfolio logo inv.png" alt="Portfolio"></a>
+    <div class="mobile-header-spacer"></div>
+</div>
 
-    <!-- Mobile Header -->
-    <div class="mobile-header" id="mobileHeader">
-        <button class="mobile-header-hamburger" id="mobileHamburger" aria-label="Menu">&#9776;</button>
-        <a href="Portfolio.html" style="display:contents;"><img class="mobile-header-logo" src="PORTFOLIO/portfolio logo inv.png" alt="Portfolio"></a>
-        <div class="mobile-header-spacer"></div>
-    </div>
+<!-- Nav hover zone (desktop only) -->
+<div class="nav-hover-zone">
 
     <!-- Desktop Nav -->
     <nav>
