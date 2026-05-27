@@ -100,191 +100,154 @@ nav .active { color: #fff !important; opacity: 1 !important; }
     position: relative;
     text-align: center;
 }
+.panel.panel-left { align-items: flex-start; text-align: left; padding-left: clamp(40px, 10vw, 160px); padding-right: clamp(40px, 10vw, 160px); }
+
+/* ── Panel label ── */
+.panel-label {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 22px;
+}
 
 /* ── Panel 1 — Hero ── */
-.hero-logo {
-    height: clamp(40px, 8vw, 90px);
-    width: auto;
-    margin-bottom: 22px;
-    filter: brightness(0) invert(1);
+.hero-content {
+    max-width: 820px;
+    text-align: center;
 }
-.hero-title {
+.hero-eyebrow {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: clamp(13px, 1.6vw, 17px);
+    font-size: 11px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
     color: #cc3300;
-    letter-spacing: 2px;
-    margin-bottom: 28px;
-    font-weight: 700;
+    margin-bottom: 36px;
 }
-.hero-title span { color: rgba(180,60,30,0.6); margin: 0 8px; }
-.hero-divider {
-    width: 48px;
-    height: 1px;
-    background: rgba(255,255,255,0.25);
-    margin: 0 auto 26px;
+.hero-quote {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: clamp(22px, 3.5vw, 42px);
+    font-weight: 900;
+    color: white;
+    line-height: 1.35;
+    margin-bottom: 36px;
 }
-.hero-summary {
+.hero-sub {
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    color: rgba(255,255,255,0.38);
+    letter-spacing: 2.5px;
+}
+
+/* ── Panel 2 — Capabilities ── */
+.cap-wrap {
+    max-width: 720px;
+    width: 100%;
+}
+.cap-intro {
     font-family: Arial, sans-serif;
     font-size: clamp(14px, 1.4vw, 16px);
     font-weight: 600;
     color: rgba(255,255,255,0.88);
-    line-height: 1.85;
-    max-width: 640px;
+    line-height: 1.8;
+    margin-bottom: 30px;
 }
-
-/* ── Panel headers ── */
-.panel-label {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 12px;
-    letter-spacing: 5px;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.4);
-    margin-bottom: 18px;
+.cap-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 36px;
 }
-
-/* ── Skills panel ── */
-.skills-grid {
+.cap-item {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    max-width: 680px;
+    gap: 5px;
+    border-left: 2px solid rgba(204,51,0,0.4);
+    padding-left: 14px;
+}
+.cap-name {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 12px;
+    color: #cc3300;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+.cap-detail {
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.68);
+    line-height: 1.55;
+}
+
+/* ── Panel 3 — Work ── */
+.work-list {
+    max-width: 720px;
     width: 100%;
-    text-align: left;
-}
-.skill-row {
     display: flex;
-    gap: 10px;
-    align-items: baseline;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    padding-bottom: 14px;
+    flex-direction: column;
+    gap: 22px;
 }
-.skill-category {
+.work-item {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+.work-name {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 13px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
     color: #cc3300;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
     flex-shrink: 0;
-    width: 140px;
+    width: 110px;
+    padding-top: 3px;
+    line-height: 1.3;
 }
-.skill-items {
+.work-detail {
     font-family: Arial, sans-serif;
     font-size: 14px;
     font-weight: 600;
-    color: rgba(255,255,255,0.80);
-    line-height: 1.6;
+    color: rgba(255,255,255,0.82);
+    line-height: 1.65;
+    border-left: 2px solid rgba(204,51,0,0.25);
+    padding-left: 18px;
 }
 
-/* ── Experience panel ── */
-.exp-list {
+/* ── Panel 4 — Education ── */
+.edu-wrap {
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    max-width: 680px;
-    width: 100%;
-    text-align: left;
-    max-height: 76vh;
-    overflow-y: auto;
-    scrollbar-width: none;
-    padding-right: 4px;
-}
-.exp-list::-webkit-scrollbar { display: none; }
-
-.exp-block { border-left: 2px solid rgba(204,51,0,0.4); padding-left: 16px; }
-.exp-block-header {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 5px;
-    margin-bottom: 2px;
-}
-.exp-block-company {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 15px;
-    color: #cc3300;
-    font-weight: 700;
-}
-.exp-block-role {
-    font-family: Arial, sans-serif;
-    font-size: 13.5px;
-    font-style: italic;
-    font-weight: 600;
-    color: rgba(255,255,255,0.85);
-}
-.exp-block-date {
-    font-family: Arial, sans-serif;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.50);
-    margin-left: auto;
-}
-.exp-block-summary {
-    font-family: Arial, sans-serif;
-    font-size: 13px;
-    font-style: italic;
-    color: rgba(255,255,255,0.55);
-    line-height: 1.45;
-    margin: 2px 0 5px;
-}
-.exp-block-bullets {
-    padding-left: 14px;
-    list-style: disc;
-}
-.exp-block-bullets li {
-    font-family: Arial, sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.78);
-    line-height: 1.45;
-    margin-bottom: 2px;
-}
-.exp-block-bullets strong { color: rgba(255,255,255,0.95); }
-
-/* ── Education panel ── */
-.edu-block {
-    max-width: 580px;
-    width: 100%;
-    text-align: left;
-    border-left: 2px solid rgba(204,51,0,0.4);
-    padding-left: 20px;
+    align-items: center;
+    gap: 10px;
 }
 .edu-school {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 20px;
-    color: #cc3300;
-    margin-bottom: 4px;
+    font-size: clamp(22px, 3vw, 34px);
+    font-weight: 900;
+    color: white;
+    line-height: 1.2;
 }
 .edu-degree {
     font-family: Arial, sans-serif;
-    font-size: 15px;
-    font-style: italic;
-    font-weight: 600;
-    color: rgba(255,255,255,0.85);
-    margin-bottom: 2px;
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.38);
+    letter-spacing: 2px;
+    margin-bottom: 18px;
 }
-.edu-date {
+.edu-note {
     font-family: Arial, sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.50);
-    margin-bottom: 16px;
-}
-.edu-bullets {
-    padding-left: 14px;
-    list-style: disc;
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-}
-.edu-bullets li {
-    font-family: Arial, sans-serif;
-    font-size: 13.5px;
+    font-size: clamp(14px, 1.4vw, 16px);
     font-weight: 600;
     color: rgba(255,255,255,0.78);
-    line-height: 1.65;
+    line-height: 1.8;
+    font-style: italic;
 }
 
-/* ── Panel navigation arrows ── */
+/* ── Panel navigation dots ── */
 .panel-nav {
     position: fixed;
     right: 32px;
@@ -308,6 +271,7 @@ nav .active { color: #fff !important; opacity: 1 !important; }
     transform: scale(1.5);
 }
 
+/* ── Panel arrows ── */
 .panel-arrow {
     position: fixed;
     left: 50%;
@@ -339,10 +303,11 @@ nav .active { color: #fff !important; opacity: 1 !important; }
 
 /* ── Mobile ── */
 @media (max-width: 768px) {
-    .panel { padding: 70px 20px 50px; }
-    .skill-row { flex-direction: column; gap: 4px; }
-    .skill-category { width: auto; }
-    .exp-block-date { margin-left: 0; width: 100%; }
+    .panel { padding: 68px 24px 50px; }
+    .panel.panel-left { padding-left: 24px; padding-right: 24px; }
+    .cap-grid { grid-template-columns: 1fr; gap: 14px; }
+    .work-item { flex-direction: column; gap: 6px; }
+    .work-name { width: auto; }
     .panel-nav { right: 14px; }
     .panel-arrow.up { bottom: 72px; }
     .panel-arrow.down { bottom: 26px; }
@@ -400,7 +365,6 @@ nav .active { color: #fff !important; opacity: 1 !important; }
     <div class="panel-dot" data-index="1"></div>
     <div class="panel-dot" data-index="2"></div>
     <div class="panel-dot" data-index="3"></div>
-    <div class="panel-dot" data-index="4"></div>
 </nav>
 
 <!-- Bottom arrows -->
@@ -412,139 +376,69 @@ nav .active { color: #fff !important; opacity: 1 !important; }
 
     <!-- Panel 1 — Hero -->
     <section class="panel">
-        <img class="hero-logo" src="PORTFOLIO/portfolio logo inv.png" alt="Charles Barrios">
-        <p class="hero-title">
-            Brand Identity &amp; Visual Designer
-            <span>|</span>
-            Apparel Graphics
-            <span>|</span>
-            Digital Content
-        </p>
-        <div class="hero-divider"></div>
-        <p class="hero-summary">
-            Creative and versatile Graphic Designer specializing in Brand Identity, Apparel Graphics, and Digital Content with years of professional experience across print, web, photography, film, and social media. Known for rapid skill growth, high-volume output, and the ability to adapt across industries and aesthetics through close client collaboration. Founder of trademarked clothing brand With Love — built entirely from the ground up, from concept to web design to production. Work recognized by global luxury fashion house Balenciaga.
-        </p>
+        <div class="hero-content">
+            <p class="hero-eyebrow">Charles Barrios</p>
+            <h1 class="hero-quote">"I create things that look exactly how they're supposed to feel — and I've been doing it long enough to know when something's right."</h1>
+            <p class="hero-sub">Graphic Designer &nbsp;&middot;&nbsp; Brand Identity &nbsp;&middot;&nbsp; Creative Director</p>
+        </div>
     </section>
 
-    <!-- Panel 2 — Skills -->
-    <section class="panel">
-        <p class="panel-label">Skills</p>
-        <div class="skills-grid">
-            <div class="skill-row">
-                <span class="skill-category">Design &amp; Creative</span>
-                <span class="skill-items">Adobe Creative Suite (Photoshop, Illustrator, Premiere Pro, After Effects, Audition, Dreamweaver), Figma, UI/UX Design, Color Theory, Trend Research &amp; Mood Board Creation</span>
-            </div>
-            <div class="skill-row">
-                <span class="skill-category">Production</span>
-                <span class="skill-items">Print Production, Large-Scale Industrial Printing, Screen Printing, Digital Asset Management, FTP &amp; Image Archiving, Production Coordination</span>
-            </div>
-            <div class="skill-row">
-                <span class="skill-category">Media</span>
-                <span class="skill-items">Photography (DSLR, Studio Lighting), Videography, Video Editing, Sound Design &amp; Audio Mixing, Social Media Content Design</span>
-            </div>
-            <div class="skill-row">
-                <span class="skill-category">Professional</span>
-                <span class="skill-items">Brand Strategy &amp; Identity, Client Consulting, Apparel Design, Lookbook Production, Advertising &amp; Promotional Design</span>
-            </div>
-            <div class="skill-row" style="border-bottom:none; padding-bottom:0;">
-                <span class="skill-category">Tech &amp; Tools</span>
-                <span class="skill-items">AI Tools (Claude, ChatGPT, Midjourney), Web Design &amp; Coding, Figma, Microsoft Excel</span>
+    <!-- Panel 2 — Capabilities -->
+    <section class="panel panel-left">
+        <p class="panel-label">What I Can Do</p>
+        <div class="cap-wrap">
+            <p class="cap-intro">My range is wide. I can take a brand from nothing — logo, identity, website, content, the whole thing — and build it into something that feels alive. I work across print, digital, apparel, photography, video, and sound. I research trends, consult on direction, and handle production from concept to final file.</p>
+            <div class="cap-grid">
+                <div class="cap-item">
+                    <span class="cap-name">Brand &amp; Identity</span>
+                    <span class="cap-detail">Adobe Creative Suite, Figma, UI/UX, color theory, trend research, mood board creation</span>
+                </div>
+                <div class="cap-item">
+                    <span class="cap-name">Print &amp; Apparel</span>
+                    <span class="cap-detail">Large-scale industrial printing, screen printing, apparel graphics, production coordination</span>
+                </div>
+                <div class="cap-item">
+                    <span class="cap-name">Photo &amp; Film</span>
+                    <span class="cap-detail">DSLR photography, studio lighting, videography, editing &amp; post-production workflows</span>
+                </div>
+                <div class="cap-item">
+                    <span class="cap-name">Sound &amp; Web</span>
+                    <span class="cap-detail">Audio mixing, sound design, web design &amp; coding, digital &amp; social media content</span>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Panel 3 — Experience (1/2) -->
-    <section class="panel">
-        <p class="panel-label">Experience &nbsp;1/2</p>
-        <div class="exp-list">
-
-            <div class="exp-block">
-                <div class="exp-block-header">
-                    <span class="exp-block-company">Cookie's Kids, Brooklyn</span>
-                    <span class="exp-block-role">— Graphic Designer / Printer</span>
-                    <span class="exp-block-date">Dec 2021 – Present</span>
-                </div>
-                <p class="exp-block-summary">Brought on as a photo editor and rapidly expanded role into graphic design, print production, logo creation, and digital asset management — becoming a one-person creative department across all visual touchpoints for a multi-location retail brand.</p>
-                <ul class="exp-block-bullets">
-                    <li><strong>High-volume photo editing:</strong> Shot and edited 500–750 product images per week with ~99% positive feedback rate.</li>
-                    <li><strong>Large-scale print production:</strong> Sole operator of industrial printing process — 250+ signs and posters weekly across 5 NYC locations.</li>
-                    <li><strong>Web &amp; digital marketing:</strong> Designed and managed all promotional web banners and sale blocks end-to-end.</li>
-                    <li><strong>Brand &amp; advertising:</strong> Contributed designs for billboard and public transit advertisements across NYC.</li>
-                    <li><strong>Logo &amp; asset creation:</strong> Designed logos and managed full digital asset pipeline including FTP uploads and archiving.</li>
-                </ul>
+    <!-- Panel 3 — Work -->
+    <section class="panel panel-left">
+        <p class="panel-label">Work I'm Proud Of</p>
+        <div class="work-list">
+            <div class="work-item">
+                <span class="work-name">Balenciaga</span>
+                <p class="work-detail">I created concept ads and lookbook designs for their 2021 fashion year — completely unsolicited. The brand acknowledged the work directly.</p>
             </div>
-
-            <div class="exp-block">
-                <div class="exp-block-header">
-                    <span class="exp-block-company">Freelance</span>
-                    <span class="exp-block-role">— Multimedia Designer</span>
-                    <span class="exp-block-date">Apr 2019 – Present</span>
-                </div>
-                <p class="exp-block-summary">Independent creative practice spanning brand identity, apparel graphics, digital design, photography, videography, and sound — serving clients across music, fashion, and digital media.</p>
-                <ul class="exp-block-bullets">
-                    <li><strong>With Love (Founder &amp; Creative Director):</strong> Built a fully trademarked clothing brand from scratch — sole creator of all brand identity, UI/UX, website, and promotional content.</li>
-                    <li><strong>Balenciaga:</strong> Created unsolicited concept ads and lookbook designs for Balenciaga's 2021 fashion year. Work acknowledged directly by the brand.</li>
-                    <li>Designed email blasts, digital banners, lookbooks, and UI/UX assets for independent creators and stores.</li>
-                    <li>Produced and directed photo and video content for startup influencers and content creators.</li>
-                    <li>Edited and mixed audio for film and music projects using Adobe Audition.</li>
-                </ul>
+            <div class="work-item">
+                <span class="work-name">With Love</span>
+                <p class="work-detail">Built a fully trademarked clothing brand entirely from scratch. The name, the identity, the website, every piece of content — all me, from the ground up.</p>
             </div>
-
+            <div class="work-item">
+                <span class="work-name">MISHKA &amp; ALIFE</span>
+                <p class="work-detail">Designed a full capsule for MISHKA — tees, sweatpants, zip-up hoodies. For ALIFE, I designed limited-edition event tees for their flagship store using their box logo and stencil prints. Those designs made it to the final product.</p>
+            </div>
+            <div class="work-item">
+                <span class="work-name">Cookie's Kids</span>
+                <p class="work-detail">Became a one-person creative department for a multi-location NYC retail brand — billboards, web banners, 250+ printed signs a week, logos, photo editing. All of it.</p>
+            </div>
         </div>
     </section>
 
-    <!-- Panel 4 — Experience (2/2) -->
-    <section class="panel">
-        <p class="panel-label">Experience &nbsp;2/2</p>
-        <div class="exp-list">
-
-            <div class="exp-block">
-                <div class="exp-block-header">
-                    <span class="exp-block-company">Renaissance, New York</span>
-                    <span class="exp-block-role">— Apparel Designer</span>
-                    <span class="exp-block-date">Jun 2017 – Aug 2018</span>
-                </div>
-                <p class="exp-block-summary">Graphic artist for an independent apparel design group. Quickly promoted into broader design responsibilities based on output quality and speed.</p>
-                <ul class="exp-block-bullets">
-                    <li><strong>MISHKA collaboration:</strong> Contributed to a capsule collection for Brooklyn streetwear brand MISHKA — designing graphics across 5 tees, 3 sweatpants, and 3 zip-up hoodies.</li>
-                    <li><strong>ALIFE collaboration:</strong> Contributed key design elements — including box logo and hardcore stencil prints — to limited-edition event tees for New York streetwear brand ALIFE's flagship store. Designs made it to the final product.</li>
-                    <li>Developed apparel graphics through Photoshop and Illustrator; sourced and analyzed fabrics, trims, and materials for production.</li>
-                    <li>Promoted to assist in seasonal forecasting, trend research, mood board creation, and design reviews with creative leads.</li>
-                    <li>Collaborated cross-functionally with marketing, merchandising, and production teams to bring concepts to garments.</li>
-                </ul>
-            </div>
-
-            <div class="exp-block">
-                <div class="exp-block-header">
-                    <span class="exp-block-company">Clarity, New York</span>
-                    <span class="exp-block-role">— Creative Assistant</span>
-                    <span class="exp-block-date">Sep 2018 – Mar 2019</span>
-                </div>
-                <p class="exp-block-summary">Supported a digital media brand consulting on brand identity, demographics, and visual direction across multiple startup client accounts simultaneously.</p>
-                <ul class="exp-block-bullets">
-                    <li>Assisted creative director in developing brand and identity for fashion startups seeking visual expansion, and tech startups building consumer-facing brand appeal.</li>
-                    <li>Consulted on target demographics, stylistic direction, asset management, and advertising strategy for startup clients.</li>
-                    <li>Produced lookbooks, social media content, and promotional graphics across multiple client aesthetics.</li>
-                    <li>Organized and maintained creative asset libraries, ensuring files were properly labeled, archived, and accessible.</li>
-                    <li>Monitored industry trends and cultural movements to keep concepts relevant.</li>
-                </ul>
-            </div>
-
-        </div>
-    </section>
-
-    <!-- Panel 5 — Education -->
+    <!-- Panel 4 — Education -->
     <section class="panel">
         <p class="panel-label">Education</p>
-        <div class="edu-block">
+        <div class="edu-wrap">
             <p class="edu-school">Hunter College, New York</p>
-            <p class="edu-degree">Bachelor of Arts</p>
-            <p class="edu-date">August 2015 – May 2020</p>
-            <ul class="edu-bullets">
-                <li>Completed coursework in film production, digital design and usability, and sound design using the Adobe Creative Suite.</li>
-                <li>Gained practical experience in media production including cinematography, editing, set work, equipment maintenance, and post-production workflows.</li>
-                <li>Developed proficiency in digital design principles and UI/UX usability through project-based learning.</li>
-            </ul>
+            <p class="edu-degree">Bachelor of Arts &nbsp;&middot;&nbsp; 2015 – 2020</p>
+            <p class="edu-note">I studied film production, digital design, and sound. Most of what I know came from doing the work — but school gave me the foundation to understand why it works.</p>
         </div>
     </section>
 
@@ -576,23 +470,19 @@ nav .active { color: #fff !important; opacity: 1 !important; }
         arrowDown.classList.toggle('hidden', current === total - 1);
     }
 
-    /* Dot clicks */
     dots.forEach(function (dot) {
         dot.addEventListener('click', function () { goTo(parseInt(dot.dataset.index)); });
     });
 
-    /* Arrow clicks */
     arrowUp.addEventListener('click', function () { goTo(current - 1); });
     arrowDown.addEventListener('click', function () { goTo(current + 1); });
 
-    /* Scroll detection */
     container.addEventListener('scroll', function () {
         if (scrolling) return;
         var idx = Math.round(container.scrollTop / window.innerHeight);
         if (idx !== current) { current = idx; updateUI(); }
     });
 
-    /* Mouse wheel — snap one panel at a time */
     container.addEventListener('wheel', function (e) {
         e.preventDefault();
         if (scrolling) return;
@@ -601,7 +491,6 @@ nav .active { color: #fff !important; opacity: 1 !important; }
         setTimeout(function () { scrolling = false; }, 700);
     }, { passive: false });
 
-    /* Touch swipe */
     var touchStartY = 0;
     container.addEventListener('touchstart', function (e) {
         touchStartY = e.touches[0].clientY;
@@ -611,7 +500,6 @@ nav .active { color: #fff !important; opacity: 1 !important; }
         if (Math.abs(diff) > 40) goTo(diff > 0 ? current + 1 : current - 1);
     }, { passive: true });
 
-    /* Mobile nav toggle */
     var btn     = document.getElementById('mobileHamburger');
     var menu    = document.getElementById('mobileNavMenu');
     var overlay = document.getElementById('mobileNavOverlay');
