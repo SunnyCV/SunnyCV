@@ -544,13 +544,6 @@ nav .active { color: #fff !important; opacity: 1 !important; }
         navHint.classList.add('hidden');
     }, { once: true });
 
-    var btn     = document.getElementById('mobileHamburger');
-    var menu    = document.getElementById('mobileNavMenu');
-    var overlay = document.getElementById('mobileNavOverlay');
-    function toggleNav() { menu.classList.toggle('open'); overlay.classList.toggle('open'); }
-    if (btn) btn.addEventListener('click', toggleNav);
-    if (overlay) overlay.addEventListener('click', toggleNav);
-
     updateUI();
 }());
 </script>
