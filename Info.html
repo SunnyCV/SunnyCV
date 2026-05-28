@@ -100,6 +100,7 @@ nav .active { color: #fff !important; opacity: 1 !important; }
     text-align: center;
 }
 .panel.panel-left { align-items: flex-start; text-align: left; padding-left: clamp(40px, 10vw, 160px); padding-right: clamp(40px, 10vw, 160px); }
+.panel.panel-right { align-items: flex-end; text-align: right; padding-left: clamp(40px, 10vw, 160px); padding-right: clamp(40px, 10vw, 160px); }
 
 /* ── Panel label ── */
 .panel-label {
@@ -227,6 +228,13 @@ nav .active { color: #fff !important; opacity: 1 !important; }
     border-left: 2px solid rgba(204,51,0,0.25);
     padding-left: 18px;
 }
+.panel-right .work-detail {
+    border-left: none;
+    border-right: 2px solid rgba(204,51,0,0.25);
+    padding-left: 0;
+    padding-right: 18px;
+}
+.panel-right .work-item { flex-direction: row-reverse; }
 
 /* ── Panel 4 — Education ── */
 .edu-wrap {
@@ -458,7 +466,7 @@ nav .active { color: #fff !important; opacity: 1 !important; }
     </section>
 
     <!-- Panel 3 — Work -->
-    <section class="panel panel-left">
+    <section class="panel panel-right">
         <p class="panel-label">Work I'm Proud Of</p>
         <div class="work-list">
             <div class="work-item">
