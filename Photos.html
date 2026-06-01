@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" type="text/css" href="PortfolioGallery.css">
+<title>Photos — Portfolio</title>
+<style>
+
+/* ── Page ── */
+html, body {
+    margin: 0; padding: 0;
+}
+
+html {
+    /* PortfolioGallery.css forces overflow-y:scroll on html, which lets the
+       html element scroll even when body is overflow:hidden. Lock it here. */
+    overflow: hidden !important;
+    height: 100%;
+}
+
+body {
+    background: radial-gradient(ellipse at 50% 30%, #f5f4f2 0%, #dddbd8 100%) !important;
+    overflow: hidden !important;
+    /* Remove the 55px padding-bottom PortfolioGallery.css injects — it adds
+       scroll height that combines with the nav to make the page scrollable. */
+    padding-bottom: 0 !important;
+    /* Flex column so nav takes its natural height and cam-page fills the rest,
+       keeping total height exactly 100vh with nothing to scroll. */
+    height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+}
+
+nav { position: relative; }
+nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width: auto; }
+nav li a { color: #333 !important; }
+li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
+.mobile-header {
+    background-color: #e8e6e3 !important;
+    border-bottom: 1px solid #ccc !important;
+}
+.mobile-header-hamburger { color: #333 !important; }
+.mobile-nav-menu {
+    background-color: #eeecea !important;
+    border-right: 1px solid #ccc !important;
+}
+.mobile-nav-menu a { color: #333 !important; border-bottom: 1px solid #ddd !important; }
+.mobile-nav-overlay { background: rgba(0,0,0,0.25) !important; }
+
+/* ── Layout ── */
+.cam-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* flex:1 + min-height:0 fills the remaining viewport below the nav
+       without ever exceeding it — no scroll space created */
+    flex: 1;
+    min-height: 0;
+    gap: 18px;
+    padding: 12px 16px;
+    box-sizing: border-box;
+}
+
+.cam-prompt {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #999;
+    margin: 0;
+    user-select: none;
+    transition: opacity 0.4s;
+}
+
+.cam-hint {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #999;
+    margin: 0;
+    user-select: none;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s;
+}
+.cam-hint.visible { opacity: 1; }
+
+/* ── 3D Flip Scene ── */
+.cam-scene { perspective: 2000px; }
+
+.cam-flip {
+    width: 820px;
+    height: 518px;
+    position: relative;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    transition: transform 1.1s cubic-bezier(0.42, 0, 0.18, 1);
+    cursor: pointer;
+}
+.cam-flip.flipped { transform: rotateY(180deg); }
+
+.cam-face {
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    overflow: hidden;
+}
+
+/* ══════ FRONT FACE — Canon PowerShot S110 ══════ */
+.cam-face-front {
+    background: linear-gradient(155deg, #e8e8e8 0%, #c8c8c8 45%, #d8d8d8 100%);
+    box-shadow:
+        0 0 0 1px #aaa,
+        0 0 0 2.5px #e0e0e0,
+        0 6px 0 3px #a0a0a0,
+        0 30px 70px rgba(0,0,0,0.35),
+        inset 0 2px 0 rgba(255,255,255,0.95),
+        inset 0 -1px 0 rgba(0,0,0,0.12);
+    display: flex;
+    flex-direction: column;
+}
+/* Gloss sheen sweep across the front */
+.cam-face-front::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background: linear-gradient(160deg,
+        rgba(255,255,255,0.55) 0%,
+        rgba(255,255,255,0.18) 30%,
+        transparent 55%
+    );
+    pointer-events: none;
+    z-index: 50;
+}
+
+/* ── Top control bar ── */
+.cf-top {
+    height: 52px;
+    background: linear-gradient(180deg, #dedede 0%, #c8c8c8 100%);
+    border-bottom: 1px solid #b0b0b0;
+    border-radius: 16px 16px 0 0;
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
+/* Canon logo centred on top bar */
+.cf-canon-top {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Times New Roman', serif;
+    font-size: 17px;
+    font-weight: bold;
+    font-style: italic;
+    color: #cc0000;
+    letter-spacing: 2px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+    user-select: none;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Power button — far left */
+.cf-power {
+    position: absolute;
+    left: 18px; top: 50%; transform: translateY(-50%);
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 34%, #353535, #1a1a1a);
+    box-shadow:
+        0 2px 5px rgba(0,0,0,0.55),
+        0 0 0 1.5px #0d0d0d,
+        0 0 0 3px #2e2e2e,
+        inset 0 1px 0 rgba(255,255,255,0.09);
+}
+.cf-power::after {
+    content: '⏻';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8px;
+    color: #525252;
+    line-height: 1;
+}
+
+/* Zoom lever + shutter group — right side */
+.cf-shutter-group {
+    position: absolute;
+    right: 102px; top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.cf-zoom {
+    width: 54px; height: 15px;
+    background: linear-gradient(180deg, #2e2e2e 0%, #202020 100%);
+    border-radius: 8px;
+    box-shadow:
+        0 2px 4px rgba(0,0,0,0.45),
+        0 0 0 1px #0d0d0d,
+        inset 0 1px 0 rgba(255,255,255,0.06);
+    position: relative;
+}
+.cf-zoom::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 20px; height: 13px;
+    background: linear-gradient(180deg, #393939 0%, #272727 100%);
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.07);
+}
+
+/* Shutter — raised silver disc */
+.cf-shutter {
+    position: relative;
+    margin-left: 6px;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 36% 30%, #e8e8e8, #b0b0b0);
+    box-shadow:
+        0 4px 10px rgba(0,0,0,0.55),
+        0 0 0 2px #181818,
+        0 0 0 4px #363636,
+        inset 0 2px 0 rgba(255,255,255,0.75),
+        inset 0 -1px 0 rgba(0,0,0,0.15);
+    z-index: 1;
+}
+.cf-shutter::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.07);
+}
+
+/* Mode dial — far right */
+.cf-mode-dial {
+    position: absolute;
+    right: 20px; top: 50%; transform: translateY(-50%);
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: conic-gradient(
+        #c0392b 0deg 42deg,
+        #e67e22 42deg 84deg,
+        #27ae60 84deg 126deg,
+        #2980b9 126deg 168deg,
+        #8e44ad 168deg 210deg,
+        #2c3e50 210deg 252deg,
+        #bdc3c7 252deg 294deg,
+        #e74c3c 294deg 336deg,
+        #c0392b 336deg 360deg
+    );
+    box-shadow:
+        0 4px 10px rgba(0,0,0,0.55),
+        0 0 0 2px #0d0d0d,
+        0 0 0 3.5px #383838;
+}
+.cf-mode-dial::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 38%, #2a2a2a, #111);
+    box-shadow: 0 0 0 1.5px #333;
+}
+.cf-mode-dial::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 50%; transform: translateX(-50%);
+    width: 2.5px; height: 8px;
+    background: rgba(255,255,255,0.85);
+    border-radius: 1px;
+}
+
+/* ── Front body ── */
+.cf-body {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0 0 16px 16px;
+}
+
+/* Left grip — darker rubber for contrast against silver */
+.cf-grip-left {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 30px;
+    background: linear-gradient(90deg, #888 0%, #999 100%);
+    border-radius: 0 0 0 16px;
+}
+.cf-grip-left::after {
+    content: '';
+    position: absolute;
+    inset: 18px 7px;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent, transparent 3px,
+        rgba(0,0,0,0.12) 3px, rgba(0,0,0,0.12) 4px
+    );
+    border-radius: 2px;
+}
+
+/* Flash unit */
+.cf-flash {
+    position: absolute;
+    top: 18px; left: 40px;
+    width: 48px; height: 26px;
+    background: linear-gradient(180deg, #ebe7db 0%, #d6d2c6 100%);
+    border-radius: 4px;
+    box-shadow:
+        0 0 0 1px #505050,
+        inset 0 1px 0 rgba(255,255,255,0.95),
+        0 4px 10px rgba(0,0,0,0.35);
+}
+.cf-flash::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.28) 0%, rgba(200,215,255,0.08) 100%);
+    border-radius: 2px;
+}
+
+/* AF assist lamp */
+.cf-af-lamp {
+    position: absolute;
+    top: 22px; left: 94px;
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 34%, #ffcc44, #cc8800);
+    box-shadow: 0 0 7px rgba(200,140,0,0.55), 0 0 0 1px #404040;
+}
+
+/* Front viewfinder window */
+.cf-vf-front {
+    position: absolute;
+    top: 20px; left: 110px;
+    width: 24px; height: 15px;
+    background: #050310;
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px #484848, inset 0 1px 5px rgba(0,0,0,0.95);
+}
+
+/* Canon + model branding on body */
+.cf-body-brand {
+    position: absolute;
+    top: 14px;
+    right: 38px;
+    text-align: right;
+    z-index: 1;
+    transition: opacity 0.2s ease;
+}
+.cf-body-brand-canon {
+    display: block;
+    font-family: 'Times New Roman', serif;
+    font-size: 21px;
+    font-weight: bold;
+    font-style: italic;
+    color: #cc0000;
+    letter-spacing: 2px;
+    text-shadow: 0 1px 5px rgba(0,0,0,0.65);
+    line-height: 1;
+}
+.cf-body-brand-model {
+    display: block;
+    font-family: Arial, sans-serif;
+    font-size: 7.5px;
+    letter-spacing: 2.5px;
+    color: #484848;
+    text-transform: uppercase;
+    margin-top: 4px;
+}
+
+/* ── Lens Assembly — the hero element ── */
+.cf-lens-assembly {
+    position: absolute;
+    top: 50%; left: 44%;
+    transform: translate(-50%, -46%);
+}
+
+/* Outer control ring — S110 signature feature, ridged clickable ring */
+.cf-lens-ring-outer {
+    width: 190px; height: 190px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 37%, #3c3c3c, #181818);
+    box-shadow:
+        0 0 0 1.5px #0a0a0a,
+        0 0 0 4px #424242,
+        0 0 0 5.5px #0d0d0d,
+        0 16px 48px rgba(0,0,0,0.8),
+        inset 0 2px 5px rgba(255,255,255,0.06),
+        inset 0 -2px 5px rgba(0,0,0,0.45);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+/* Ridged control ring texture */
+.cf-lens-ring-outer::before {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    border-radius: 50%;
+    background: repeating-conic-gradient(
+        #313131 0deg 2.5deg,
+        #222222 2.5deg 5deg
+    );
+    box-shadow: inset 0 3px 10px rgba(0,0,0,0.55);
+}
+
+/* Inner barrel ring */
+.cf-lens-barrel {
+    width: 136px; height: 136px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 37%, #2a2a2a, #101010);
+    box-shadow:
+        0 0 0 1.5px #0a0a0a,
+        0 0 0 4px #363636,
+        0 0 0 5.5px #0a0a0a,
+        inset 0 3px 8px rgba(0,0,0,0.85);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+/* Lens glass element */
+.cf-lens-glass {
+    width: 88px; height: 88px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 26%, #1c3254, #06101e);
+    box-shadow:
+        0 0 0 2px #080808,
+        0 0 0 5px #202020,
+        0 0 0 6px #080808,
+        inset 0 5px 18px rgba(0,0,0,0.95),
+        0 0 28px rgba(8,24,72,0.5);
+    position: relative;
+    z-index: 2;
+    overflow: hidden;
+}
+/* Main lens highlight */
+.cf-lens-glass::before {
+    content: '';
+    position: absolute;
+    top: 9px; left: 11px;
+    width: 26px; height: 18px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.13);
+    transform: rotate(-30deg);
+}
+/* Secondary reflection */
+.cf-lens-glass::after {
+    content: '';
+    position: absolute;
+    top: 24px; left: 22px;
+    width: 11px; height: 7px;
+    border-radius: 50%;
+    background: rgba(160,190,255,0.09);
+    transform: rotate(-20deg);
+}
+
+/* Centre lens element */
+.cf-lens-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 35%, #0e2040, #040c1c);
+    box-shadow:
+        0 0 0 1.5px rgba(80,120,200,0.18),
+        inset 0 3px 8px rgba(0,0,0,0.95);
+}
+
+/* ── Bottom edge strip ── */
+.cf-bottom-strip {
+    position: absolute;
+    bottom: 10px;
+    left: 50%; transform: translateX(-50%);
+    width: 100px; height: 4px;
+    background: linear-gradient(90deg, transparent, #bbb 30%, #bbb 70%, transparent);
+    border-radius: 2px;
+}
+
+/* ══════ BACK FACE — Canon PowerShot S110 ══════ */
+.cam-face-back {
+    transform: rotateY(180deg);
+    background: linear-gradient(155deg, #e4e4e4 0%, #c4c4c4 50%, #d4d4d4 100%);
+    box-shadow:
+        0 0 0 1px #aaa,
+        0 0 0 2.5px #ddd,
+        0 30px 70px rgba(0,0,0,0.35),
+        inset 0 2px 0 rgba(255,255,255,0.9),
+        inset 0 -1px 0 rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+/* Gloss sheen on back */
+.cam-face-back::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background: linear-gradient(160deg,
+        rgba(255,255,255,0.5) 0%,
+        rgba(255,255,255,0.15) 28%,
+        transparent 52%
+    );
+    pointer-events: none;
+    z-index: 50;
+}
+
+/* ── Back top bar ── */
+.cb-top {
+    height: 52px;
+    background: linear-gradient(180deg, #dcdcdc 0%, #c8c8c8 100%);
+    border-bottom: 1px solid #b0b0b0;
+    border-radius: 16px 16px 0 0;
+    position: relative;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 12px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
+/* Viewfinder eyepiece */
+.cb-vf {
+    width: 42px; height: 26px;
+    background: #030209;
+    border-radius: 4px;
+    box-shadow: 0 0 0 1.5px #484848, inset 0 2px 8px rgba(0,0,0,0.98);
+    position: relative;
+    flex-shrink: 0;
+}
+.cb-vf::after {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    border-radius: 7px;
+    border: 5px solid #b0b0b0;
+    box-shadow: 0 0 0 1px #aaa;
+}
+
+.cb-top-label {
+    font-family: Arial, sans-serif;
+    font-size: 7.5px;
+    letter-spacing: 2px;
+    color: #888;
+    text-transform: uppercase;
+}
+
+/* ── Back body ── */
+.cb-body {
+    flex: 1;
+    display: flex;
+    border-radius: 0 0 16px 16px;
+    overflow: hidden;
+    padding: 11px 11px 16px 11px;
+    gap: 11px;
+}
+
+/* LCD — 3" touchscreen dominates the back (like the real S110) */
+.cb-screen {
+    flex: 1;
+    background: #060810;
+    border-radius: 7px;
+    box-shadow:
+        0 0 0 2px #0c0c0c,
+        0 0 0 5.5px #303030,
+        0 0 0 7px #0c0c0c,
+        inset 0 3px 18px rgba(0,0,0,0.95),
+        0 0 24px rgba(0,0,40,0.25);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    cursor: default;
+    position: relative;
+}
+/* Screen sheen overlay */
+.cb-screen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(145deg, rgba(255,255,255,0.025) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 10;
+    border-radius: 7px;
+}
+
+.lcd-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px;
+    background: rgba(0,0,0,0.65);
+    border-bottom: 1px solid rgba(255,255,255,0.025);
+    flex-shrink: 0;
+}
+.lcd-mode {
+    font-family: 'Courier New', monospace;
+    font-size: 9px;
+    color: rgba(135,165,220,0.92);
+    letter-spacing: 1.5px;
+}
+.lcd-count {
+    font-family: 'Courier New', monospace;
+    font-size: 9px;
+    color: rgba(135,165,220,0.52);
+}
+.lcd-batt {
+    width: 24px; height: 11px;
+    border: 1px solid rgba(135,165,220,0.38);
+    border-radius: 2px;
+    position: relative;
+}
+.lcd-batt::before {
+    content: '';
+    position: absolute;
+    right: -4px; top: 2px;
+    width: 3px; height: 7px;
+    background: rgba(135,165,220,0.38);
+    border-radius: 0 1px 1px 0;
+}
+.lcd-batt::after {
+    content: '';
+    position: absolute;
+    inset: 2px; right: 5px;
+    background: rgba(55,190,100,0.82);
+    border-radius: 1px;
+}
+
+/* Grid */
+.lcd-grid {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 3px;
+    padding: 5px 5px 3px;
+}
+.lcd-grid::-webkit-scrollbar { display: none; }
+
+.lcd-thumb {
+    background: #0c0c1c;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    outline: 2px solid transparent;
+    outline-offset: -1px;
+    transition: outline-color 0.12s;
+    border-radius: 2px;
+}
+.lcd-thumb:hover { outline-color: rgba(135,165,220,0.7); }
+.lcd-thumb img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+}
+.lcd-thumb-n {
+    position: absolute;
+    bottom: 2px; right: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 7px;
+    color: rgba(255,255,255,0.38);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.95);
+    pointer-events: none;
+}
+
+/* Page navigation bar */
+.lcd-page-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 8px;
+    background: rgba(0,0,0,0.55);
+    border-top: 1px solid rgba(255,255,255,0.03);
+    flex-shrink: 0;
+}
+.lcd-page-btn {
+    background: rgba(135,165,220,0.1);
+    border: 1px solid rgba(135,165,220,0.25);
+    color: rgba(135,165,220,0.85);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 3px 11px;
+    border-radius: 2px;
+    font-family: 'Courier New', monospace;
+    transition: background 0.12s;
+    line-height: 1;
+    user-select: none;
+}
+.lcd-page-btn:hover:not(:disabled) { background: rgba(135,165,220,0.22); }
+.lcd-page-btn:disabled { opacity: 0.22; cursor: default; }
+.lcd-page-indicator {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    color: rgba(135,165,220,0.5);
+    letter-spacing: 1px;
+    user-select: none;
+}
+
+/* Single photo view */
+.lcd-single {
+    flex: 1;
+    min-height: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 28px 8px 36px;
+    overflow: hidden;
+}
+.lcd-single.active { display: flex; }
+.lcd-single img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    cursor: pointer;
+    display: block;
+}
+.lcd-single-nav {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+.lcd-nav-btn {
+    background: rgba(135,165,220,0.1);
+    border: 1px solid rgba(135,165,220,0.28);
+    color: rgba(135,165,220,0.92);
+    font-size: 10px; cursor: pointer;
+    padding: 5px 16px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    transition: background 0.12s;
+}
+.lcd-nav-btn:hover { background: rgba(135,165,220,0.22); }
+.lcd-back-btn {
+    position: absolute;
+    top: 6px; left: 8px;
+    background: rgba(135,165,220,0.1);
+    border: 1px solid rgba(135,165,220,0.26);
+    color: rgba(135,165,220,0.7);
+    font-size: 7px; cursor: pointer;
+    padding: 3px 9px;
+    border-radius: 2px;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+    transition: background 0.12s;
+}
+.lcd-back-btn:hover { background: rgba(135,165,220,0.22); }
+
+/* ── Controls panel — slim, like S110 ── */
+.cb-controls {
+    width: 112px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding-top: 4px;
+}
+
+/* Thumb rubber grip */
+.cb-thumb-grip {
+    width: 100%;
+    height: 58px;
+    background: linear-gradient(90deg, #888 0%, #999 100%);
+    border-radius: 6px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.2);
+}
+.cb-thumb-grip::after {
+    content: '';
+    position: absolute;
+    inset: 8px 12px;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent, transparent 4px,
+        rgba(0,0,0,0.1) 4px, rgba(0,0,0,0.1) 5px
+    );
+    border-radius: 2px;
+}
+
+/* Control ring / rear dial */
+.cb-control-ring {
+    position: relative;
+    width: 88px; height: 88px;
+    flex-shrink: 0;
+}
+.cb-ring-disc {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 37%, #2e2e2e, #151515);
+    box-shadow:
+        0 6px 16px rgba(0,0,0,0.55),
+        0 0 0 1.5px #0a0a0a,
+        0 0 0 3px #343434,
+        0 0 0 4.5px #0a0a0a,
+        inset 0 1px 0 rgba(255,255,255,0.07);
+}
+.cb-ring-disc::before {
+    content: '';
+    position: absolute;
+    inset: 7px;
+    border-radius: 50%;
+    background: repeating-conic-gradient(
+        #2a2a2a 0deg 2.5deg,
+        #1c1c1c 2.5deg 5deg
+    );
+}
+
+/* Centre SET button */
+.cb-ring-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 37%, #323232, #1c1c1c);
+    box-shadow:
+        0 4px 10px rgba(0,0,0,0.55),
+        0 0 0 1.5px #0a0a0a,
+        0 0 0 3px #2e2e2e,
+        inset 0 1px 0 rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+.cb-ring-center-label {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 7.5px;
+    letter-spacing: 1px;
+    color: #505050;
+    user-select: none;
+}
+
+/* D-pad directional arrows */
+.dpad-arr {
+    position: absolute;
+    color: #4a4a4a;
+    font-size: 9px;
+    line-height: 1;
+    user-select: none;
+    pointer-events: none;
+    z-index: 2;
+}
+.dpad-arr.u { top: 9px;    left: 50%; transform: translateX(-50%); }
+.dpad-arr.d { bottom: 9px; left: 50%; transform: translateX(-50%); }
+.dpad-arr.l { left: 9px;   top: 50%;  transform: translateY(-50%); }
+.dpad-arr.r { right: 9px;  top: 50%;  transform: translateY(-50%); }
+
+/* Buttons */
+.cb-btn-grid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+}
+.cb-btn {
+    background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+    border: none;
+    border-radius: 4px;
+    color: #585858;
+    font-family: Arial, sans-serif;
+    font-size: 6.5px;
+    letter-spacing: 0.5px;
+    cursor: default;
+    padding: 6px 3px;
+    box-shadow:
+        0 3px 0 #0a0a0a,
+        0 4px 8px rgba(0,0,0,0.4),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+    text-transform: uppercase;
+    text-align: center;
+    user-select: none;
+}
+.cb-btn-play { color: #4a8a5e; }
+.cb-btn-del  { color: #8a4040; }
+
+/* ── Back power button ── */
+.cb-power-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    margin-top: 4px;
+}
+.cb-power-label {
+    font-family: Arial, sans-serif;
+    font-size: 6.5px;
+    letter-spacing: 2px;
+    color: #666;
+    text-transform: uppercase;
+    user-select: none;
+}
+.cb-power-btn {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 34%, #555, #222);
+    box-shadow:
+        0 4px 10px rgba(0,0,0,0.5),
+        0 0 0 2px #111,
+        0 0 0 4px #484848,
+        0 0 0 5px #111,
+        inset 0 1px 0 rgba(255,255,255,0.12);
+    cursor: pointer;
+    border: none;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: box-shadow 0.35s, background 0.35s;
+}
+.cb-power-btn::after {
+    content: '⏻';
+    font-size: 16px;
+    color: #686868;
+    transition: color 0.35s, text-shadow 0.35s;
+    line-height: 1;
+}
+.cb-power-btn.on {
+    background: radial-gradient(circle at 38% 34%, #606060, #2a2a2a);
+    box-shadow:
+        0 4px 10px rgba(0,0,0,0.5),
+        0 0 0 2px #111,
+        0 0 0 4px #484848,
+        0 0 0 5px #111,
+        0 0 16px rgba(50,220,80,0.7),
+        0 0 32px rgba(50,220,80,0.3),
+        inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.cb-power-btn.on::after {
+    color: #3ddc55;
+    text-shadow: 0 0 10px rgba(50,220,80,0.95);
+}
+
+/* ── LCD off state ── */
+.lcd-off {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #020304;
+}
+.lcd-off-icon {
+    font-size: 26px;
+    color: rgba(255,255,255,0.07);
+    line-height: 1;
+}
+.lcd-off-hint {
+    font-family: 'Courier New', monospace;
+    font-size: 7.5px;
+    letter-spacing: 2.5px;
+    color: rgba(255,255,255,0.05);
+    text-transform: uppercase;
+}
+
+/* ── Boot screen ── */
+.lcd-boot {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #020304;
+    position: relative;
+    overflow: hidden;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+.lcd-boot.active { display: flex; }
+.lcd-boot-logo {
+    font-family: 'Times New Roman', serif;
+    font-size: 26px;
+    font-weight: bold;
+    font-style: italic;
+    color: #cc0000;
+    letter-spacing: 3px;
+    opacity: 0;
+    transform: scale(0.88);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transition: opacity 0.55s ease, transform 0.55s ease;
+    text-shadow: 0 0 18px rgba(180,0,0,0.4);
+}
+.lcd-boot-logo.show { opacity: 1; transform: scale(1); }
+.lcd-boot-model {
+    font-family: 'Courier New', monospace;
+    font-size: 8px;
+    letter-spacing: 3px;
+    color: rgba(135,165,220,0.65);
+    text-transform: uppercase;
+    margin-top: 8px;
+    opacity: 0;
+    transition: opacity 0.5s ease 0.35s;
+}
+.lcd-boot-model.show { opacity: 1; }
+.lcd-boot-bar {
+    position: absolute;
+    bottom: 22px;
+    width: 90px; height: 2px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 1px;
+    overflow: hidden;
+}
+.lcd-boot-bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(135,165,220,0.4), rgba(135,165,220,0.8));
+    border-radius: 1px;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.9s ease 0.45s;
+}
+.lcd-boot-bar.fill::after { transform: scaleX(1); }
+
+/* ── Full-screen lightbox ── */
+.photo-lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: rgba(0,0,0,0.92);
+    align-items: center;
+    justify-content: center;
+}
+.photo-lightbox.open { display: flex; }
+
+.lb-img {
+    max-width: 90vw;
+    max-height: 88vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 3px;
+    box-shadow: 0 12px 60px rgba(0,0,0,0.85);
+    animation: lbZoom 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    display: block;
+}
+@keyframes lbZoom {
+    from { transform: scale(0.88); opacity: 0; }
+    to   { transform: scale(1);    opacity: 1; }
+}
+
+.lb-close {
+    position: fixed;
+    top: 18px; right: 24px;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.75);
+    font-size: 40px;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.15s;
+    z-index: 2001;
+    padding: 0;
+}
+.lb-close:hover { color: #fff; }
+
+.lb-nav {
+    position: fixed;
+    top: 50%; transform: translateY(-50%);
+    background: rgba(0,0,0,0.45);
+    color: #fff;
+    border: none;
+    font-size: 30px;
+    padding: 14px 18px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.18s;
+    z-index: 2001;
+    line-height: 1;
+    user-select: none;
+}
+.lb-nav:hover { background: rgba(0,0,0,0.78); }
+.lb-prev { left: 14px; }
+.lb-next { right: 14px; }
+
+.lb-counter {
+    position: fixed;
+    bottom: 20px;
+    left: 50%; transform: translateX(-50%);
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.45);
+    z-index: 2001;
+    user-select: none;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+    .cam-flip {
+        width: min(88vw, 700px);
+        height: calc(min(88vw, 700px) * 0.6315);
+    }
+    .cb-controls { width: 96px; gap: 7px; }
+    .cb-control-ring { width: 74px; height: 74px; }
+    .cb-ring-center { width: 42px; height: 42px; }
+    .cb-thumb-grip { height: 46px; }
+    .cf-lens-ring-outer { width: 158px; height: 158px; }
+    .cf-lens-barrel { width: 114px; height: 114px; }
+    .cf-lens-glass { width: 74px; height: 74px; }
+    .cf-lens-center { width: 32px; height: 32px; }
+}
+@media (max-width: 700px) {
+    body { padding-top: 48px; }
+    .cam-page { gap: 12px; justify-content: flex-start; padding-top: 14px; }
+    .cam-flip {
+        width: min(96vw, 480px);
+        height: calc(min(96vw, 480px) * 0.6315);
+    }
+    .cf-body-brand-canon { font-size: 16px; }
+    .cf-lens-ring-outer { width: 118px; height: 118px; }
+    .cf-lens-barrel { width: 84px; height: 84px; }
+    .cf-lens-glass { width: 54px; height: 54px; }
+    .cf-lens-center { width: 22px; height: 22px; }
+    .cb-controls { width: 78px; gap: 6px; }
+    .cb-control-ring { width: 58px; height: 58px; }
+    .cb-ring-center { width: 32px; height: 32px; }
+    .cb-thumb-grip { display: none; }
+    .cb-btn { font-size: 5.5px; padding: 5px 2px; }
+    .lcd-mode, .lcd-count { font-size: 7.5px; }
+}
+
+@media (orientation: landscape) and (max-height: 450px) {
+    .cam-page { gap: 6px; justify-content: flex-start !important; padding-top: 6px; padding-bottom: 0; }
+    .cam-flip {
+        width: 380px;
+        height: 240px;
+        max-width: 88vw;
+    }
+    .cf-body-brand-canon { font-size: 16px; }
+    .cf-lens-ring-outer { width: 118px; height: 118px; }
+    .cf-lens-barrel { width: 84px; height: 84px; }
+    .cf-lens-glass { width: 54px; height: 54px; }
+    .cf-lens-center { width: 22px; height: 22px; }
+    .cb-controls { width: 78px; gap: 6px; }
+    .cb-control-ring { width: 58px; height: 58px; }
+    .cb-ring-center { width: 32px; height: 32px; }
+    .cb-thumb-grip { display: none; }
+    .cb-btn { font-size: 5.5px; padding: 5px 2px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- Mobile Header Bar -->
+<div class="mobile-header" id="mobileHeader">
+    <button class="mobile-header-hamburger" id="mobileHamburger" aria-label="Menu">&#9776;</button>
+    <a href="Portfolio.html" style="display:contents;"><img class="mobile-header-logo" src="PORTFOLIO/portfolio logo.png" alt="Portfolio"></a>
+    <div class="mobile-header-spacer"></div>
+</div>
+
+<!-- Mobile Nav -->
+<div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+<div class="mobile-nav-menu" id="mobileNavMenu">
+    <a href="Portfolio.html">HOME</a>
+    <a href="Videos.html">VIDEOS</a>
+    <a href="Designs.html">DESIGNS</a>
+    <a class="active" href="Photos.html">PHOTOS</a>
+    <a href="Music.html">MUSIC</a>
+    <a href="Info.html">ABOUT</a>
+</div>
+
+<nav>
+<a href="Portfolio.html" style="display:contents;"><img src="PORTFOLIO/portfolio logo.png" alt=""></a>
+<ul>
+    <li><a href="Videos.html">Videos</a></li>
+    <li><a href="Designs.html">Designs</a></li>
+    <li><a class="active" href="Photos.html">Photos</a></li>
+    <li><a href="Music.html">Music</a></li>
+    <li><a href="Info.html">About</a></li>
+    <li><a href="Portfolio.html">Home</a></li>
+</ul>
+</nav>
+
+<!-- Camera page -->
+<div class="cam-page">
+
+    <p class="cam-prompt" id="camPrompt">Click the camera to view photos</p>
+
+    <div class="cam-scene">
+        <div class="cam-flip" id="camFlip">
+
+            <!-- ▸ FRONT FACE -->
+            <div class="cam-face cam-face-front">
+                <div class="cf-top">
+                    <div class="cf-power"></div>
+                    <div class="cf-shutter-group">
+                        <div class="cf-zoom"></div>
+                        <div class="cf-shutter"></div>
+                    </div>
+                    <div class="cf-mode-dial"></div>
+                </div>
+                <div class="cf-body">
+                    <div class="cf-grip-left"></div>
+                    <div class="cf-flash"></div>
+                    <div class="cf-af-lamp"></div>
+                    <div class="cf-vf-front"></div>
+                    <div class="cf-body-brand">
+                        <span class="cf-body-brand-canon">With Love</span>
+                        <span class="cf-body-brand-model">SuperSnap T1000</span>
+                    </div>
+                    <div class="cf-lens-assembly">
+                        <div class="cf-lens-ring-outer">
+                            <div class="cf-lens-barrel">
+                                <div class="cf-lens-glass">
+                                    <div class="cf-lens-center"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cf-bottom-strip"></div>
+                </div>
+            </div>
+
+            <!-- ▸ BACK FACE -->
+            <div class="cam-face cam-face-back">
+                <div class="cb-top">
+                    <div class="cb-vf"></div>
+                    <span class="cb-top-label">SuperSnap T1000</span>
+                </div>
+                <div class="cb-body">
+
+                    <!-- LCD Screen -->
+                    <div class="cb-screen" id="cbScreen">
+                        <!-- Off state -->
+                        <div class="lcd-off" id="lcdOff">
+                            <div class="lcd-off-icon">⏻</div>
+                            <div class="lcd-off-hint">Press power to start</div>
+                        </div>
+                        <!-- Boot screen -->
+                        <div class="lcd-boot" id="lcdBoot">
+                            <div class="lcd-boot-logo" id="lcdBootLogo">With Love</div>
+                            <div class="lcd-boot-model" id="lcdBootModel">SuperSnap T1000</div>
+                            <div class="lcd-boot-bar" id="lcdBootBar"></div>
+                        </div>
+                        <!-- Gallery (hidden until powered on) -->
+                        <div class="lcd-header" id="lcdHeader" style="display:none;">
+                            <span class="lcd-mode">&#9654; PLAYBACK</span>
+                            <span class="lcd-count" id="lcdCount">0 photos</span>
+                            <div class="lcd-batt"></div>
+                        </div>
+                        <div class="lcd-grid" id="lcdGrid" style="display:none;"></div>
+                        <div class="lcd-page-nav" id="lcdPageNav" style="display:none;">
+                            <button class="lcd-page-btn" id="lcdPagePrev">&#8592;</button>
+                            <span class="lcd-page-indicator" id="lcdPageIndicator">1 / 1</span>
+                            <button class="lcd-page-btn" id="lcdPageNext">&#8594;</button>
+                        </div>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="cb-controls">
+                        <div class="cb-thumb-grip"></div>
+                        <div class="cb-control-ring">
+                            <div class="cb-ring-disc"></div>
+                            <div class="cb-ring-center">
+                                <span class="cb-ring-center-label">SET</span>
+                            </div>
+                            <span class="dpad-arr u">&#9650;</span>
+                            <span class="dpad-arr d">&#9660;</span>
+                            <span class="dpad-arr l">&#9664;</span>
+                            <span class="dpad-arr r">&#9654;</span>
+                        </div>
+                        <div class="cb-btn-grid">
+                            <div class="cb-btn">MENU</div>
+                            <div class="cb-btn">DISP</div>
+                            <div class="cb-btn cb-btn-play">&#9654; PLAY</div>
+                            <div class="cb-btn cb-btn-del">&#9003; DEL</div>
+                        </div>
+                        <div class="cb-power-wrap">
+                            <button class="cb-power-btn" id="cbPowerBtn"></button>
+                            <span class="cb-power-label">POWER</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <p class="cam-hint" id="camHint">Press Power Button</p>
+
+</div>
+
+<!-- Full-screen lightbox -->
+<div id="photoLightbox" class="photo-lightbox">
+    <button class="lb-close" id="lbClose">&#x2715;</button>
+    <button class="lb-nav lb-prev" id="lbPrev">&#8592;</button>
+    <img class="lb-img" id="lbImg" src="" alt="">
+    <button class="lb-nav lb-next" id="lbNext">&#8594;</button>
+    <div class="lb-counter" id="lbCounter"></div>
+</div>
+
+<script src="PortfolioGallery.js"></script>
+<script>
+(function () {
+
+    var V = '?v=2'; // bump this any time you re-upload photos to bust browser cache
+
+    var photos = [
+        { src: 'PORTFOLIO/PICS/1.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/2.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/3.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/4.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/5.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/6.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/7.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/8.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/10.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/11.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/12.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/13.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/14.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/15.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/16.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/17.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/18.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/19.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/20.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/21.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/22.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/23.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/24.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/25.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/26.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/27.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/28.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/29.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/30.JPG' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/31.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/32.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/33.jpeg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/34.jpeg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/35.jpeg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/36.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/37.jpeg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/38.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/39.jpeg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/40.jpeg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/41.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/42.jpeg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/43.jpeg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/44.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/45.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/46.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/47.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/48.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/49.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/50.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/51.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/52.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/53.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/54.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/55.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/56.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/57.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/58.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/59.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/60.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/61.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/62.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/63.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/64.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/65.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/66.jpg' + V, caption: '' },
+        { src: 'PORTFOLIO/PICS/67.jpg' + V, caption: '' },
+    ];
+
+    // Preload every photo up front so the grid never waits on the network
+    photos.forEach(function (p) { var img = new Image(); img.src = p.src; });
+
+    var camFlip        = document.getElementById('camFlip');
+    var prompt         = document.getElementById('camPrompt');
+    var hint           = document.getElementById('camHint');
+    var lcdOff         = document.getElementById('lcdOff');
+    var lcdBoot        = document.getElementById('lcdBoot');
+    var lcdBootLogo    = document.getElementById('lcdBootLogo');
+    var lcdBootModel   = document.getElementById('lcdBootModel');
+    var lcdBootBar     = document.getElementById('lcdBootBar');
+    var lcdHeader      = document.getElementById('lcdHeader');
+    var lcdGrid        = document.getElementById('lcdGrid');
+    var lcdCount       = document.getElementById('lcdCount');
+    var lcdPageNav     = document.getElementById('lcdPageNav');
+    var lcdPagePrev    = document.getElementById('lcdPagePrev');
+    var lcdPageNext    = document.getElementById('lcdPageNext');
+    var lcdPageIndicator = document.getElementById('lcdPageIndicator');
+    var powerBtn       = document.getElementById('cbPowerBtn');
+    var lightbox       = document.getElementById('photoLightbox');
+    var lbImg          = document.getElementById('lbImg');
+    var lbCounter      = document.getElementById('lbCounter');
+    var lbClose        = document.getElementById('lbClose');
+    var lbPrev         = document.getElementById('lbPrev');
+    var lbNext         = document.getElementById('lbNext');
+
+    var currentIdx     = 0;
+    var isFlipped      = false;
+    var isPowered      = false;
+    var isBooting      = false;
+    var currentPage    = 0;
+    var PER_PAGE       = 9;
+    var totalPages     = Math.ceil(photos.length / PER_PAGE);
+
+    var frontFace    = camFlip.querySelector('.cam-face-front');
+    var backFace     = camFlip.querySelector('.cam-face-back');
+    var bodyBrand    = camFlip.querySelector('.cf-body-brand');
+    var flipTimeout  = null;
+    var brandTimeout = null;
+
+    // iOS WebKit ignores backface-visibility on children with transforms;
+    // start with the back face invisible and swap visibility via JS.
+    backFace.style.visibility = 'hidden';
+
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        prompt.textContent = 'Tap the camera to view photos';
+    }
+
+    lcdCount.textContent = photos.length + ' photos';
+
+    /* ── Paginated grid ── */
+    function renderPage(page) {
+        lcdGrid.innerHTML = '';
+        var start = page * PER_PAGE;
+        var end   = Math.min(start + PER_PAGE, photos.length);
+
+        for (var i = start; i < end; i++) {
+            (function (idx) {
+                var thumb = document.createElement('div');
+                thumb.className = 'lcd-thumb';
+
+                var photo = photos[idx];
+                if (photo.src !== 'insert here') {
+                    var img = document.createElement('img');
+                    img.src = photo.src;
+                    img.alt = photo.caption || '';
+                    thumb.appendChild(img);
+                }
+
+                var num = document.createElement('div');
+                num.className = 'lcd-thumb-n';
+                num.textContent = String(idx + 1).padStart(2, '0');
+                thumb.appendChild(num);
+
+                thumb.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    if (isPowered) openLightbox(idx);
+                });
+                lcdGrid.appendChild(thumb);
+            })(i);
+        }
+
+        lcdPageIndicator.textContent = (page + 1) + ' / ' + totalPages;
+        lcdPagePrev.disabled = page === 0;
+        lcdPageNext.disabled = page === totalPages - 1;
+    }
+
+    function preloadPage(page) {
+        var start = page * PER_PAGE;
+        var end   = Math.min(start + PER_PAGE, photos.length);
+        for (var i = start; i < end; i++) {
+            var img = new Image();
+            img.src = photos[i].src;
+        }
+    }
+
+    function goToPage(page) {
+        currentPage = page;
+        renderPage(currentPage);
+        if (currentPage < totalPages - 1) preloadPage(currentPage + 1);
+    }
+
+    lcdPagePrev.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (currentPage > 0) goToPage(currentPage - 1);
+    });
+    lcdPageNext.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (currentPage < totalPages - 1) goToPage(currentPage + 1);
+    });
+
+    /* Flip camera on body click */
+    camFlip.addEventListener('click', function () {
+        if (flipTimeout)  { clearTimeout(flipTimeout);  flipTimeout  = null; }
+        if (brandTimeout) { clearTimeout(brandTimeout); brandTimeout = null; }
+
+        // Both faces must be visible during the 3D rotation
+        frontFace.style.visibility = 'visible';
+        backFace.style.visibility  = 'visible';
+
+        isFlipped = !isFlipped;
+        camFlip.classList.toggle('flipped', isFlipped);
+        prompt.style.opacity = isFlipped ? '0' : '1';
+        if (isFlipped && !isPowered) hint.classList.add('visible');
+        if (!isFlipped) hint.classList.remove('visible');
+
+        if (isFlipped) {
+            // Fade brand text out immediately so it doesn't visibly rotate
+            bodyBrand.style.opacity = '0';
+            preloadPage(0);
+        } else {
+            // Fade brand text back in near the end of the return animation
+            brandTimeout = setTimeout(function () {
+                bodyBrand.style.opacity = '1';
+                brandTimeout = null;
+            }, 900);
+        }
+
+        // Hide at the midpoint (~480ms) when the camera is edge-on —
+        // before iOS WebKit can render the source face on the far side.
+        var faceToHide = isFlipped ? frontFace : backFace;
+        flipTimeout = setTimeout(function () {
+            faceToHide.style.visibility = 'hidden';
+            flipTimeout = null;
+        }, 480);
+    });
+
+    /* Power button */
+    powerBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (isBooting) return;
+        isPowered ? powerOff() : powerOn();
+    });
+
+    function powerOn() {
+        isBooting = true;
+        hint.classList.remove('visible');
+        powerBtn.classList.add('on');
+        lcdOff.style.display = 'none';
+        lcdBoot.classList.add('active');
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                lcdBootLogo.classList.add('show');
+                lcdBootModel.classList.add('show');
+                lcdBootBar.classList.add('fill');
+            });
+        });
+        setTimeout(function () {
+            lcdBoot.classList.remove('active');
+            lcdBootLogo.classList.remove('show');
+            lcdBootModel.classList.remove('show');
+            lcdBootBar.classList.remove('fill');
+            lcdHeader.style.display = 'flex';
+            lcdGrid.style.display = 'grid';
+            lcdPageNav.style.display = 'flex';
+            renderPage(0);
+            isPowered = true;
+            isBooting = false;
+        }, 1900);
+    }
+
+    function powerOff() {
+        isPowered = false;
+        hint.classList.add('visible');
+        powerBtn.classList.remove('on');
+        closeLightbox();
+        lcdHeader.style.display = 'none';
+        lcdGrid.style.display = 'none';
+        lcdPageNav.style.display = 'none';
+        lcdOff.style.display = 'flex';
+    }
+
+    /* ── Lightbox ── */
+    function openLightbox(idx) {
+        currentIdx = idx;
+        var p = photos[idx];
+        lbImg.src = p.src !== 'insert here' ? p.src : '';
+        lbImg.alt = p.caption || '';
+        lbCounter.textContent = (idx + 1) + ' / ' + photos.length;
+        lightbox.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+        lightbox.classList.remove('open');
+        document.body.style.overflow = '';
+        lbImg.src = '';
+    }
+
+    function lbNavigate(dir) {
+        currentIdx = (currentIdx + dir + photos.length) % photos.length;
+        var p = photos[currentIdx];
+        lbImg.src = p.src !== 'insert here' ? p.src : '';
+        lbImg.alt = p.caption || '';
+        lbCounter.textContent = (currentIdx + 1) + ' / ' + photos.length;
+    }
+
+    lbClose.addEventListener('click', closeLightbox);
+    lbPrev.addEventListener('click', function (e) { e.stopPropagation(); lbNavigate(-1); });
+    lbNext.addEventListener('click', function (e) { e.stopPropagation(); lbNavigate(1); });
+    lightbox.addEventListener('click', function (e) {
+        if (e.target === lightbox) closeLightbox();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (lightbox.classList.contains('open')) {
+            if (e.key === 'ArrowLeft')  lbNavigate(-1);
+            if (e.key === 'ArrowRight') lbNavigate(1);
+            if (e.key === 'Escape')     closeLightbox();
+            return;
+        }
+        if (isPowered) {
+            if (e.key === 'ArrowLeft'  && currentPage > 0)              goToPage(currentPage - 1);
+            if (e.key === 'ArrowRight' && currentPage < totalPages - 1) goToPage(currentPage + 1);
+        }
+    });
+
+}());
+</script>
+</body>
+</html>

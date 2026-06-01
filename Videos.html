@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" type="text/css" href="PortfolioGallery.css">
+<title>Videos — Portfolio</title>
+<style>
+/* ── Setup container ── */
+.setup-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 80px;
+    box-sizing: border-box;
+    min-height: calc(100vh - 60px);
+}
+
+/* ── TV ── */
+.tv-body {
+    width: 1050px;
+    max-width: 94vw;
+    background: linear-gradient(160deg, #2e2e2e 0%, #1a1a1a 60%, #242424 100%);
+    border-radius: 18px 18px 14px 14px;
+    padding: 28px 28px 20px;
+    box-shadow:
+        0 0 0 3px #333,
+        0 0 0 5px #111,
+        0 30px 80px rgba(0,0,0,0.9),
+        inset 0 1px 0 rgba(255,255,255,0.07),
+        inset 0 -2px 0 rgba(0,0,0,0.4);
+}
+
+.tv-screen-bezel {
+    background: #0c0c0c;
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow:
+        inset 0 3px 10px rgba(0,0,0,0.95),
+        inset 0 0 2px rgba(255,255,255,0.03);
+}
+
+.tv-screen {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #030303;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+#tvVideo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: none;
+    z-index: 1;
+    background: #000;
+}
+
+#staticCanvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: block;
+}
+
+.tv-scanlines {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.2) 2px,
+        rgba(0,0,0,0.2) 4px
+    );
+    pointer-events: none;
+    z-index: 5;
+}
+
+.tv-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 50%, transparent 52%, rgba(0,0,0,0.8) 100%);
+    pointer-events: none;
+    z-index: 6;
+}
+
+.tv-glitch-bar {
+    position: absolute;
+    left: 0; right: 0;
+    height: 0;
+    background: rgba(160,210,255,0.1);
+    pointer-events: none;
+    z-index: 7;
+    opacity: 0;
+    transition: opacity 0.05s;
+}
+
+/* Fullscreen button */
+.tv-fullscreen-btn {
+    position: absolute;
+    bottom: 9px;
+    right: 9px;
+    width: 28px;
+    height: 28px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 8;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, border-color 0.15s;
+    opacity: 0.5;
+}
+.tv-fullscreen-btn:hover { background: rgba(0,0,0,0.8); border-color: rgba(255,255,255,0.4); opacity: 1; }
+
+/* Volume meter overlay */
+.vol-meter {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    background: rgba(0,0,0,0.72);
+    padding: 8px 10px 7px;
+    border-radius: 4px;
+    border: 1px solid rgba(61,158,61,0.3);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+}
+.vol-meter.visible { opacity: 1; }
+.vol-meter-label {
+    font-family: 'Courier New', monospace;
+    font-size: 7px;
+    letter-spacing: 3px;
+    color: #3d9e3d;
+    text-transform: uppercase;
+}
+.vol-meter-bars {
+    display: flex;
+    gap: 3px;
+    align-items: flex-end;
+}
+.vol-bar {
+    width: 5px;
+    height: 14px;
+    background: #102210;
+    border-radius: 1px;
+    transition: background 0.1s;
+}
+.vol-bar.on { background: #3d9e3d; }
+.vol-bar.on.hi { background: #bfa030; }
+.vol-bar.on.peak { background: #c84040; }
+
+.tv-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+    padding: 0 4px;
+}
+
+.tv-brand {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 5px;
+    color: #3a3a3a;
+    text-transform: uppercase;
+}
+
+.tv-power-light {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #c00;
+    box-shadow: 0 0 6px #f00, 0 0 14px rgba(255,0,0,0.35);
+}
+
+@keyframes glitch-shake {
+    0%   { transform: translate(0, 0);     filter: none; }
+    20%  { transform: translate(-4px, 0);  filter: hue-rotate(80deg) saturate(4); }
+    40%  { transform: translate(4px, 1px); filter: hue-rotate(160deg) brightness(1.5); }
+    60%  { transform: translate(-2px, 0);  filter: brightness(0.5); }
+    80%  { transform: translate(3px, -1px);filter: hue-rotate(240deg); }
+    100% { transform: translate(0, 0);     filter: none; }
+}
+.tv-screen.glitching { animation: glitch-shake 0.12s steps(2) forwards; }
+
+/* ── VHS Player ── */
+.vhs-body {
+    width: 1050px;
+    max-width: 94vw;
+    margin-top: 20px;
+    height: 110px;
+    background: linear-gradient(180deg, #242424 0%, #171717 55%, #1e1e1e 100%);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    box-sizing: border-box;
+    box-shadow:
+        0 0 0 2px #2e2e2e,
+        0 0 0 3px #111,
+        0 12px 36px rgba(0,0,0,0.85),
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        inset 0 -1px 0 rgba(0,0,0,0.5);
+    gap: 20px;
+    transition: border-radius 0.3s;
+}
+.vhs-body.drawer-open { border-radius: 6px 6px 0 0; }
+
+.vhs-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.vhs-vol-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.vhs-vol-label {
+    font-family: Arial, sans-serif;
+    font-size: 7px;
+    letter-spacing: 2px;
+    color: #2c2c2c;
+    text-transform: uppercase;
+}
+
+.vhs-vol-btns { display: flex; gap: 6px; }
+
+.vhs-vol-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    border: none;
+    background: linear-gradient(180deg, #2e2e2e 0%, #1e1e1e 100%);
+    color: #777;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 0 #0c0c0c, 0 4px 8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
+    transition: transform 0.07s, box-shadow 0.07s;
+    position: relative; top: 0;
+}
+.vhs-vol-btn:hover { color: #aaa; }
+.vhs-vol-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #0c0c0c, 0 2px 4px rgba(0,0,0,0.5), inset 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.vhs-display {
+    background: #070d07;
+    color: #3d9e3d;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    letter-spacing: 3px;
+    padding: 6px 14px;
+    border-radius: 3px;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.9), 0 0 10px rgba(50,140,50,0.12);
+    text-align: center;
+}
+
+.vhs-center { flex: 0 0 auto; }
+
+.vhs-slot {
+    width: 400px;
+    height: 72px;
+    background: linear-gradient(180deg, #030303 0%, #0a0a0a 100%);
+    border-radius: 3px;
+    box-shadow: inset 0 5px 16px rgba(0,0,0,0.99), inset 0 1px 2px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Guide rails at top and bottom of slot */
+.vhs-slot::before,
+.vhs-slot::after {
+    content: '';
+    position: absolute;
+    left: 10px; right: 10px;
+    height: 1px;
+    background: rgba(255,255,255,0.04);
+}
+.vhs-slot::before { top: 6px; }
+.vhs-slot::after  { bottom: 6px; }
+
+.vhs-tape-label {
+    width: 88%;
+    height: 62%;
+    border-radius: 2px;
+    background: #111;
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: background 0.3s;
+}
+
+.vhs-tape-label-text {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #444;
+    text-align: center;
+    padding: 0 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.3s;
+}
+
+.vhs-right {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.vhs-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.vhs-divider {
+    width: 1px;
+    height: 30px;
+    background: #2a2a2a;
+    margin: 0 2px;
+}
+
+.vhs-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 5px;
+    border: none;
+    background: linear-gradient(180deg, #2e2e2e 0%, #1e1e1e 100%);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    box-shadow: 0 4px 0 #0c0c0c, 0 5px 10px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
+    transition: transform 0.07s, box-shadow 0.07s, filter 0.15s;
+    position: relative; top: 0;
+}
+.vhs-btn:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #0c0c0c, 0 2px 4px rgba(0,0,0,0.5), inset 0 2px 4px rgba(0,0,0,0.4);
+}
+.vhs-btn:hover { filter: brightness(1.35); }
+
+.vhs-btn-rw    { color: #9a9a4e; font-size: 11px; }
+.vhs-btn-play  { color: #4e9a4e; }
+.vhs-btn-pause { color: #9a9a4e; }
+.vhs-btn-ff    { color: #9a9a4e; font-size: 11px; }
+.vhs-btn-stop  { color: #9a4e4e; }
+.vhs-btn-eject { color: #6a8a9a; }
+.vhs-btn.held  {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #0c0c0c, 0 2px 4px rgba(0,0,0,0.5), inset 0 2px 4px rgba(0,0,0,0.4);
+    filter: brightness(2) !important;
+}
+
+.vhs-btn-tapes {
+    width: auto;
+    padding: 0 14px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: #7a8a9a;
+}
+.vhs-btn-tapes.active {
+    color: #aabfcc;
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #0c0c0c, 0 2px 4px rgba(0,0,0,0.5), inset 0 2px 4px rgba(0,0,0,0.4);
+}
+
+/* ── Tape Drawer ── */
+.tape-drawer {
+    width: 1050px;
+    max-width: 94vw;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.38s cubic-bezier(0.4, 0, 0.2, 1), padding 0.38s;
+    background: linear-gradient(180deg, #161616 0%, #101010 100%);
+    border-radius: 0 0 8px 8px;
+    box-sizing: border-box;
+    padding: 0 24px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.9), 0 0 0 2px #222, 0 0 0 3px #111;
+}
+.tape-drawer.open {
+    max-height: 220px;
+    padding: 22px 24px;
+}
+
+.tape-row {
+    display: flex;
+    gap: 18px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+}
+.tape-row::-webkit-scrollbar { height: 8px; }
+.tape-row::-webkit-scrollbar-track { background: #111; border-radius: 4px; }
+.tape-row::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+.tape-row::-webkit-scrollbar-thumb:hover { background: #666; }
+
+/* ── VHS Cassette ── */
+.vhs-cassette {
+    flex-shrink: 0;
+    width: 172px;
+    height: 108px;
+    background: linear-gradient(175deg, #222 0%, #111 100%);
+    border-radius: 3px 3px 5px 5px;
+    position: relative;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.85), 0 0 0 1px #2a2a2a, inset 0 1px 0 rgba(255,255,255,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+    user-select: none;
+}
+.vhs-cassette:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 30px rgba(0,0,0,0.9), 0 0 0 1px #383838, inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.vhs-cassette.active {
+    transform: translateY(-8px);
+    box-shadow: 0 18px 36px rgba(0,0,0,0.95), 0 0 0 1px #555, inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+/* Tape window — wide, spans most of the cassette */
+.cassette-window {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    height: 36px;
+    background: #040404;
+    border-radius: 2px;
+    box-shadow: inset 0 3px 8px rgba(0,0,0,0.98), inset 0 0 1px rgba(255,255,255,0.03);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+}
+
+/* Tape path line between reels */
+.cassette-window::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 38px; right: 38px;
+    height: 1px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 1px;
+}
+
+.cassette-reel {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 38% 36%, #303030, #060606);
+    box-shadow: 0 0 0 1px #252525, inset 0 0 0 5px #080808, inset 0 0 0 6px #222;
+    position: relative;
+}
+
+/* Reel hub dot */
+.cassette-reel::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #1a1a1a;
+}
+
+/* Cassette label */
+.cassette-label {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
+    height: 40px;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.cassette-label-text {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-align: center;
+    padding: 0 6px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .setup-container { padding: 20px 10px 60px; min-height: auto; }
+    .tv-fullscreen-btn { display: none; }
+    .tv-body { padding: 16px 16px 14px; }
+    .tv-screen { aspect-ratio: 4 / 3; }
+    .vhs-body { height: auto; padding: 14px; flex-wrap: wrap; gap: 10px; }
+    .vhs-left { gap: 10px; }
+    .vhs-slot { width: 180px; height: 52px; }
+    .vhs-display { font-size: 11px; padding: 5px 10px; letter-spacing: 2px; }
+    .vhs-btn { width: 32px; height: 32px; font-size: 12px; }
+    .vhs-btn-tapes { width: auto; padding: 0 12px; }
+    .tape-drawer { padding: 0 14px; }
+    .tape-drawer.open { padding: 16px 14px; }
+    .vhs-cassette { width: 134px; height: 86px; }
+    .cassette-window { height: 28px; top: 8px; left: 8px; right: 8px; padding: 0 12px; }
+    .cassette-reel { width: 17px; height: 17px; }
+    .cassette-label { height: 30px; bottom: 7px; left: 6px; right: 6px; }
+    .cassette-label-text { font-size: 8px; }
+}
+
+@media (orientation: landscape) and (max-height: 450px) {
+    .vhs-slot { width: 180px; height: 52px; }
+    .vhs-btn { width: 24px; height: 24px; font-size: 10px; }
+    .vhs-controls { gap: 4px; }
+    .vhs-btn-tapes { padding: 0 6px; letter-spacing: 0; }
+    .tv-fullscreen-btn { display: none; }
+}
+
+nav { position: relative; }
+nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width: auto; }
+
+.vhs-hint {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #444;
+    margin: 10px 0 0;
+    user-select: none;
+    transition: opacity 0.3s;
+}
+.vhs-hint.hidden { opacity: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<video autoplay muted loop playsinline
+    style="position:fixed;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:-1;transform:translateZ(0);will-change:transform;">
+    <source src="insert here" type="video/mp4">
+</video>
+
+<!-- Mobile Header Bar -->
+<div class="mobile-header" id="mobileHeader">
+    <button class="mobile-header-hamburger" id="mobileHamburger" aria-label="Menu">&#9776;</button>
+    <a href="Portfolio.html" style="display:contents;"><img class="mobile-header-logo" src="PORTFOLIO/portfolio logo inv.png" alt="Portfolio"></a>
+    <div class="mobile-header-spacer"></div>
+</div>
+
+<!-- Mobile Nav -->
+<div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+<div class="mobile-nav-menu" id="mobileNavMenu">
+    <a href="Portfolio.html">HOME</a>
+    <a class="active" href="Videos.html">VIDEOS</a>
+    <a href="Designs.html">DESIGNS</a>
+    <a href="Photos.html">PHOTOS</a>
+    <a href="Music.html">MUSIC</a>
+    <a href="Info.html">ABOUT</a>
+</div>
+
+<nav>
+<a href="Portfolio.html" style="display:contents;"><img src="PORTFOLIO/portfolio logo inv.png" alt=""></a>
+<ul>
+    <li><a class="active" href="Videos.html">Videos</a></li>
+    <li><a href="Designs.html">Designs</a></li>
+    <li><a href="Photos.html">Photos</a></li>
+    <li><a href="Music.html">Music</a></li>
+    <li><a href="Info.html">About</a></li>
+    <li><a href="Portfolio.html">Home</a></li>
+</ul>
+</nav>
+
+<!-- TV + VHS Setup -->
+<div class="setup-container">
+
+    <!-- TV -->
+    <div class="tv-body">
+        <div class="tv-screen-bezel">
+            <div class="tv-screen" id="tvScreen">
+                <video id="tvVideo"></video>
+                <canvas id="staticCanvas"></canvas>
+                <div class="tv-scanlines"></div>
+                <div class="tv-vignette"></div>
+                <div class="tv-glitch-bar" id="glitchBar"></div>
+                <!-- Volume meter -->
+                <div class="vol-meter" id="volMeter">
+                    <div class="vol-meter-label">VOL</div>
+                    <div class="vol-meter-bars" id="volBars"></div>
+                </div>
+                <!-- Fullscreen button -->
+                <button class="tv-fullscreen-btn" id="tvFullscreenBtn" title="Fullscreen">
+                    <svg id="fsIcon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,0.8)">
+                        <path id="fsPath" d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <div class="tv-bottom">
+            <span class="tv-brand">Made With Love</span>
+            <div class="tv-power-light"></div>
+        </div>
+    </div>
+
+    <!-- VHS Player -->
+    <div class="vhs-body" id="vhsBody">
+
+        <div class="vhs-left">
+            <div class="vhs-vol-wrap">
+                <span class="vhs-vol-label">Vol</span>
+                <div class="vhs-vol-btns">
+                    <button class="vhs-vol-btn" id="vhsVolDown">&#8722;</button>
+                    <button class="vhs-vol-btn" id="vhsVolUp">&#43;</button>
+                </div>
+            </div>
+            <div class="vhs-display" id="vhsDisplay">-- : --</div>
+        </div>
+
+        <div class="vhs-center">
+            <div class="vhs-slot">
+                <div class="vhs-tape-label" id="vhsTapeLabel">
+                    <span class="vhs-tape-label-text" id="vhsLabelText">no tape</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="vhs-right">
+            <div class="vhs-controls">
+                <button class="vhs-btn vhs-btn-rw"    id="vhsRW"    title="Hold to Rewind">&#9664;&#9664;</button>
+                <button class="vhs-btn vhs-btn-play"  id="vhsPlay"  title="Play">&#9654;</button>
+                <button class="vhs-btn vhs-btn-pause" id="vhsPause" title="Pause">&#9646;&#9646;</button>
+                <button class="vhs-btn vhs-btn-ff"    id="vhsFF"    title="Hold to Fast Forward">&#9654;&#9654;</button>
+                <button class="vhs-btn vhs-btn-stop"  id="vhsStop"  title="Stop">&#9632;</button>
+                <button class="vhs-btn vhs-btn-eject" id="vhsEject" title="Eject">&#9650;</button>
+                <div class="vhs-divider"></div>
+                <button class="vhs-btn vhs-btn-tapes" id="vhsTapesBtn" title="Open Tape Drawer">TAPES</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Tape Drawer -->
+    <div class="tape-drawer" id="tapeDrawer">
+        <div class="tape-row" id="tapeRow"></div>
+    </div>
+
+    <p class="vhs-hint" id="vhsHint">Click TAPES to view videos</p>
+
+</div>
+
+<script src="PortfolioGallery.js"></script>
+<script>
+/* ── Static + glitch ── */
+(function () {
+    var canvas      = document.getElementById('staticCanvas');
+    var ctx         = canvas.getContext('2d');
+    var screen      = document.getElementById('tvScreen');
+    var glitchBar   = document.getElementById('glitchBar');
+    var isGlitching = false;
+
+    function resizeCanvas() {
+        canvas.width  = screen.offsetWidth;
+        canvas.height = screen.offsetHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    function drawStatic() {
+        var w = canvas.width, h = canvas.height;
+        if (!w || !h) { requestAnimationFrame(drawStatic); return; }
+        var imageData = ctx.createImageData(w, h);
+        var data = imageData.data;
+        for (var i = 0; i < data.length; i += 4) {
+            var v = (Math.random() * 255) | 0;
+            data[i] = v*0.82; data[i+1] = v*0.93; data[i+2] = v; data[i+3] = 255;
+        }
+        if (isGlitching) {
+            var bandY = (Math.random() * h) | 0;
+            var bandH = ((Math.random() * 24) + 4) | 0;
+            var shift = (((Math.random() - 0.5) * 50)) | 0;
+            for (var y = bandY; y < Math.min(bandY + bandH, h); y++) {
+                for (var x = 0; x < w; x++) {
+                    var srcX = Math.min(w-1, Math.max(0, x+shift));
+                    var dst = (y*w+x)*4, src = (y*w+srcX)*4;
+                    data[dst]=data[src]; data[dst+1]=data[src+1]; data[dst+2]=data[src+2];
+                }
+            }
+        }
+        ctx.putImageData(imageData, 0, 0);
+        requestAnimationFrame(drawStatic);
+    }
+    drawStatic();
+
+    function triggerGlitch() {
+        isGlitching = true;
+        screen.classList.add('glitching');
+        glitchBar.style.top       = (Math.random() * 80) + '%';
+        glitchBar.style.height    = ((Math.random() * 14) + 3) + 'px';
+        glitchBar.style.opacity   = '1';
+        glitchBar.style.transform = 'translateX(' + (((Math.random()-0.5)*24)|0) + 'px)';
+        var dur = 80 + Math.random() * 220;
+        setTimeout(function () {
+            isGlitching = false;
+            screen.classList.remove('glitching');
+            glitchBar.style.opacity = '0';
+        }, dur);
+        setTimeout(triggerGlitch, 1500 + Math.random() * 5000);
+    }
+    setTimeout(triggerGlitch, 600 + Math.random() * 1500);
+}());
+
+/* ── Tape system ── */
+(function () {
+    var tapes = [
+        { title: 'Promo Video #1', src: 'PORTFOLIO/Videos/1.mp4', labelBg: '#4a1212', labelColor: '#f5c8c8' },
+        { title: 'Promo Video #2', src: 'PORTFOLIO/Videos/2.mp4', labelBg: '#12244a', labelColor: '#c8d4f5' },
+        { title: 'Launch Video', src: 'PORTFOLIO/Videos/3.mp4', labelBg: '#124a22', labelColor: '#c8f5d4' },
+        { title: 'Brand Commercial', src: 'PORTFOLIO/Videos/4.mp4', labelBg: '#32124a', labelColor: '#e8c8f5' },
+        { title: 'Teaser Trailer', src: 'PORTFOLIO/Videos/5.mp4', labelBg: '#4a2e12', labelColor: '#f5e0c8' },
+        { title: 'Concept Video', src: 'PORTFOLIO/Videos/6.mp4', labelBg: '#124040', labelColor: '#c8f0f5' },
+    ];
+
+    var video        = document.getElementById('tvVideo');
+    var canvas       = document.getElementById('staticCanvas');
+    var labelText    = document.getElementById('vhsLabelText');
+    var tapeLabel    = document.getElementById('vhsTapeLabel');
+    var display      = document.getElementById('vhsDisplay');
+    var drawer       = document.getElementById('tapeDrawer');
+    var tapesBtn     = document.getElementById('vhsTapesBtn');
+    var vhsBody      = document.getElementById('vhsBody');
+    var vhsHint      = document.getElementById('vhsHint');
+    var timerInterval = null;
+
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        vhsHint.textContent = 'Tap TAPES to view videos';
+    }
+
+    /* Build cassettes */
+    var tapeRow = document.getElementById('tapeRow');
+    tapes.forEach(function (tape, i) {
+        var el = document.createElement('div');
+        el.className = 'vhs-cassette';
+        el.innerHTML =
+            '<div class="cassette-window">' +
+                '<div class="cassette-reel"></div>' +
+                '<div class="cassette-reel"></div>' +
+            '</div>' +
+            '<div class="cassette-label" style="background:' + tape.labelBg + '">' +
+                '<span class="cassette-label-text" style="color:' + tape.labelColor + '">' + tape.title + '</span>' +
+            '</div>';
+        el.addEventListener('click', function () { insertTape(i, el); });
+        tapeRow.appendChild(el);
+    });
+
+    /* Toggle drawer */
+    tapesBtn.addEventListener('click', function () {
+        drawer.classList.toggle('open');
+        vhsBody.classList.toggle('drawer-open');
+        tapesBtn.classList.toggle('active');
+        vhsHint.classList.toggle('hidden', drawer.classList.contains('open'));
+    });
+
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+    function insertTape(index, el) {
+        document.querySelectorAll('.vhs-cassette').forEach(function (c) { c.classList.remove('active'); });
+        el.classList.add('active');
+
+        var tape = tapes[index];
+        labelText.textContent = tape.title;
+        labelText.style.color = tape.labelColor;
+        tapeLabel.style.background = tape.labelBg;
+
+        video.src = tape.src;
+        video.style.display = 'block';
+        canvas.style.display = 'none';
+        video.play();
+
+        drawer.classList.remove('open');
+        vhsBody.classList.remove('drawer-open');
+        tapesBtn.classList.remove('active');
+        vhsHint.classList.remove('hidden');
+
+        clearInterval(timerInterval);
+        timerInterval = setInterval(function () {
+            if (video.duration) {
+                var t = video.currentTime;
+                display.textContent = pad(Math.floor(t / 60)) + ':' + pad(Math.floor(t % 60));
+            }
+        }, 500);
+    }
+
+    function eject() {
+        video.pause();
+        video.src = '';
+        video.style.display = 'none';
+        canvas.style.display = 'block';
+        labelText.textContent = 'no tape';
+        labelText.style.color = '';
+        tapeLabel.style.background = '';
+        display.textContent = '-- : --';
+        clearInterval(timerInterval);
+        document.querySelectorAll('.vhs-cassette').forEach(function (c) { c.classList.remove('active'); });
+    }
+
+    /* Transport buttons */
+    document.getElementById('vhsPlay').addEventListener('click', function () {
+        if (video.src && video.src !== window.location.href) video.play();
+    });
+    document.getElementById('vhsPause').addEventListener('click', function () {
+        if (!video.paused) video.pause();
+    });
+    document.getElementById('vhsStop').addEventListener('click', function () {
+        video.pause();
+        video.currentTime = 0;
+        display.textContent = '00:00';
+    });
+    document.getElementById('vhsEject').addEventListener('click', eject);
+
+    /* Volume meter */
+    var volMeter      = document.getElementById('volMeter');
+    var volBarsEl     = document.getElementById('volBars');
+    var volHideTimer  = null;
+    for (var b = 0; b < 10; b++) {
+        var bar = document.createElement('div');
+        bar.className = 'vol-bar';
+        volBarsEl.appendChild(bar);
+    }
+    function showVolMeter() {
+        var bars   = volBarsEl.querySelectorAll('.vol-bar');
+        var filled = Math.round(volume * 10);
+        bars.forEach(function (bar, idx) {
+            bar.classList.remove('on', 'hi', 'peak');
+            if (idx < filled) {
+                bar.classList.add('on');
+                if (idx >= 9)      bar.classList.add('peak');
+                else if (idx >= 7) bar.classList.add('hi');
+            }
+        });
+        volMeter.classList.add('visible');
+        clearTimeout(volHideTimer);
+        volHideTimer = setTimeout(function () { volMeter.classList.remove('visible'); }, 2000);
+    }
+
+    /* Volume */
+    var volume = 0.8;
+    video.volume = volume;
+    document.getElementById('vhsVolUp').addEventListener('click', function () {
+        volume = Math.min(1, parseFloat((volume + 0.1).toFixed(1)));
+        video.volume = volume;
+        showVolMeter();
+    });
+    document.getElementById('vhsVolDown').addEventListener('click', function () {
+        volume = Math.max(0, parseFloat((volume - 0.1).toFixed(1)));
+        video.volume = volume;
+        showVolMeter();
+    });
+
+    /* FF / RW — hold to engage, release to resume (VHS style) */
+    var ffBtn      = document.getElementById('vhsFF');
+    var rwBtn      = document.getElementById('vhsRW');
+    var rwInterval = null;
+    var wasPlaying = false;
+    var hasTape    = function () { return video.src && video.src !== window.location.href; };
+
+    function startFF() {
+        if (!hasTape()) return;
+        wasPlaying = !video.paused;
+        if (video.paused) video.play();
+        video.playbackRate = 8;
+        ffBtn.classList.add('held');
+    }
+    function stopFF() {
+        if (!ffBtn.classList.contains('held')) return;
+        video.playbackRate = 1;
+        if (!wasPlaying) video.pause();
+        ffBtn.classList.remove('held');
+    }
+
+    function startRW() {
+        if (!hasTape()) return;
+        wasPlaying = !video.paused;
+        video.pause();
+        rwBtn.classList.add('held');
+        rwInterval = setInterval(function () {
+            if (video.currentTime <= 0) { stopRW(); return; }
+            video.currentTime = Math.max(0, video.currentTime - 0.4);
+        }, 50);
+    }
+    function stopRW() {
+        if (!rwBtn.classList.contains('held')) return;
+        clearInterval(rwInterval);
+        rwInterval = null;
+        rwBtn.classList.remove('held');
+        if (wasPlaying) video.play();
+    }
+
+    /* Stop FF if video reaches end naturally */
+    video.addEventListener('ended', function () { stopFF(); });
+
+    ['mousedown', 'touchstart'].forEach(function (ev) {
+        ffBtn.addEventListener(ev, function (e) { e.preventDefault(); startFF(); });
+        rwBtn.addEventListener(ev, function (e) { e.preventDefault(); startRW(); });
+    });
+    ['mouseup', 'mouseleave', 'touchend', 'touchcancel'].forEach(function (ev) {
+        ffBtn.addEventListener(ev, stopFF);
+        rwBtn.addEventListener(ev, stopRW);
+    });
+}());
+
+/* ── Fullscreen ── */
+(function () {
+    var btn    = document.getElementById('tvFullscreenBtn');
+    var screen = document.getElementById('tvScreen');
+    var fsPath = document.getElementById('fsPath');
+    var expand   = 'M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z';
+    var compress = 'M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z';
+
+    btn.addEventListener('click', function () {
+        if (!document.fullscreenElement) {
+            screen.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
+    });
+
+    document.addEventListener('fullscreenchange', function () {
+        if (document.fullscreenElement) {
+            fsPath.setAttribute('d', compress);
+            btn.title = 'Exit Fullscreen';
+        } else {
+            fsPath.setAttribute('d', expand);
+            btn.title = 'Fullscreen';
+        }
+    });
+}());
+</script>
+</body>
+</html>
