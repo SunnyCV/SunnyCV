@@ -6,21 +6,6 @@
 <link rel="stylesheet" type="text/css" href="PortfolioGallery.css">
 <title>Videos — Portfolio</title>
 <style>
-html, body { margin: 0; padding: 0; }
-body {
-    background: radial-gradient(ellipse at 50% 20%, #f5f4f2 0%, #dddbd8 100%) !important;
-    min-height: 100vh;
-}
-nav { position: relative; }
-nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width: auto; }
-nav li a { color: #333 !important; }
-li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
-.mobile-header { background-color: #e8e6e3 !important; border-bottom: 1px solid #ccc !important; }
-.mobile-header-hamburger { color: #333 !important; }
-.mobile-nav-menu { background-color: #eeecea !important; border-right: 1px solid #ccc !important; }
-.mobile-nav-menu a { color: #333 !important; border-bottom: 1px solid #ddd !important; }
-.mobile-nav-overlay { background: rgba(0,0,0,0.25) !important; }
-
 /* ── Setup container ── */
 .setup-container {
     display: none;
@@ -56,7 +41,7 @@ body.presentation-active .setup-container { display: flex; }
     font-weight: 700;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: #2a2a2a;
+    color: #fff;
     margin: 0;
 }
 .wg-present-btn {
@@ -65,15 +50,15 @@ body.presentation-active .setup-container { display: flex; }
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: #333;
+    color: #fff;
     background: transparent;
-    border: 1px solid rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.35);
     border-radius: 20px;
     padding: 10px 20px;
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s;
 }
-.wg-present-btn:hover { background-color: rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.5); }
+.wg-present-btn:hover { background-color: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.6); }
 
 .wg-grid {
     display: grid;
@@ -730,7 +715,7 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
 <!-- Mobile Header Bar -->
 <div class="mobile-header" id="mobileHeader">
     <button class="mobile-header-hamburger" id="mobileHamburger" aria-label="Menu">&#9776;</button>
-    <a href="Portfolio.html" style="display:contents;"><img class="mobile-header-logo" src="PORTFOLIO/portfolio logo.png" alt="Portfolio"></a>
+    <a href="Portfolio.html" style="display:contents;"><img class="mobile-header-logo" src="PORTFOLIO/portfolio logo inv.png" alt="Portfolio"></a>
     <div class="mobile-header-spacer"></div>
 </div>
 
@@ -746,7 +731,7 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
 </div>
 
 <nav>
-<a href="Portfolio.html" style="display:contents;"><img src="PORTFOLIO/portfolio logo.png" alt=""></a>
+<a href="Portfolio.html" style="display:contents;"><img src="PORTFOLIO/portfolio logo inv.png" alt=""></a>
 <ul>
     <li><a class="active" href="Videos.html">Videos</a></li>
     <li><a href="Designs.html">Designs</a></li>
