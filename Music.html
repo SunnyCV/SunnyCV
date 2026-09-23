@@ -45,11 +45,11 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 }
 .wg-header {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 16px;
+    gap: 14px;
     margin-bottom: 28px;
+    text-align: center;
 }
 .wg-eyebrow {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
@@ -112,10 +112,8 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 .wg-track.playing .wg-track-title { color: #cc3300; }
 
 .wg-exit-btn {
-    display: none;
-    position: fixed;
-    top: 76px; right: 24px;
-    z-index: 210;
+    display: block;
+    margin: 0 auto 16px;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 11px;
     font-weight: 700;
@@ -130,12 +128,12 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     transition: background-color 0.2s;
 }
 .wg-exit-btn:hover { background-color: #fff; }
-body.presentation-active .wg-exit-btn { display: block; }
 body.presentation-active #workGridSection { display: none; }
 
 @media (max-width: 768px) {
     .work-grid-section { padding: 88px 16px 60px; }
-    .wg-exit-btn { top: 60px; right: 12px; }
+    /* Clear the fixed mobile header (48px) so the button isn't hidden behind it */
+    .wg-exit-btn { margin-top: 56px; }
 }
 
 /* ── Page layout — column, CD player above binder ── */
@@ -684,10 +682,10 @@ body.presentation-active .music-page { display: flex; }
     <div class="wg-track-list" id="wgTrackList"></div>
 </div>
 
-<!-- Exit button for presentation mode -->
-<button class="wg-exit-btn" id="exitPresentBtn">&times; Exit Presentation</button>
-
 <div class="music-page" id="musicPage">
+
+    <!-- Exit button for presentation mode -->
+    <button class="wg-exit-btn" id="exitPresentBtn">&times; Exit Presentation</button>
 
     <!-- ── CD Player ── -->
     <div class="cdp">

@@ -55,11 +55,11 @@ body.dark-room .mobile-nav-menu a { color: #ccc !important; border-bottom-color:
 }
 .wg-header {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 16px;
+    gap: 14px;
     margin-bottom: 28px;
+    text-align: center;
 }
 .wg-eyebrow {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
@@ -112,10 +112,8 @@ body.dark-room .mobile-nav-menu a { color: #ccc !important; border-bottom-color:
 body.presentation-active .dsgn-main { display: flex; }
 
 .wg-exit-btn {
-    display: none;
-    position: fixed;
-    top: 76px; right: 24px;
-    z-index: 210;
+    display: block;
+    margin: 0 auto 22px;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 11px;
     font-weight: 700;
@@ -130,14 +128,14 @@ body.presentation-active .dsgn-main { display: flex; }
     transition: background-color 0.2s;
 }
 .wg-exit-btn:hover { background-color: #fff; }
-body.presentation-active .wg-exit-btn { display: block; }
 body.presentation-active #workGridSection { display: none; }
-body.presentation-active.dark-room .wg-exit-btn { color: #ddd; background: rgba(20,20,20,0.85); border-color: rgba(255,255,255,0.15); }
+body.dark-room .wg-exit-btn { color: #ddd; background: rgba(20,20,20,0.85); border-color: rgba(255,255,255,0.15); }
 
 @media (max-width: 768px) {
     .work-grid-section { padding: 88px 16px 60px; }
     .wg-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .wg-exit-btn { top: 60px; right: 12px; }
+    /* Clear the fixed mobile header (48px) so the button isn't hidden behind it */
+    .wg-exit-btn { margin-top: 56px; }
 }
 
 /* ══════════════════════════════════════
@@ -1223,11 +1221,11 @@ body.dark-room .dsgn-floor-line {
     <div class="wg-grid" id="wgGrid"></div>
 </div>
 
-<!-- Exit button for presentation mode -->
-<button class="wg-exit-btn" id="exitPresentBtn">&times; Exit Presentation</button>
-
 <!-- ── Main Content ── -->
 <div class="dsgn-main">
+
+    <!-- Exit button for presentation mode -->
+    <button class="wg-exit-btn" id="exitPresentBtn">&times; Exit Presentation</button>
 
     <!-- Large Projection Screen (wall-mounted) -->
     <div class="dsgn-screen-section">

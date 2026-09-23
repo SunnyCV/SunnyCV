@@ -29,11 +29,11 @@ body.presentation-active .setup-container { display: flex; }
 }
 .wg-header {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 16px;
+    gap: 14px;
     margin-bottom: 28px;
+    text-align: center;
 }
 .wg-eyebrow {
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
@@ -107,10 +107,8 @@ body.presentation-active .setup-container { display: flex; }
 }
 
 .wg-exit-btn {
-    display: none;
-    position: fixed;
-    top: 76px; right: 24px;
-    z-index: 210;
+    display: block;
+    margin: 0 auto 24px;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 11px;
     font-weight: 700;
@@ -125,7 +123,6 @@ body.presentation-active .setup-container { display: flex; }
     transition: background-color 0.2s;
 }
 .wg-exit-btn:hover { background-color: #fff; }
-body.presentation-active .wg-exit-btn { display: block; }
 body.presentation-active #workGridSection { display: none; }
 
 /* ── Video lightbox ── */
@@ -152,7 +149,8 @@ body.presentation-active #workGridSection { display: none; }
 @media (max-width: 768px) {
     .work-grid-section { padding: 88px 16px 60px; }
     .wg-grid { grid-template-columns: 1fr; gap: 14px; }
-    .wg-exit-btn { top: 60px; right: 12px; }
+    /* Clear the fixed mobile header (48px) so the button isn't hidden behind it */
+    .wg-exit-btn { margin-top: 56px; }
 }
 
 /* ── TV ── */
@@ -752,9 +750,6 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
     <div class="wg-grid" id="wgGrid"></div>
 </div>
 
-<!-- Exit button for presentation mode -->
-<button class="wg-exit-btn" id="exitPresentBtn">&times; Exit Presentation</button>
-
 <!-- Video lightbox (grid playback) -->
 <div class="video-lightbox" id="videoLightbox">
     <button class="lb-close" id="vlbClose">&times;</button>
@@ -763,6 +758,9 @@ nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width
 
 <!-- TV + VHS Setup -->
 <div class="setup-container">
+
+    <!-- Exit button for presentation mode -->
+    <button class="wg-exit-btn" id="exitPresentBtn">&times; Exit Presentation</button>
 
     <!-- TV -->
     <div class="tv-body">
