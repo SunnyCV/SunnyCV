@@ -8,30 +8,139 @@
 <style>
 
 html, body { margin: 0; padding: 0; }
-html { overflow: hidden !important; height: 100%; }
+html { height: 100%; }
+html.presentation-active { overflow: hidden !important; }
 body {
-    background: radial-gradient(ellipse at 50% 30%, #f5f4f2 0%, #dddbd8 100%) !important;
-    overflow: hidden !important;
+    background-color: #000;
     padding-bottom: 0 !important;
-    height: 100vh;
+    min-height: 100vh;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
 }
+body.presentation-active {
+    background: radial-gradient(ellipse at 50% 30%, #f5f4f2 0%, #dddbd8 100%) !important;
+    overflow: hidden !important;
+    height: 100vh;
+}
 
 nav { position: relative; }
 nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width: auto; }
-nav li a { color: #333 !important; }
-li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
-.mobile-header { background-color: #e8e6e3 !important; border-bottom: 1px solid #ccc !important; }
-.mobile-header-hamburger { color: #333 !important; }
-.mobile-nav-menu { background-color: #eeecea !important; border-right: 1px solid #ccc !important; }
-.mobile-nav-menu a { color: #333 !important; border-bottom: 1px solid #ddd !important; }
-.mobile-nav-overlay { background: rgba(0,0,0,0.25) !important; }
+body.presentation-active nav li a { color: #333 !important; }
+body.presentation-active li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
+body.presentation-active .mobile-header { background-color: #e8e6e3 !important; border-bottom: 1px solid #ccc !important; }
+body.presentation-active .mobile-header-hamburger { color: #333 !important; }
+body.presentation-active .mobile-nav-menu { background-color: #eeecea !important; border-right: 1px solid #ccc !important; }
+body.presentation-active .mobile-nav-menu a { color: #333 !important; border-bottom: 1px solid #ddd !important; }
+body.presentation-active .mobile-nav-overlay { background: rgba(0,0,0,0.25) !important; }
+
+/* ══════════════════════════════════════
+   TRACK GRID — default landing view
+══════════════════════════════════════ */
+.work-grid-section {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+    box-sizing: border-box;
+    width: 100%;
+}
+.wg-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+.wg-eyebrow {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #fff;
+    margin: 0;
+}
+.wg-present-btn {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #fff;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+.wg-present-btn:hover { background-color: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.6); }
+
+.wg-track-list { display: flex; flex-direction: column; }
+.wg-track {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    cursor: pointer;
+}
+.wg-track:hover { background: rgba(255,255,255,0.05); }
+.wg-track-play {
+    flex-shrink: 0;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.4);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-size: 11px;
+}
+.wg-track.playing .wg-track-play { background: #fff; color: #000; border-color: #fff; }
+.wg-track-num {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    width: 24px;
+    flex-shrink: 0;
+}
+.wg-track-title {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    color: #fff;
+}
+.wg-track.playing .wg-track-title { color: #cc3300; }
+
+.wg-exit-btn {
+    display: none;
+    position: fixed;
+    top: 76px; right: 24px;
+    z-index: 210;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #333;
+    background: rgba(255,255,255,0.85);
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 20px;
+    padding: 9px 18px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.wg-exit-btn:hover { background-color: #fff; }
+body.presentation-active .wg-exit-btn { display: block; }
+
+@media (max-width: 768px) {
+    .work-grid-section { padding: 88px 16px 60px; }
+    .wg-exit-btn { top: 60px; right: 12px; }
+}
 
 /* ── Page layout — column, CD player above binder ── */
 .music-page {
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
@@ -43,6 +152,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
 }
+body.presentation-active .music-page { display: flex; }
 /* Pushes content to center when it fits; collapses when it doesn't */
 .music-page::before {
     content: '';
@@ -565,6 +675,18 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
 
 <audio id="cdpAudio"></audio>
 
+<!-- ── Work Grid (default view) ── -->
+<div class="work-grid-section" id="workGridSection">
+    <div class="wg-header">
+        <p class="wg-eyebrow">Music</p>
+        <button class="wg-present-btn" id="enterPresentBtn">&#9654; Presentation Mode</button>
+    </div>
+    <div class="wg-track-list" id="wgTrackList"></div>
+</div>
+
+<!-- Exit button for presentation mode -->
+<button class="wg-exit-btn" id="exitPresentBtn">&times; Exit Presentation</button>
+
 <div class="music-page" id="musicPage">
 
     <!-- ── CD Player ── -->
@@ -837,6 +959,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
         led.classList.add('on');
 
         renderBinder(currentPage);
+        updateGridPlayStates();
     }
 
     /* ── Playback ── */
@@ -852,6 +975,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
             elapsed = audio.src && !isNaN(audio.currentTime) ? audio.currentTime : elapsed + 1;
             lcdTime.textContent = fmt(elapsed);
         }, 1000);
+        updateGridPlayStates();
     }
 
     function pause() {
@@ -861,6 +985,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
         btnPP.innerHTML = '&#9654;';
         if (audio.src) audio.pause();
         clearInterval(timerID);
+        updateGridPlayStates();
     }
 
     function stopPlayback() {
@@ -872,6 +997,7 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
         lcdTime.textContent = '0:00';
         if (audio.src) { audio.pause(); audio.currentTime = 0; }
         clearInterval(timerID);
+        updateGridPlayStates();
     }
 
     btnPP.addEventListener('click', function () {
@@ -963,9 +1089,74 @@ li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
                     labelTitle.textContent = title;
                     lcdTrack.textContent   = title;
                 }
+                if (gridTitleEls[idx]) gridTitleEls[idx].textContent = title;
             });
         });
     }
+
+    /* ── Work Grid (default landing view) ── */
+    var wgTrackList = document.getElementById('wgTrackList');
+    var gridRowEls  = {};
+    var gridTitleEls = {};
+
+    tracks.forEach(function (t, idx) {
+        if (!t.src) return;
+        var row = document.createElement('div');
+        row.className = 'wg-track';
+
+        var playBtn = document.createElement('div');
+        playBtn.className = 'wg-track-play';
+        playBtn.innerHTML = '&#9654;';
+
+        var num = document.createElement('span');
+        num.className = 'wg-track-num';
+        num.textContent = String(idx + 1).padStart(2, '0');
+
+        var title = document.createElement('span');
+        title.className = 'wg-track-title';
+        title.textContent = t.title;
+
+        row.appendChild(playBtn);
+        row.appendChild(num);
+        row.appendChild(title);
+        row.addEventListener('click', function () { gridPlayToggle(idx); });
+        wgTrackList.appendChild(row);
+
+        gridRowEls[idx]   = { row: row, playBtn: playBtn };
+        gridTitleEls[idx] = title;
+    });
+
+    function gridPlayToggle(idx) {
+        if (currentTrack === idx && isPlaying) {
+            pause();
+        } else {
+            loadTrack(idx);
+            play();
+        }
+    }
+
+    function updateGridPlayStates() {
+        Object.keys(gridRowEls).forEach(function (key) {
+            var idx = Number(key);
+            var isCurrent = idx === currentTrack && isPlaying;
+            gridRowEls[key].row.classList.toggle('playing', isCurrent);
+            gridRowEls[key].playBtn.innerHTML = isCurrent ? '&#9646;&#9646;' : '&#9654;';
+        });
+    }
+
+    /* ── Presentation Mode toggle ── */
+    var enterPresentBtn = document.getElementById('enterPresentBtn');
+    var exitPresentBtn  = document.getElementById('exitPresentBtn');
+
+    enterPresentBtn.addEventListener('click', function () {
+        document.documentElement.classList.add('presentation-active');
+        document.body.classList.add('presentation-active');
+    });
+    exitPresentBtn.addEventListener('click', function () {
+        stopPlayback();
+        document.documentElement.classList.remove('presentation-active');
+        document.body.classList.remove('presentation-active');
+    });
 
     /* ── Init ── */
     renderBinder(0);
