@@ -11,7 +11,7 @@ html, body { margin: 0; padding: 0; }
 html { height: 100%; }
 html.presentation-active { overflow: hidden !important; }
 body {
-    background-color: #000;
+    background: radial-gradient(ellipse at 50% 30%, #f5f4f2 0%, #dddbd8 100%) !important;
     padding-bottom: 0 !important;
     min-height: 100vh;
     box-sizing: border-box;
@@ -19,20 +19,19 @@ body {
     flex-direction: column;
 }
 body.presentation-active {
-    background: radial-gradient(ellipse at 50% 30%, #f5f4f2 0%, #dddbd8 100%) !important;
     overflow: hidden !important;
     height: 100vh;
 }
 
 nav { position: relative; }
 nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width: auto; }
-body.presentation-active nav li a { color: #333 !important; }
-body.presentation-active li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
-body.presentation-active .mobile-header { background-color: #e8e6e3 !important; border-bottom: 1px solid #ccc !important; }
-body.presentation-active .mobile-header-hamburger { color: #333 !important; }
-body.presentation-active .mobile-nav-menu { background-color: #eeecea !important; border-right: 1px solid #ccc !important; }
-body.presentation-active .mobile-nav-menu a { color: #333 !important; border-bottom: 1px solid #ddd !important; }
-body.presentation-active .mobile-nav-overlay { background: rgba(0,0,0,0.25) !important; }
+nav li a { color: #333 !important; }
+li a:hover:not(.active) { background-color: rgba(0,0,0,0.07) !important; }
+.mobile-header { background-color: #e8e6e3 !important; border-bottom: 1px solid #ccc !important; }
+.mobile-header-hamburger { color: #333 !important; }
+.mobile-nav-menu { background-color: #eeecea !important; border-right: 1px solid #ccc !important; }
+.mobile-nav-menu a { color: #333 !important; border-bottom: 1px solid #ddd !important; }
+.mobile-nav-overlay { background: rgba(0,0,0,0.25) !important; }
 
 /* ══════════════════════════════════════
    TRACK GRID — default landing view
@@ -58,7 +57,7 @@ body.presentation-active .mobile-nav-overlay { background: rgba(0,0,0,0.25) !imp
     font-weight: 700;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: #fff;
+    color: #2a2a2a;
     margin: 0;
 }
 .wg-present-btn {
@@ -67,15 +66,15 @@ body.presentation-active .mobile-nav-overlay { background: rgba(0,0,0,0.25) !imp
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: #fff;
+    color: #333;
     background: transparent;
-    border: 1px solid rgba(255,255,255,0.35);
+    border: 1px solid rgba(0,0,0,0.3);
     border-radius: 20px;
     padding: 10px 20px;
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s;
 }
-.wg-present-btn:hover { background-color: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.6); }
+.wg-present-btn:hover { background-color: rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.5); }
 
 .wg-track-list { display: flex; flex-direction: column; }
 .wg-track {
@@ -83,24 +82,24 @@ body.presentation-active .mobile-nav-overlay { background: rgba(0,0,0,0.25) !imp
     align-items: center;
     gap: 14px;
     padding: 12px 8px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(0,0,0,0.12);
     cursor: pointer;
 }
-.wg-track:hover { background: rgba(255,255,255,0.05); }
+.wg-track:hover { background: rgba(0,0,0,0.05); }
 .wg-track-play {
     flex-shrink: 0;
     width: 30px; height: 30px;
     border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.4);
+    border: 1px solid rgba(0,0,0,0.35);
     display: flex; align-items: center; justify-content: center;
-    color: #fff;
+    color: #333;
     font-size: 11px;
 }
-.wg-track.playing .wg-track-play { background: #fff; color: #000; border-color: #fff; }
+.wg-track.playing .wg-track-play { background: #333; color: #fff; border-color: #333; }
 .wg-track-num {
     font-family: 'Courier New', monospace;
     font-size: 12px;
-    color: rgba(255,255,255,0.4);
+    color: rgba(0,0,0,0.4);
     width: 24px;
     flex-shrink: 0;
 }
@@ -108,7 +107,7 @@ body.presentation-active .mobile-nav-overlay { background: rgba(0,0,0,0.25) !imp
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 14px;
     letter-spacing: 0.5px;
-    color: #fff;
+    color: #222;
 }
 .wg-track.playing .wg-track-title { color: #cc3300; }
 

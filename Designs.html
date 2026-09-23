@@ -18,36 +18,31 @@ html, body {
 }
 
 body {
-    background-color: #000;
+    background: linear-gradient(180deg, #ece8df 0%, #ddd8cc 100%) !important;
     min-height: 100vh;
     overflow-x: hidden;
 }
 
-/* Room backgrounds only apply once Presentation Mode is active */
-body.presentation-active {
-    background: linear-gradient(180deg, #ece8df 0%, #ddd8cc 100%) !important;
-}
-
-body.presentation-active.dark-room {
+body.dark-room {
     background: radial-gradient(ellipse at 40% 25%, #16181f 0%, #0c0d12 55%, #070809 100%) !important;
 }
 
-/* Nav adapts to room state (only while presenting — default nav stays site-standard black/white) */
+/* Nav adapts to room state */
 nav { position: relative; }
 nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width: auto; }
-body.presentation-active nav li a { color: #333 !important; transition: color 1.4s ease; }
-body.presentation-active li a:hover:not(.active) { background-color: rgba(0,0,0,0.06) !important; transition: background-color 1.4s; }
-body.presentation-active.dark-room nav li a { color: #bbb !important; }
-body.presentation-active.dark-room li a:hover:not(.active) { background-color: rgba(255,255,255,0.06) !important; }
+nav li a { color: #333 !important; transition: color 1.4s ease; }
+li a:hover:not(.active) { background-color: rgba(0,0,0,0.06) !important; transition: background-color 1.4s; }
+body.dark-room nav li a { color: #bbb !important; }
+body.dark-room li a:hover:not(.active) { background-color: rgba(255,255,255,0.06) !important; }
 
-body.presentation-active .mobile-header { background-color: #ddd8ce !important; border-bottom: 1px solid #ccc !important; transition: background-color 1.4s; }
-body.presentation-active .mobile-header-hamburger { color: #444 !important; }
-body.presentation-active .mobile-nav-menu { background-color: #e8e4da !important; border-right: 1px solid #ccc !important; }
-body.presentation-active .mobile-nav-menu a { color: #333 !important; border-bottom: 1px solid #ccc !important; }
-body.presentation-active.dark-room .mobile-header { background-color: #111 !important; border-bottom-color: #222 !important; }
-body.presentation-active.dark-room .mobile-header-hamburger { color: #ccc !important; }
-body.presentation-active.dark-room .mobile-nav-menu { background-color: #0e0e0e !important; border-right-color: #222 !important; }
-body.presentation-active.dark-room .mobile-nav-menu a { color: #ccc !important; border-bottom-color: #222 !important; }
+.mobile-header { background-color: #ddd8ce !important; border-bottom: 1px solid #ccc !important; transition: background-color 1.4s; }
+.mobile-header-hamburger { color: #444 !important; }
+.mobile-nav-menu { background-color: #e8e4da !important; border-right: 1px solid #ccc !important; }
+.mobile-nav-menu a { color: #333 !important; border-bottom: 1px solid #ccc !important; }
+body.dark-room .mobile-header { background-color: #111 !important; border-bottom-color: #222 !important; }
+body.dark-room .mobile-header-hamburger { color: #ccc !important; }
+body.dark-room .mobile-nav-menu { background-color: #0e0e0e !important; border-right-color: #222 !important; }
+body.dark-room .mobile-nav-menu a { color: #ccc !important; border-bottom-color: #222 !important; }
 
 /* ══════════════════════════════════════
    WORK GRID — default landing view
@@ -72,7 +67,7 @@ body.presentation-active.dark-room .mobile-nav-menu a { color: #ccc !important; 
     font-weight: 700;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: #fff;
+    color: #2a2520;
     margin: 0;
 }
 .wg-present-btn {
@@ -81,15 +76,15 @@ body.presentation-active.dark-room .mobile-nav-menu a { color: #ccc !important; 
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: #fff;
+    color: #333;
     background: transparent;
-    border: 1px solid rgba(255,255,255,0.35);
+    border: 1px solid rgba(0,0,0,0.3);
     border-radius: 20px;
     padding: 10px 20px;
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s;
 }
-.wg-present-btn:hover { background-color: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.6); }
+.wg-present-btn:hover { background-color: rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.5); }
 
 .wg-grid {
     display: grid;
@@ -101,7 +96,7 @@ body.presentation-active.dark-room .mobile-nav-menu a { color: #ccc !important; 
     overflow: hidden;
     border-radius: 3px;
     cursor: pointer;
-    background: #111;
+    background: rgba(0,0,0,0.06);
 }
 .wg-item img {
     width: 100%; height: 100%;
