@@ -18,37 +18,136 @@ html, body {
 }
 
 body {
-    background: linear-gradient(180deg, #ece8df 0%, #ddd8cc 100%) !important;
+    background-color: #000;
     min-height: 100vh;
     overflow-x: hidden;
 }
 
-body.dark-room {
+/* Room backgrounds only apply once Presentation Mode is active */
+body.presentation-active {
+    background: linear-gradient(180deg, #ece8df 0%, #ddd8cc 100%) !important;
+}
+
+body.presentation-active.dark-room {
     background: radial-gradient(ellipse at 40% 25%, #16181f 0%, #0c0d12 55%, #070809 100%) !important;
 }
 
-/* Nav adapts to room state */
+/* Nav adapts to room state (only while presenting — default nav stays site-standard black/white) */
 nav { position: relative; }
 nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width: auto; }
-nav li a { color: #333 !important; transition: color 1.4s ease; }
-li a:hover:not(.active) { background-color: rgba(0,0,0,0.06) !important; transition: background-color 1.4s; }
-body.dark-room nav li a { color: #bbb !important; }
-body.dark-room li a:hover:not(.active) { background-color: rgba(255,255,255,0.06) !important; }
+body.presentation-active nav li a { color: #333 !important; transition: color 1.4s ease; }
+body.presentation-active li a:hover:not(.active) { background-color: rgba(0,0,0,0.06) !important; transition: background-color 1.4s; }
+body.presentation-active.dark-room nav li a { color: #bbb !important; }
+body.presentation-active.dark-room li a:hover:not(.active) { background-color: rgba(255,255,255,0.06) !important; }
 
-.mobile-header { background-color: #ddd8ce !important; border-bottom: 1px solid #ccc !important; transition: background-color 1.4s; }
-.mobile-header-hamburger { color: #444 !important; }
-.mobile-nav-menu { background-color: #e8e4da !important; border-right: 1px solid #ccc !important; }
-.mobile-nav-menu a { color: #333 !important; border-bottom: 1px solid #ccc !important; }
-body.dark-room .mobile-header { background-color: #111 !important; border-bottom-color: #222 !important; }
-body.dark-room .mobile-header-hamburger { color: #ccc !important; }
-body.dark-room .mobile-nav-menu { background-color: #0e0e0e !important; border-right-color: #222 !important; }
-body.dark-room .mobile-nav-menu a { color: #ccc !important; border-bottom-color: #222 !important; }
+body.presentation-active .mobile-header { background-color: #ddd8ce !important; border-bottom: 1px solid #ccc !important; transition: background-color 1.4s; }
+body.presentation-active .mobile-header-hamburger { color: #444 !important; }
+body.presentation-active .mobile-nav-menu { background-color: #e8e4da !important; border-right: 1px solid #ccc !important; }
+body.presentation-active .mobile-nav-menu a { color: #333 !important; border-bottom: 1px solid #ccc !important; }
+body.presentation-active.dark-room .mobile-header { background-color: #111 !important; border-bottom-color: #222 !important; }
+body.presentation-active.dark-room .mobile-header-hamburger { color: #ccc !important; }
+body.presentation-active.dark-room .mobile-nav-menu { background-color: #0e0e0e !important; border-right-color: #222 !important; }
+body.presentation-active.dark-room .mobile-nav-menu a { color: #ccc !important; border-bottom-color: #222 !important; }
+
+/* ══════════════════════════════════════
+   WORK GRID — default landing view
+══════════════════════════════════════ */
+.work-grid-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+    box-sizing: border-box;
+}
+.wg-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+.wg-eyebrow {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #fff;
+    margin: 0;
+}
+.wg-present-btn {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #fff;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+.wg-present-btn:hover { background-color: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.6); }
+
+.wg-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+}
+.wg-item {
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: 3px;
+    cursor: pointer;
+    background: #111;
+}
+.wg-item img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.35s ease;
+    -webkit-user-drag: none;
+}
+.wg-item:hover img { transform: scale(1.05); }
+
+/* Presentation experience hidden until toggled on */
+.dsgn-main { display: none; }
+body.presentation-active .dsgn-main { display: flex; }
+
+.wg-exit-btn {
+    display: none;
+    position: fixed;
+    top: 76px; right: 24px;
+    z-index: 210;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #333;
+    background: rgba(255,255,255,0.85);
+    border: 1px solid rgba(0,0,0,0.15);
+    border-radius: 20px;
+    padding: 9px 18px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.wg-exit-btn:hover { background-color: #fff; }
+body.presentation-active .wg-exit-btn { display: block; }
+body.presentation-active.dark-room .wg-exit-btn { color: #ddd; background: rgba(20,20,20,0.85); border-color: rgba(255,255,255,0.15); }
+
+@media (max-width: 768px) {
+    .work-grid-section { padding: 88px 16px 60px; }
+    .wg-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .wg-exit-btn { top: 60px; right: 12px; }
+}
 
 /* ══════════════════════════════════════
    MAIN LAYOUT
 ══════════════════════════════════════ */
 .dsgn-main {
-    display: flex;
     flex-direction: column;
     align-items: center;
     padding: 28px 16px 40px;
@@ -1119,6 +1218,18 @@ body.dark-room .dsgn-floor-line {
 </ul>
 </nav>
 
+<!-- ── Work Grid (default view) ── -->
+<div class="work-grid-section" id="workGridSection">
+    <div class="wg-header">
+        <p class="wg-eyebrow">Designs</p>
+        <button class="wg-present-btn" id="enterPresentBtn">&#9654; Presentation Mode</button>
+    </div>
+    <div class="wg-grid" id="wgGrid"></div>
+</div>
+
+<!-- Exit button for presentation mode -->
+<button class="wg-exit-btn" id="exitPresentBtn">&times; Exit Presentation</button>
+
 <!-- ── Main Content ── -->
 <div class="dsgn-main">
 
@@ -1691,15 +1802,20 @@ dsgnScreen.addEventListener('click', function () {
     openLightbox(curSlide);
 });
 
-/* ── Lightbox ── */
+/* ── Lightbox (decoupled from projector state — works from the grid too) ── */
+var lbIndex = 0;
 function openLightbox(index) {
-    stopAutoAdvance();
-    lbImg.src  = designs[index].src;
-    lbImg.alt  = designs[index].title;
-    lbCounter.textContent = (index + 1) + ' / ' + designs.length;
-    lbPrev.disabled = index <= 0;
-    lbNext.disabled = index >= designs.length - 1;
+    if (isPowered) stopAutoAdvance();
+    lbIndex = index;
+    updateLightboxImage();
     dsgnLightbox.classList.add('open');
+}
+function updateLightboxImage() {
+    lbImg.src  = designs[lbIndex].src;
+    lbImg.alt  = designs[lbIndex].title;
+    lbCounter.textContent = (lbIndex + 1) + ' / ' + designs.length;
+    lbPrev.disabled = lbIndex <= 0;
+    lbNext.disabled = lbIndex >= designs.length - 1;
 }
 function closeLightbox() {
     dsgnLightbox.classList.remove('open');
@@ -1710,10 +1826,10 @@ dsgnLightbox.addEventListener('click', function (e) {
     if (e.target === dsgnLightbox) closeLightbox();
 });
 lbPrev.addEventListener('click', function () {
-    if (curSlide > 0) { curSlide--; renderSlide(curSlide, true); updateControls(); openLightbox(curSlide); }
+    if (lbIndex > 0) { lbIndex--; updateLightboxImage(); }
 });
 lbNext.addEventListener('click', function () {
-    if (curSlide < designs.length - 1) { curSlide++; renderSlide(curSlide, true); updateControls(); openLightbox(curSlide); }
+    if (lbIndex < designs.length - 1) { lbIndex++; updateLightboxImage(); }
 });
 document.addEventListener('keydown', function (e) {
     if (!dsgnLightbox.classList.contains('open')) return;
@@ -1722,8 +1838,65 @@ document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape')     closeLightbox();
 });
 
-/* ── Preload the first few slides so they're ready when the projector boots ── */
-for (var i = 0; i < Math.min(4, designs.length); i++) {
+/* ── Work Grid (default landing view) ── */
+var wgGrid = document.getElementById('wgGrid');
+designs.forEach(function (d, i) {
+    var item = document.createElement('div');
+    item.className = 'wg-item';
+    var img = document.createElement('img');
+    img.src = d.src;
+    img.alt = d.title;
+    img.loading = 'lazy';
+    img.draggable = false;
+    item.appendChild(img);
+    item.addEventListener('click', function () { openLightbox(i); });
+    wgGrid.appendChild(item);
+});
+
+/* ── Presentation Mode toggle ── */
+var enterPresentBtn = document.getElementById('enterPresentBtn');
+var exitPresentBtn  = document.getElementById('exitPresentBtn');
+
+enterPresentBtn.addEventListener('click', function () {
+    document.body.classList.add('presentation-active');
+});
+exitPresentBtn.addEventListener('click', function () {
+    resetPresentation();
+    document.body.classList.remove('presentation-active');
+});
+
+function resetPresentation() {
+    stopAutoAdvance();
+    if (laptopOpened) {
+        laptopOpened = false;
+        lpWebcam.classList.remove('on');
+        lpScreenContent.classList.remove('visible');
+        lpScreenBar.classList.remove('fill');
+        lpStatus.classList.remove('show');
+        lpScreenLabel.textContent = 'Connecting...';
+        if (lpHint) lpHint.style.opacity = '1';
+        if (dsgnLaptopPrompt) dsgnLaptopPrompt.classList.remove('gone');
+    }
+    document.body.classList.remove('dark-room');
+    isPowered = false;
+    isBooting = false;
+    dsgnWarmth.classList.remove('on');
+    dsgnBeam.classList.remove('on');
+    pjLensGlass.classList.remove('powered');
+    pjLedPower.classList.remove('on');
+    pjLedLamp.classList.remove('on');
+    pjBtnPower.classList.remove('on');
+    dsgnScreenOff.style.opacity = '1';
+    dsgnSlideWrap.classList.remove('visible');
+    imgA.src = ''; imgA.classList.remove('active');
+    imgB.src = ''; imgB.classList.remove('active');
+    activeImg = imgA; inactiveImg = imgB;
+    pjCounterText.textContent = '— / —';
+    updateControls();
+}
+
+/* ── Preload the first few images so they're ready quickly ── */
+for (var i = 0; i < Math.min(8, designs.length); i++) {
     (new Image()).src = designs[i].src;
 }
 </script>
