@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio</title>
+<style>
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+    margin: 0; padding: 0;
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #000;
+}
+
+/* ── Background video ── */
+#bgVideo {
+    position: fixed;
+    inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+    pointer-events: none;
+}
+#bgVideo.visible { opacity: 1; }
+
+/* ── Screens (intro + menu share the same full-screen layer) ── */
+.screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    transition: opacity 0.9s ease;
+}
+.screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ── Intro ── */
+#introScreen { cursor: pointer; }
+
+/* Logo is a fixed overlay so it can animate independently of the intro screen */
+#portfolioLogo {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    height: 72px;
+    width: auto;
+    z-index: 2;
+    pointer-events: none;
+    user-select: none;
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 10px));
+    transition: opacity 0.9s ease,
+                top 0.85s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.85s cubic-bezier(0.4, 0, 0.2, 1),
+                height 0.85s ease;
+}
+#portfolioLogo.show {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+}
+#portfolioLogo.at-top {
+    top: 22px;
+    transform: translateX(-50%);
+    height: 34px;
+}
+
+/* Placeholder that reserves the logo's vertical space so "click to enter"
+   stays correctly positioned below it */
+.logo-spacer {
+    height: 72px;
+    flex-shrink: 0;
+    pointer-events: none;
+}
+
+.intro-enter {
+    margin-top: 26px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 10px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    opacity: 0;
+    transition: opacity 0.7s ease;
+    pointer-events: none;
+    user-select: none;
+}
+.intro-enter.show { opacity: 1; }
+
+/* ── Menu ── */
+.menu-btn {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    padding: 15px 52px;
+    display: block;
+    transition: color 0.25s ease, letter-spacing 0.25s ease;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.menu-btn:hover,
+.menu-btn.active {
+    color: #fff;
+    letter-spacing: 8px;
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+    #portfolioLogo        { height: 52px; }
+    #portfolioLogo.at-top { height: 28px; top: 16px; }
+    .logo-spacer          { height: 52px; }
+    .intro-enter  { font-size: 9px; letter-spacing: 4px; margin-top: 22px; }
+    .menu-btn     { font-size: 12px; letter-spacing: 5px; padding: 14px 36px; }
+    .menu-btn:hover, .menu-btn.active { letter-spacing: 5px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- Background video — fill in data-video on each .menu-btn to hook up -->
+<video id="bgVideo" autoplay muted loop playsinline></video>
+
+<!-- Logo: fixed overlay, animates from center to top on enter -->
+<img id="portfolioLogo" src="PORTFOLIO/portfolio logo inv.png" alt="Portfolio">
+
+<!-- Intro screen -->
+<div id="introScreen" class="screen">
+    <div class="logo-spacer"></div>
+    <p class="intro-enter" id="introEnter">Click to enter</p>
+</div>
+
+<!-- Menu screen -->
+<div id="menuScreen" class="screen hidden">
+    <a class="menu-btn" href="Videos.html"  data-video="PORTFOLIO/Videos.mp4">Videos</a>
+    <a class="menu-btn" href="Designs.html" data-video="PORTFOLIO/Designs.mp4">Designs</a>
+    <a class="menu-btn" href="Photos.html"  data-video="PORTFOLIO/Photos.mp4">Photos</a>
+    <a class="menu-btn" href="Music.html"   data-video="PORTFOLIO/Music.mp4">Music</a>
+    <a class="menu-btn" href="Info.html"    data-video="">About</a>
+</div>
+
+<script>
+(function () {
+
+    var introScreen   = document.getElementById('introScreen');
+    var portfolioLogo = document.getElementById('portfolioLogo');
+    var introEnter    = document.getElementById('introEnter');
+    var menuScreen  = document.getElementById('menuScreen');
+    var bgVideo     = document.getElementById('bgVideo');
+    var menuBtns    = Array.prototype.slice.call(
+                          document.querySelectorAll('.menu-btn'));
+
+    var isMobile = ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    var entered  = false;
+    var fadeOutTimer = null;
+    var activeBtn = null;
+
+    if (isMobile) introEnter.textContent = 'Tap to enter';
+
+    /* ── Intro animation ── */
+    setTimeout(function () { portfolioLogo.classList.add('show'); }, 400);
+    setTimeout(function () { introEnter.classList.add('show'); }, 1500);
+
+    introScreen.addEventListener('click', function () {
+        if (entered) return;
+        entered = true;
+        introScreen.classList.add('hidden');
+        portfolioLogo.classList.add('at-top');
+        menuScreen.classList.remove('hidden');
+    });
+
+    /* ── Video helpers ── */
+    function showVideo(src) {
+        if (!src) return;
+        if (fadeOutTimer) { clearTimeout(fadeOutTimer); fadeOutTimer = null; }
+        if (bgVideo.dataset.current !== src) {
+            bgVideo.src = src;
+            bgVideo.dataset.current = src;
+            bgVideo.play().catch(function () {});
+        }
+        bgVideo.classList.add('visible');
+    }
+
+    function hideVideo() {
+        bgVideo.classList.remove('visible');
+        // Wait for the CSS fade before stopping playback
+        fadeOutTimer = setTimeout(function () {
+            bgVideo.pause();
+            bgVideo.removeAttribute('src');
+            bgVideo.load();
+            bgVideo.dataset.current = '';
+            fadeOutTimer = null;
+        }, 700);
+    }
+
+    /* ── Desktop: hover to show/hide video, click navigates normally ── */
+    if (!isMobile) {
+        menuBtns.forEach(function (btn) {
+            btn.addEventListener('mouseenter', function () {
+                showVideo(btn.dataset.video);
+            });
+            btn.addEventListener('mouseleave', function () {
+                hideVideo();
+            });
+        });
+    }
+
+    /* ── Mobile: first tap previews video, second tap navigates ── */
+    if (isMobile) {
+        menuBtns.forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                // Second tap on the already-active button → navigate
+                if (activeBtn === btn) {
+                    window.location.href = btn.getAttribute('href');
+                    return;
+                }
+
+                // First tap → activate and show video
+                menuBtns.forEach(function (b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                showVideo(btn.dataset.video);
+                activeBtn = btn;
+            });
+        });
+
+        // Tap anywhere outside the buttons cancels selection
+        document.addEventListener('click', function (e) {
+            if (!entered) return;
+            if (e.target.closest && e.target.closest('.menu-btn')) return;
+            menuBtns.forEach(function (b) { b.classList.remove('active'); });
+            hideVideo();
+            activeBtn = null;
+        });
+    }
+
+}());
+</script>
+</body>
+</html>
