@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>[Restaurant Name] — Fine Dining, Italian &amp; French</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=EB+Garamond:wght@400;500&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+
+/* ══════════════════════════════════════
+   HERO
+══════════════════════════════════════ */
+.hero {
+    position: relative;
+    height: 100vh;
+    min-height: 640px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 50% 30%, rgba(217,154,78,0.14) 0%, transparent 55%),
+        radial-gradient(ellipse at 20% 80%, rgba(107,31,36,0.35) 0%, transparent 60%),
+        linear-gradient(180deg, #1c1712 0%, #120e0b 100%);
+}
+.hero::before {
+    /* fine wood floor / vignette suggestion at the base */
+    content: '';
+    position: absolute; left: 0; right: 0; bottom: 0; height: 40%;
+    background: linear-gradient(to top, rgba(74,50,32,0.55), transparent);
+    pointer-events: none;
+}
+.hero::after {
+    content: '';
+    position: absolute; inset: 0;
+    box-shadow: inset 0 0 180px rgba(0,0,0,0.75);
+    pointer-events: none;
+}
+.hero .glow.g1 { width: 460px; height: 460px; top: 8%; left: 50%; transform: translateX(-50%); }
+.hero .glow.g2 { width: 300px; height: 300px; bottom: 6%; right: 8%; animation-delay: 1.4s; }
+
+.hero-content { position: relative; z-index: 2; padding: 0 24px; }
+.hero-eyebrow {
+    font-family: var(--font-label);
+    font-size: 12px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--amber-soft);
+    margin-bottom: 22px;
+}
+.hero-title {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(46px, 8vw, 92px);
+    color: var(--cream);
+    line-height: 1.1;
+}
+.hero-sub {
+    font-family: var(--font-body);
+    font-size: 17px;
+    color: var(--cream-dim);
+    max-width: 480px;
+    margin: 24px auto 0;
+    letter-spacing: 0.3px;
+}
+.hero-actions {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    margin-top: 40px;
+    flex-wrap: wrap;
+}
+.hero-scroll {
+    position: absolute;
+    bottom: 34px; left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-label);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--cream-faint);
+    z-index: 2;
+}
+.hero-scroll::after {
+    content: '';
+    display: block;
+    width: 1px; height: 34px;
+    background: linear-gradient(to bottom, var(--amber), transparent);
+    margin: 10px auto 0;
+}
+
+/* ══════════════════════════════════════
+   INTRO
+══════════════════════════════════════ */
+.intro {
+    padding: 130px 0;
+    background: var(--charcoal);
+}
+.intro-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+}
+.intro-visual {
+    aspect-ratio: 4 / 5;
+    border-radius: 2px;
+    background:
+        radial-gradient(circle at 30% 25%, rgba(217,154,78,0.22), transparent 55%),
+        linear-gradient(160deg, var(--wall-beige-lt) 0%, var(--wood-dark) 70%, var(--charcoal) 100%);
+    position: relative;
+    overflow: hidden;
+}
+.intro-visual::after {
+    content: 'Interior photography here';
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-label);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(242,232,216,0.28);
+    text-align: center;
+    padding: 20px;
+}
+.intro-text .eyebrow { margin-bottom: 18px; display: block; }
+.intro-text h2 {
+    font-size: clamp(30px, 4vw, 44px);
+    font-style: italic;
+    line-height: 1.25;
+    margin-bottom: 26px;
+}
+.intro-text p {
+    color: var(--cream-dim);
+    font-size: 17px;
+    margin-bottom: 18px;
+}
+.intro-text p:last-of-type { margin-bottom: 0; }
+
+/* ══════════════════════════════════════
+   HIGHLIGHTS
+══════════════════════════════════════ */
+.highlights {
+    padding: 0 0 130px;
+    background: var(--charcoal);
+}
+.highlights-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(217,154,78,0.15);
+    border: 1px solid rgba(217,154,78,0.15);
+}
+.highlight-card {
+    background: var(--charcoal);
+    padding: 52px 40px;
+    text-align: center;
+}
+.highlight-mark {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 34px;
+    color: var(--amber-soft);
+    margin-bottom: 20px;
+}
+.highlight-card h3 {
+    font-size: 22px;
+    margin-bottom: 12px;
+}
+.highlight-card p {
+    color: var(--cream-dim);
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+/* ══════════════════════════════════════
+   SIGNATURE DISHES
+══════════════════════════════════════ */
+.signature {
+    padding: 0 0 130px;
+    background: var(--charcoal);
+    text-align: center;
+}
+.signature .section-head { margin-bottom: 60px; }
+.signature h2 {
+    font-size: clamp(30px, 4vw, 42px);
+    font-style: italic;
+    margin-top: 14px;
+}
+.dish-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 36px;
+    text-align: left;
+}
+.dish-card { position: relative; }
+.dish-photo {
+    aspect-ratio: 1 / 1;
+    border-radius: 2px;
+    margin-bottom: 20px;
+    background:
+        radial-gradient(circle at 35% 30%, rgba(217,154,78,0.2), transparent 60%),
+        linear-gradient(150deg, var(--wall-beige) 0%, var(--wood-dark) 100%);
+    position: relative;
+    overflow: hidden;
+}
+.dish-photo::after {
+    content: 'Dish photography here';
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-label);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(242,232,216,0.26);
+    text-align: center;
+    padding: 16px;
+}
+.dish-card h3 {
+    font-size: 21px;
+    font-style: italic;
+    margin-bottom: 6px;
+}
+.dish-card p {
+    font-size: 14px;
+    color: var(--cream-faint);
+    letter-spacing: 0.3px;
+}
+.signature .btn { margin-top: 56px; }
+
+/* ══════════════════════════════════════
+   PRESS / ACCOLADES STRIP
+══════════════════════════════════════ */
+.press {
+    padding: 110px 0;
+    background: var(--wall-beige);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.press blockquote {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(24px, 3.2vw, 34px);
+    line-height: 1.5;
+    max-width: 780px;
+    margin: 0 auto;
+    color: var(--cream);
+}
+.press cite {
+    display: block;
+    font-family: var(--font-label);
+    font-style: normal;
+    font-size: 12px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--amber-soft);
+    margin-top: 28px;
+}
+.press-marks {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    margin-top: 56px;
+    flex-wrap: wrap;
+}
+.press-mark {
+    font-family: var(--font-label);
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--cream-faint);
+}
+
+/* ══════════════════════════════════════
+   RESERVE BAND
+══════════════════════════════════════ */
+.reserve-band {
+    padding: 100px 0;
+    background: linear-gradient(135deg, var(--maroon-deep) 0%, var(--maroon) 100%);
+    text-align: center;
+}
+.reserve-band h2 {
+    font-size: clamp(28px, 3.6vw, 40px);
+    font-style: italic;
+    margin-bottom: 30px;
+}
+.reserve-band .btn-outline { border-color: rgba(242,232,216,0.5); }
+
+@media (max-width: 900px) {
+    .intro-grid { grid-template-columns: 1fr; gap: 40px; }
+    .highlights-grid, .dish-grid { grid-template-columns: 1fr; }
+    .highlights-grid { gap: 1px; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-nav">
+    <a href="index.html" class="wordmark">[Restaurant <span>Name</span>]</a>
+    <nav class="nav-links">
+        <a href="index.html" class="active">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="reservations.html">Reservations</a>
+        <a href="about.html">About</a>
+    </nav>
+    <a href="reservations.html" class="nav-cta">Reserve</a>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+    </button>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="menu.html">Menu</a>
+    <a href="reservations.html">Reservations</a>
+    <a href="about.html">About</a>
+    <a href="reservations.html" class="nav-cta">Reserve a Table</a>
+</div>
+
+<!-- ── Hero ── -->
+<section class="hero">
+    <div class="glow g1"></div>
+    <div class="glow g2"></div>
+    <div class="hero-content">
+        <p class="hero-eyebrow">Fine Dining &middot; Italian &amp; French</p>
+        <h1 class="hero-title">A Table, Held<br>for You</h1>
+        <p class="hero-sub">A candlelit dining room where Italian warmth meets French precision — seasonal, considered, and quietly exceptional.</p>
+        <div class="hero-actions">
+            <a href="reservations.html" class="btn btn-primary">Reserve a Table</a>
+            <a href="menu.html" class="btn btn-outline">View Menu</a>
+        </div>
+    </div>
+    <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- ── Intro ── -->
+<section class="intro">
+    <div class="container intro-grid">
+        <div class="intro-visual reveal"></div>
+        <div class="intro-text reveal">
+            <span class="eyebrow">Our Philosophy</span>
+            <h2>Two culinary traditions,<br>one quiet room.</h2>
+            <p>Every dish begins with the same question our chefs have asked for years: what does restraint make possible? The answer lives somewhere between a Roman trattoria and a Left Bank bistro — rustic ingredients, handled with French technique, served without excess.</p>
+            <p>The room follows the same instinct. Dark beige walls, wine-red accents, and the low amber glow of candlelight against fine wood floors — a space built for long dinners and quiet conversation.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ── Highlights ── -->
+<section class="highlights">
+    <div class="container">
+        <div class="highlights-grid reveal">
+            <div class="highlight-card">
+                <div class="highlight-mark">I.</div>
+                <h3>Seasonal Tasting Menu</h3>
+                <p>A rotating multi-course menu shaped by what's in season, paired by our sommelier.</p>
+            </div>
+            <div class="highlight-card">
+                <div class="highlight-mark">II.</div>
+                <h3>Curated Wine Cellar</h3>
+                <p>A focused list spanning Piedmont to Bordeaux, chosen to complement the kitchen.</p>
+            </div>
+            <div class="highlight-card">
+                <div class="highlight-mark">III.</div>
+                <h3>Private Dining</h3>
+                <p>An intimate room for gatherings of up to twelve, with a menu built around your table.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── Signature Dishes ── -->
+<section class="signature">
+    <div class="container">
+        <div class="section-head reveal">
+            <span class="eyebrow">From the Kitchen</span>
+            <h2>Signature Dishes</h2>
+        </div>
+        <div class="dish-grid reveal">
+            <div class="dish-card">
+                <div class="dish-photo"></div>
+                <h3>Tagliatelle al Tartufo</h3>
+                <p>Hand-cut pasta, black truffle, aged parmesan</p>
+            </div>
+            <div class="dish-card">
+                <div class="dish-photo"></div>
+                <h3>Canard à l'Orange</h3>
+                <p>Roasted duck breast, orange reduction, root vegetables</p>
+            </div>
+            <div class="dish-card">
+                <div class="dish-photo"></div>
+                <h3>Branzino al Sale</h3>
+                <p>Salt-crusted sea bass, lemon, Ligurian olive oil</p>
+            </div>
+        </div>
+        <a href="menu.html" class="btn btn-outline">View Full Menu</a>
+    </div>
+</section>
+
+<!-- ── Press ── -->
+<section class="press">
+    <div class="container reveal">
+        <blockquote>&ldquo;A masterclass in restraint — the kind of restaurant that makes you forget to check your phone.&rdquo;</blockquote>
+        <cite>— Critic Name, Publication</cite>
+        <div class="press-marks">
+            <span class="press-mark">Highly Recommended</span>
+            <span class="press-mark">Editor's Choice</span>
+            <span class="press-mark">Best New Dining Room</span>
+        </div>
+    </div>
+</section>
+
+<!-- ── Reserve CTA ── -->
+<section class="reserve-band">
+    <div class="container reveal">
+        <h2>Join us for an evening.</h2>
+        <a href="reservations.html" class="btn btn-outline">Reserve a Table</a>
+    </div>
+</section>
+
+<footer class="site-footer">
+    <a href="index.html" class="wordmark">[Restaurant <span style="color:var(--amber-soft);">Name</span>]</a>
+    <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="reservations.html">Reservations</a>
+        <a href="about.html">About</a>
+    </div>
+    <p class="footer-fine">123 Placeholder Street, City &nbsp;&middot;&nbsp; (000) 000-0000</p>
+    <p class="footer-fine">&copy; 2026 [Restaurant Name]. All rights reserved.</p>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>

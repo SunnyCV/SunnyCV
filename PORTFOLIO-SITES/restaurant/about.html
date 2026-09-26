@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>About — [Restaurant Name]</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=EB+Garamond:wght@400;500&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+
+.page-header {
+    position: relative;
+    padding: 200px 0 90px;
+    text-align: center;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(217,154,78,0.12) 0%, transparent 60%),
+        var(--charcoal);
+    overflow: hidden;
+}
+.page-header .glow { width: 380px; height: 380px; top: -10%; left: 50%; transform: translateX(-50%); }
+.page-header h1 {
+    position: relative; z-index: 1;
+    font-size: clamp(40px, 6vw, 64px);
+    font-style: italic;
+    margin-top: 14px;
+}
+.page-header p {
+    position: relative; z-index: 1;
+    color: var(--cream-dim);
+    max-width: 480px;
+    margin: 20px auto 0;
+    font-size: 16px;
+}
+
+/* ── Story ── */
+.story { padding: 0 0 120px; }
+.story-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+}
+.story-visual {
+    aspect-ratio: 4 / 5;
+    border-radius: 2px;
+    background:
+        radial-gradient(circle at 30% 25%, rgba(217,154,78,0.22), transparent 55%),
+        linear-gradient(160deg, var(--wall-beige-lt) 0%, var(--wood-dark) 70%, var(--charcoal) 100%);
+    position: relative;
+    overflow: hidden;
+}
+.story-visual::after {
+    content: 'Chef portrait here';
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-label);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(242,232,216,0.28);
+}
+.story-text h2 {
+    font-size: clamp(28px, 4vw, 40px);
+    font-style: italic;
+    line-height: 1.25;
+    margin-bottom: 24px;
+}
+.story-text p {
+    color: var(--cream-dim);
+    font-size: 16.5px;
+    margin-bottom: 16px;
+}
+.story-signature {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 22px;
+    color: var(--amber-soft);
+    margin-top: 20px;
+    display: block;
+}
+
+/* ── Hours & Location ── */
+.contact-band {
+    padding: 100px 0;
+    background: var(--wall-beige);
+}
+.contact-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 50px;
+    text-align: center;
+}
+.contact-card .eyebrow { display: block; margin-bottom: 14px; }
+.contact-card h3 { font-size: 22px; font-style: italic; margin-bottom: 14px; }
+.contact-card p { color: var(--cream-dim); font-size: 15.5px; line-height: 1.8; }
+.contact-card a { color: var(--amber-soft); transition: color 0.25s; }
+.contact-card a:hover { color: var(--cream); }
+
+.map-placeholder {
+    margin-top: 60px;
+    aspect-ratio: 16 / 5;
+    min-height: 180px;
+    border: 1px solid rgba(217,154,78,0.25);
+    background: rgba(21,17,13,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-label);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--cream-faint);
+}
+
+/* ── Press ── */
+.press-section { padding: 120px 0; text-align: center; }
+.press-section .section-head { margin-bottom: 56px; }
+.press-section h2 { font-size: clamp(28px, 4vw, 38px); font-style: italic; margin-top: 12px; }
+.press-list {
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: left;
+}
+.press-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 26px 4px;
+    border-bottom: 1px solid rgba(217,154,78,0.15);
+    transition: opacity 0.25s;
+}
+.press-link:hover { opacity: 0.72; }
+.press-link:last-child { border-bottom: none; }
+.press-link-pub {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 22px;
+    color: var(--cream);
+}
+.press-link-quote {
+    font-size: 14px;
+    color: var(--cream-faint);
+    margin-top: 4px;
+}
+.press-link-arrow {
+    font-family: var(--font-label);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--amber-soft);
+    white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+    .story-grid { grid-template-columns: 1fr; gap: 40px; }
+    .contact-grid { grid-template-columns: 1fr; gap: 44px; }
+}
+@media (max-width: 560px) {
+    .press-link { flex-direction: column; align-items: flex-start; gap: 8px; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-nav solid">
+    <a href="index.html" class="wordmark">[Restaurant <span>Name</span>]</a>
+    <nav class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="reservations.html">Reservations</a>
+        <a href="about.html" class="active">About</a>
+    </nav>
+    <a href="reservations.html" class="nav-cta">Reserve</a>
+    <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+    </button>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="menu.html">Menu</a>
+    <a href="reservations.html">Reservations</a>
+    <a href="about.html">About</a>
+    <a href="reservations.html" class="nav-cta">Reserve a Table</a>
+</div>
+
+<section class="page-header">
+    <div class="glow"></div>
+    <span class="eyebrow">Our Story</span>
+    <h1>About Us</h1>
+    <p>A dining room built on two culinary traditions, a lot of patience, and a genuine dislike of rushing a meal.</p>
+</section>
+
+<section class="story">
+    <div class="container story-grid">
+        <div class="story-visual reveal"></div>
+        <div class="story-text reveal">
+            <h2>Where Italian warmth<br>meets French discipline.</h2>
+            <p>[Restaurant Name] opened with a simple idea: take the generosity of an Italian kitchen and the precision of a French one, and let them share a single menu. No fusion gimmicks — just two traditions that, it turns out, were never that far apart.</p>
+            <p>The dining room was designed the same way the menu was written — slowly, and with restraint. Dark beige walls, wine-red details, fine wood floors, and just enough amber light to make you forget what time it is.</p>
+            <p>We've kept the room small on purpose. Every table gets the same attention a chef gives a sauce that's almost ready — patient, and a little obsessive.</p>
+            <span class="story-signature">— The Kitchen</span>
+        </div>
+    </div>
+</section>
+
+<section class="contact-band">
+    <div class="container">
+        <div class="contact-grid reveal">
+            <div class="contact-card">
+                <span class="eyebrow">Visit</span>
+                <h3>Location</h3>
+                <p>123 Placeholder Street<br>City, State 00000</p>
+            </div>
+            <div class="contact-card">
+                <span class="eyebrow">Hours</span>
+                <h3>Open Tuesday–Sunday</h3>
+                <p>5:30 PM &ndash; 10:30 PM<br>Closed Mondays</p>
+            </div>
+            <div class="contact-card">
+                <span class="eyebrow">Contact</span>
+                <h3>Get in Touch</h3>
+                <p><a href="tel:+10000000000">(000) 000-0000</a><br><a href="mailto:hello@restaurant.com">hello@restaurant.com</a></p>
+            </div>
+        </div>
+        <div class="map-placeholder reveal">Map embed here</div>
+    </div>
+</section>
+
+<section class="press-section">
+    <div class="container">
+        <div class="section-head reveal">
+            <span class="eyebrow">In the Press</span>
+            <h2>Reviews &amp; Recognition</h2>
+        </div>
+        <div class="press-list reveal">
+            <a class="press-link" href="#" target="_blank" rel="noopener">
+                <span>
+                    <span class="press-link-pub">The Local Critic</span>
+                    <span class="press-link-quote">"A masterclass in restraint."</span>
+                </span>
+                <span class="press-link-arrow">Read Review &rarr;</span>
+            </a>
+            <a class="press-link" href="#" target="_blank" rel="noopener">
+                <span>
+                    <span class="press-link-pub">City Dining Guide</span>
+                    <span class="press-link-quote">Named one of this year's best new dining rooms.</span>
+                </span>
+                <span class="press-link-arrow">Read Review &rarr;</span>
+            </a>
+            <a class="press-link" href="#" target="_blank" rel="noopener">
+                <span>
+                    <span class="press-link-pub">Regional Food &amp; Wine</span>
+                    <span class="press-link-quote">Editor's Choice, Fine Dining.</span>
+                </span>
+                <span class="press-link-arrow">Read Review &rarr;</span>
+            </a>
+            <a class="press-link" href="#" target="_blank" rel="noopener">
+                <span>
+                    <span class="press-link-pub">Guest Reviews</span>
+                    <span class="press-link-quote">See what our guests are saying.</span>
+                </span>
+                <span class="press-link-arrow">View All &rarr;</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<footer class="site-footer">
+    <a href="index.html" class="wordmark">[Restaurant <span style="color:var(--amber-soft);">Name</span>]</a>
+    <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="menu.html">Menu</a>
+        <a href="reservations.html">Reservations</a>
+        <a href="about.html">About</a>
+    </div>
+    <p class="footer-fine">123 Placeholder Street, City &nbsp;&middot;&nbsp; (000) 000-0000</p>
+    <p class="footer-fine">&copy; 2026 [Restaurant Name]. All rights reserved.</p>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>
