@@ -3,93 +3,148 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Menu — [Restaurant Name]</title>
+<title>Menu — Restaurant Name</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=EB+Garamond:wght@400;500&family=Jost:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=EB+Garamond:wght@400;500&family=Jost:wght@400;500&family=Pinyon+Script&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <style>
 
-.page-header {
-    position: relative;
-    padding: 200px 0 90px;
-    text-align: center;
-    background:
-        radial-gradient(ellipse at 50% 0%, rgba(217,154,78,0.12) 0%, transparent 60%),
-        var(--charcoal);
+/* Full-page ambient background — same treatment as Home for now.
+   Swap the gradient (or drop in a looping video/image) per active
+   category later; #menuBg is the hook for that. */
+.menu-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
     overflow: hidden;
+    background:
+        radial-gradient(ellipse at 50% 30%, rgba(217,154,78,0.14) 0%, transparent 55%),
+        radial-gradient(ellipse at 20% 80%, rgba(107,31,36,0.35) 0%, transparent 60%),
+        linear-gradient(180deg, #1c1712 0%, #120e0b 100%);
 }
-.page-header .glow { width: 380px; height: 380px; top: -10%; left: 50%; transform: translateX(-50%); }
-.page-header h1 {
-    position: relative; z-index: 1;
-    font-size: clamp(40px, 6vw, 64px);
+.menu-bg::after {
+    content: '';
+    position: absolute; inset: 0;
+    box-shadow: inset 0 0 180px rgba(0,0,0,0.75);
+}
+.menu-bg .glow.g1 { width: 420px; height: 420px; top: -6%; left: 50%; transform: translateX(-50%); }
+.menu-bg .glow.g2 { width: 280px; height: 280px; bottom: 4%; right: 6%; animation-delay: 1.4s; }
+
+body { background: transparent; }
+
+/* ── Category tabs ── */
+.menu-tabs {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px 22px;
+    padding: 168px 24px 56px;
+    text-align: center;
+}
+.menu-tab {
+    font-family: var(--font-display);
     font-style: italic;
-    margin-top: 14px;
-}
-.page-header p {
-    position: relative; z-index: 1;
+    font-size: 21px;
     color: var(--cream-dim);
-    max-width: 480px;
-    margin: 20px auto 0;
-    font-size: 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 0 5px;
+    position: relative;
+    transition: color 0.3s;
 }
-
-.menu-section { padding: 0 0 100px; }
-.menu-section .container { max-width: 820px; }
-
-.menu-cat { margin-bottom: 76px; }
-.menu-cat:last-child { margin-bottom: 0; }
-.menu-cat-head { text-align: center; margin-bottom: 44px; }
-.menu-cat-head h2 {
-    font-size: 32px;
+.menu-tab:hover { color: var(--cream); }
+.menu-tab.active { color: var(--amber-soft); }
+.menu-tab.active::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 1px;
+    background: var(--amber);
+}
+.menu-tab-sep {
+    font-family: var(--font-display);
     font-style: italic;
-    margin-top: 10px;
+    font-size: 21px;
+    color: rgba(242,232,216,0.28);
 }
+
+/* ── Menu box ── */
+.menu-box-wrap {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    padding: 0 24px 130px;
+}
+.menu-box {
+    width: 100%;
+    max-width: 640px;
+    border: 1px solid rgba(217,154,78,0.3);
+    background: rgba(21,17,13,0.4);
+    backdrop-filter: blur(2px);
+    padding: 46px 42px 54px;
+}
+.menu-box-title {
+    text-align: center;
+    font-size: 30px;
+    font-style: italic;
+    margin-bottom: 34px;
+}
+
+.menu-panel { display: none; opacity: 0; transition: opacity 0.25s ease; }
+.menu-panel.active { display: block; }
+.menu-panel.visible { opacity: 1; }
 
 .menu-item {
     display: flex;
     align-items: baseline;
+    flex-wrap: wrap;
     gap: 14px;
-    padding: 20px 0;
+    padding: 18px 0;
     border-bottom: 1px solid rgba(217,154,78,0.12);
 }
 .menu-item:last-child { border-bottom: none; }
 .menu-item-name {
     font-family: var(--font-display);
     font-style: italic;
-    font-size: 21px;
+    font-size: 20px;
     color: var(--cream);
     white-space: nowrap;
 }
 .menu-item-fill {
     flex: 1;
-    border-bottom: 1px dotted rgba(242,232,216,0.2);
+    min-width: 20px;
+    border-bottom: 1px dotted rgba(242,232,216,0.22);
     transform: translateY(-6px);
 }
 .menu-item-price {
     font-family: var(--font-label);
-    font-size: 15px;
+    font-size: 14.5px;
     color: var(--amber-soft);
     white-space: nowrap;
 }
 .menu-item-desc {
     flex-basis: 100%;
-    font-size: 14.5px;
+    font-size: 14px;
     color: var(--cream-faint);
-    margin-top: 4px;
+    margin-top: -6px;
     line-height: 1.6;
 }
 
 .wine-note {
     text-align: center;
     color: var(--cream-faint);
-    font-size: 14px;
+    font-size: 13.5px;
     font-style: italic;
-    margin-top: 28px;
+    margin-top: 24px;
 }
 
 @media (max-width: 600px) {
-    .menu-item { flex-wrap: wrap; }
+    .menu-tabs { padding: 130px 20px 44px; }
+    .menu-box { padding: 36px 24px 42px; }
     .menu-item-name { white-space: normal; }
     .menu-item-fill { display: none; }
 }
@@ -97,15 +152,22 @@
 </head>
 <body>
 
+<div class="menu-bg" id="menuBg">
+    <div class="glow g1"></div>
+    <div class="glow g2"></div>
+</div>
+
 <header class="site-nav solid">
-    <a href="index.html" class="wordmark">[Restaurant <span>Name</span>]</a>
+    <a href="index.html" class="wordmark">Restaurant Name</a>
     <nav class="nav-links">
         <a href="index.html">Home</a>
+        <span class="nav-sep">|</span>
+        <a href="reservations.html">Reserve</a>
+        <span class="nav-sep">|</span>
         <a href="menu.html" class="active">Menu</a>
-        <a href="reservations.html">Reservations</a>
+        <span class="nav-sep">|</span>
         <a href="about.html">About</a>
     </nav>
-    <a href="reservations.html" class="nav-cta">Reserve</a>
     <button class="hamburger" id="hamburger" aria-label="Menu">
         <span></span><span></span><span></span>
     </button>
@@ -113,80 +175,81 @@
 
 <div class="mobile-menu" id="mobileMenu">
     <a href="index.html">Home</a>
-    <a href="menu.html">Menu</a>
-    <a href="reservations.html">Reservations</a>
+    <a href="reservations.html">Reserve</a>
+    <a href="menu.html" class="active">Menu</a>
     <a href="about.html">About</a>
-    <a href="reservations.html" class="nav-cta">Reserve a Table</a>
 </div>
 
-<section class="page-header">
-    <div class="glow"></div>
-    <span class="eyebrow">Italian &amp; French, in Season</span>
-    <h1>The Menu</h1>
-    <p>A shorter menu, changed with the seasons — every dish considered, nothing crowded onto the plate.</p>
-</section>
+<div class="menu-tabs" id="menuTabs">
+    <button class="menu-tab active" data-cat="breakfast">Breakfast</button>
+    <span class="menu-tab-sep">|</span>
+    <button class="menu-tab" data-cat="lunch">Lunch</button>
+    <span class="menu-tab-sep">|</span>
+    <button class="menu-tab" data-cat="dinner">Dinner</button>
+    <span class="menu-tab-sep">|</span>
+    <button class="menu-tab" data-cat="cocktails">Cocktails</button>
+    <span class="menu-tab-sep">|</span>
+    <button class="menu-tab" data-cat="wine">Wine</button>
+</div>
 
-<section class="menu-section">
-    <div class="container">
+<div class="menu-box-wrap">
+    <div class="menu-box">
+        <h2 class="menu-box-title" id="menuBoxTitle">Breakfast</h2>
 
-        <div class="menu-cat reveal">
-            <div class="menu-cat-head">
-                <span class="eyebrow">Antipasti</span>
-                <h2>To Start</h2>
-            </div>
-
+        <div class="menu-panel active visible" data-panel="breakfast">
             <div class="menu-item">
-                <span class="menu-item-name">Burrata e Prosciutto</span>
-                <span class="menu-item-fill"></span>
-                <span class="menu-item-price">$22</span>
-                <span class="menu-item-desc">Cream burrata, 24-month prosciutto, aged balsamic, basil oil</span>
-            </div>
-            <div class="menu-item">
-                <span class="menu-item-name">Velouté de Champignons</span>
+                <span class="menu-item-name">Uova alla Fiorentina</span>
                 <span class="menu-item-fill"></span>
                 <span class="menu-item-price">$18</span>
-                <span class="menu-item-desc">Wild mushroom velouté, truffle cream, chives</span>
+                <span class="menu-item-desc">Poached eggs, spinach, hollandaise, toasted brioche</span>
             </div>
             <div class="menu-item">
-                <span class="menu-item-name">Tartare de Boeuf</span>
+                <span class="menu-item-name">Croissant aux Amandes</span>
                 <span class="menu-item-fill"></span>
-                <span class="menu-item-price">$26</span>
-                <span class="menu-item-desc">Hand-cut beef, capers, shallot, egg yolk, grilled sourdough</span>
+                <span class="menu-item-price">$9</span>
+                <span class="menu-item-desc">Almond croissant, mascarpone cream</span>
+            </div>
+            <div class="menu-item">
+                <span class="menu-item-name">Frittata al Tartufo</span>
+                <span class="menu-item-fill"></span>
+                <span class="menu-item-price">$16</span>
+                <span class="menu-item-desc">Truffle frittata, fontina, wild mushrooms</span>
+            </div>
+            <div class="menu-item">
+                <span class="menu-item-name">Café au Lait / Cappuccino</span>
+                <span class="menu-item-fill"></span>
+                <span class="menu-item-price">$6</span>
             </div>
         </div>
 
-        <div class="menu-cat reveal">
-            <div class="menu-cat-head">
-                <span class="eyebrow">Primi</span>
-                <h2>Pasta &amp; Risotto</h2>
-            </div>
-
+        <div class="menu-panel" data-panel="lunch">
             <div class="menu-item">
-                <span class="menu-item-name">Tagliatelle al Tartufo</span>
+                <span class="menu-item-name">Insalata di Burrata</span>
                 <span class="menu-item-fill"></span>
-                <span class="menu-item-price">$38</span>
-                <span class="menu-item-desc">Hand-cut pasta, black truffle, aged parmesan</span>
+                <span class="menu-item-price">$19</span>
+                <span class="menu-item-desc">Burrata, heirloom tomato, basil, aged balsamic</span>
             </div>
             <div class="menu-item">
-                <span class="menu-item-name">Risotto al Barolo</span>
+                <span class="menu-item-name">Croque Madame</span>
                 <span class="menu-item-fill"></span>
-                <span class="menu-item-price">$34</span>
-                <span class="menu-item-desc">Barolo-braised risotto, bone marrow, gremolata</span>
+                <span class="menu-item-price">$17</span>
+                <span class="menu-item-desc">Ham, gruyère, béchamel, fried egg</span>
             </div>
             <div class="menu-item">
-                <span class="menu-item-name">Agnolotti del Plin</span>
+                <span class="menu-item-name">Tagliatelle al Limone</span>
                 <span class="menu-item-fill"></span>
-                <span class="menu-item-price">$36</span>
-                <span class="menu-item-desc">Veal &amp; herb agnolotti, brown butter, sage</span>
+                <span class="menu-item-price">$24</span>
+                <span class="menu-item-desc">Hand-cut pasta, lemon, parmesan, cracked pepper</span>
+            </div>
+            <div class="menu-item">
+                <span class="menu-item-name">Soupe à l'Oignon</span>
+                <span class="menu-item-fill"></span>
+                <span class="menu-item-price">$14</span>
+                <span class="menu-item-desc">Classic French onion soup, gruyère crust</span>
             </div>
         </div>
 
-        <div class="menu-cat reveal">
-            <div class="menu-cat-head">
-                <span class="eyebrow">Secondi</span>
-                <h2>Main Courses</h2>
-            </div>
-
+        <div class="menu-panel" data-panel="dinner">
             <div class="menu-item">
                 <span class="menu-item-name">Canard à l'Orange</span>
                 <span class="menu-item-fill"></span>
@@ -213,38 +276,34 @@
             </div>
         </div>
 
-        <div class="menu-cat reveal">
-            <div class="menu-cat-head">
-                <span class="eyebrow">Dolci</span>
-                <h2>Dessert</h2>
-            </div>
-
+        <div class="menu-panel" data-panel="cocktails">
             <div class="menu-item">
-                <span class="menu-item-name">Tiramisù</span>
+                <span class="menu-item-name">Negroni Sbagliato</span>
                 <span class="menu-item-fill"></span>
                 <span class="menu-item-price">$16</span>
-                <span class="menu-item-desc">Espresso-soaked ladyfingers, mascarpone, cocoa</span>
+                <span class="menu-item-desc">Prosecco, Campari, sweet vermouth</span>
             </div>
             <div class="menu-item">
-                <span class="menu-item-name">Tarte Tatin</span>
+                <span class="menu-item-name">French 75</span>
                 <span class="menu-item-fill"></span>
                 <span class="menu-item-price">$17</span>
-                <span class="menu-item-desc">Caramelized apple tart, crème fraîche</span>
+                <span class="menu-item-desc">Gin, lemon, sugar, champagne</span>
             </div>
             <div class="menu-item">
-                <span class="menu-item-name">Panna Cotta al Caffè</span>
+                <span class="menu-item-name">Americano Classico</span>
                 <span class="menu-item-fill"></span>
                 <span class="menu-item-price">$15</span>
-                <span class="menu-item-desc">Espresso panna cotta, hazelnut praline</span>
+                <span class="menu-item-desc">Campari, sweet vermouth, soda</span>
+            </div>
+            <div class="menu-item">
+                <span class="menu-item-name">Sidecar</span>
+                <span class="menu-item-fill"></span>
+                <span class="menu-item-price">$16</span>
+                <span class="menu-item-desc">Cognac, orange liqueur, lemon</span>
             </div>
         </div>
 
-        <div class="menu-cat reveal">
-            <div class="menu-cat-head">
-                <span class="eyebrow">Cave à Vin</span>
-                <h2>Wine &amp; Spirits</h2>
-            </div>
-
+        <div class="menu-panel" data-panel="wine">
             <div class="menu-item">
                 <span class="menu-item-name">Barolo, Piedmont</span>
                 <span class="menu-item-fill"></span>
@@ -269,18 +328,18 @@
         </div>
 
     </div>
-</section>
+</div>
 
 <footer class="site-footer">
-    <a href="index.html" class="wordmark">[Restaurant <span style="color:var(--amber-soft);">Name</span>]</a>
+    <a href="index.html" class="wordmark">Restaurant Name</a>
     <div class="footer-links">
         <a href="index.html">Home</a>
+        <a href="reservations.html">Reserve</a>
         <a href="menu.html">Menu</a>
-        <a href="reservations.html">Reservations</a>
         <a href="about.html">About</a>
     </div>
     <p class="footer-fine">123 Placeholder Street, City &nbsp;&middot;&nbsp; (000) 000-0000</p>
-    <p class="footer-fine">&copy; 2026 [Restaurant Name]. All rights reserved.</p>
+    <p class="footer-fine">&copy; 2026 Restaurant Name. All rights reserved.</p>
 </footer>
 
 <script src="js/script.js"></script>

@@ -135,18 +135,15 @@ header.site-nav {
 }
 
 .wordmark {
-    font-family: var(--font-display);
-    font-size: 24px;
-    letter-spacing: 3px;
+    font-family: 'Pinyon Script', cursive;
+    font-size: 30px;
     color: var(--cream);
-    font-style: italic;
 }
-.wordmark span { color: var(--amber-soft); }
 
 nav.nav-links {
     display: flex;
     align-items: center;
-    gap: 40px;
+    gap: 12px;
 }
 nav.nav-links a {
     font-family: var(--font-label);
@@ -154,36 +151,15 @@ nav.nav-links a {
     letter-spacing: 2.5px;
     text-transform: uppercase;
     color: var(--cream-dim);
-    position: relative;
-    padding-bottom: 4px;
     transition: color 0.3s;
 }
-nav.nav-links a::after {
-    content: '';
-    position: absolute;
-    left: 0; right: 100%;
-    bottom: 0;
-    height: 1px;
-    background: var(--amber);
-    transition: right 0.3s ease;
-}
-nav.nav-links a:hover,
-nav.nav-links a.active { color: var(--cream); }
-nav.nav-links a:hover::after,
-nav.nav-links a.active::after { right: 0; }
-
-.nav-cta {
+nav.nav-links a:hover { color: var(--cream); }
+nav.nav-links a.active { color: var(--amber-soft); }
+nav.nav-links .nav-sep {
+    color: rgba(242,232,216,0.3);
     font-family: var(--font-label);
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--cream);
-    background: var(--maroon);
-    padding: 11px 22px;
-    border-radius: 2px;
-    transition: background-color 0.3s;
+    font-size: 12px;
 }
-.nav-cta:hover { background: var(--maroon-bright); }
 
 .hamburger {
     display: none;
@@ -220,12 +196,11 @@ nav.nav-links a.active::after { right: 0; }
 }
 .mobile-menu.open { opacity: 1; pointer-events: auto; }
 .mobile-menu a {
-    font-family: var(--font-display);
-    font-size: 28px;
-    font-style: italic;
+    font-family: 'Pinyon Script', cursive;
+    font-size: 32px;
     color: var(--cream);
 }
-.mobile-menu .nav-cta { margin-top: 10px; }
+.mobile-menu a.active { color: var(--amber-soft); }
 
 /* ══════════════════════════════════════
    FOOTER
@@ -236,7 +211,7 @@ footer.site-footer {
     text-align: center;
     border-top: 1px solid rgba(217,154,78,0.15);
 }
-footer.site-footer .wordmark { font-size: 22px; margin-bottom: 18px; display: inline-block; }
+footer.site-footer .wordmark { font-size: 28px; margin-bottom: 18px; display: inline-block; }
 .footer-links {
     display: flex;
     justify-content: center;
@@ -273,7 +248,7 @@ footer.site-footer .wordmark { font-size: 22px; margin-bottom: 18px; display: in
    RESPONSIVE — shared
 ══════════════════════════════════════ */
 @media (max-width: 900px) {
-    nav.nav-links, .nav-cta:not(.mobile-menu .nav-cta) { display: none; }
+    nav.nav-links { display: none; }
     .hamburger { display: flex; }
     header.site-nav { padding: 18px 24px; }
 }

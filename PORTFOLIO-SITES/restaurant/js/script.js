@@ -59,6 +59,47 @@
     }, 5500);
 }());
 
+/* ── Menu page: category tabs with a quick fade-out / fade-in swap ── */
+(function () {
+    var tabsWrap = document.getElementById('menuTabs');
+    var titleEl  = document.getElementById('menuBoxTitle');
+    if (!tabsWrap || !titleEl) return;
+
+    var tabs   = tabsWrap.querySelectorAll('.menu-tab');
+    var panels = document.querySelectorAll('.menu-panel');
+    var switching = false;
+
+    function labelFor(tab) { return tab.textContent.trim(); }
+
+    tabsWrap.addEventListener('click', function (e) {
+        var tab = e.target.closest('.menu-tab');
+        if (!tab || tab.classList.contains('active') || switching) return;
+        switching = true;
+
+        var cat = tab.dataset.cat;
+        var currentPanel = document.querySelector('.menu-panel.active');
+        var nextPanel = document.querySelector('.menu-panel[data-panel="' + cat + '"]');
+        if (!nextPanel || nextPanel === currentPanel) { switching = false; return; }
+
+        tabs.forEach(function (t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+
+        if (currentPanel) currentPanel.classList.remove('visible');
+
+        setTimeout(function () {
+            if (currentPanel) currentPanel.classList.remove('active');
+            nextPanel.classList.add('active');
+            titleEl.textContent = labelFor(tab);
+            // force reflow so the opacity transition actually fires
+            void nextPanel.offsetWidth;
+            requestAnimationFrame(function () {
+                nextPanel.classList.add('visible');
+                switching = false;
+            });
+        }, 260);
+    });
+}());
+
 /* ── Reservation form (front-end only — no backend wired up yet) ── */
 (function () {
     var form = document.getElementById('reservationForm');
