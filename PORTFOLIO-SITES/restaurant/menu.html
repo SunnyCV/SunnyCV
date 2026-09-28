@@ -142,6 +142,21 @@ body { background: transparent; }
     margin-top: 24px;
 }
 
+/* ── Signature dishes (leads the Dinner panel) ── */
+.menu-signature { margin-bottom: 6px; }
+.menu-signature .eyebrow {
+    display: block;
+    text-align: center;
+    margin-bottom: 18px;
+}
+.menu-item.signature .menu-item-name { color: var(--amber-soft); }
+
+.menu-sub-eyebrow {
+    display: block;
+    text-align: center;
+    margin: -6px 0 18px;
+}
+
 @media (max-width: 600px) {
     .menu-tabs { padding: 130px 20px 44px; }
     .menu-box { padding: 36px 24px 42px; }
@@ -181,11 +196,9 @@ body { background: transparent; }
 </div>
 
 <div class="menu-tabs" id="menuTabs">
-    <button class="menu-tab active" data-cat="breakfast">Breakfast</button>
+    <button class="menu-tab active" data-cat="dinner">Dinner</button>
     <span class="menu-tab-sep">|</span>
-    <button class="menu-tab" data-cat="lunch">Lunch</button>
-    <span class="menu-tab-sep">|</span>
-    <button class="menu-tab" data-cat="dinner">Dinner</button>
+    <button class="menu-tab" data-cat="dessert">Dessert</button>
     <span class="menu-tab-sep">|</span>
     <button class="menu-tab" data-cat="cocktails">Cocktails</button>
     <span class="menu-tab-sep">|</span>
@@ -194,73 +207,46 @@ body { background: transparent; }
 
 <div class="menu-box-wrap">
     <div class="menu-box">
-        <h2 class="menu-box-title" id="menuBoxTitle">Breakfast</h2>
+        <h2 class="menu-box-title" id="menuBoxTitle">Dinner</h2>
 
-        <div class="menu-panel active visible" data-panel="breakfast">
-            <div class="menu-item">
-                <span class="menu-item-name">Uova alla Fiorentina</span>
-                <span class="menu-item-fill"></span>
-                <span class="menu-item-price">$18</span>
-                <span class="menu-item-desc">Poached eggs, spinach, hollandaise, toasted brioche</span>
-            </div>
-            <div class="menu-item">
-                <span class="menu-item-name">Croissant aux Amandes</span>
-                <span class="menu-item-fill"></span>
-                <span class="menu-item-price">$9</span>
-                <span class="menu-item-desc">Almond croissant, mascarpone cream</span>
-            </div>
-            <div class="menu-item">
-                <span class="menu-item-name">Frittata al Tartufo</span>
-                <span class="menu-item-fill"></span>
-                <span class="menu-item-price">$16</span>
-                <span class="menu-item-desc">Truffle frittata, fontina, wild mushrooms</span>
-            </div>
-            <div class="menu-item">
-                <span class="menu-item-name">Café au Lait / Cappuccino</span>
-                <span class="menu-item-fill"></span>
-                <span class="menu-item-price">$6</span>
-            </div>
-        </div>
+        <div class="menu-panel active visible" data-panel="dinner">
 
-        <div class="menu-panel" data-panel="lunch">
-            <div class="menu-item">
-                <span class="menu-item-name">Insalata di Burrata</span>
-                <span class="menu-item-fill"></span>
-                <span class="menu-item-price">$19</span>
-                <span class="menu-item-desc">Burrata, heirloom tomato, basil, aged balsamic</span>
+            <div class="menu-signature">
+                <span class="eyebrow">Chef's Signature</span>
+                <div class="menu-item signature">
+                    <span class="menu-item-name">Tagliatelle al Tartufo</span>
+                    <span class="menu-item-fill"></span>
+                    <span class="menu-item-price">$38</span>
+                    <span class="menu-item-desc">Hand-cut pasta, black truffle, aged parmesan</span>
+                </div>
+                <div class="menu-item signature">
+                    <span class="menu-item-name">Canard à l'Orange</span>
+                    <span class="menu-item-fill"></span>
+                    <span class="menu-item-price">$52</span>
+                    <span class="menu-item-desc">Roasted duck breast, orange reduction, root vegetables</span>
+                </div>
+                <div class="menu-item signature">
+                    <span class="menu-item-name">Branzino al Sale</span>
+                    <span class="menu-item-fill"></span>
+                    <span class="menu-item-price">$48</span>
+                    <span class="menu-item-desc">Salt-crusted sea bass, lemon, Ligurian olive oil</span>
+                </div>
             </div>
-            <div class="menu-item">
-                <span class="menu-item-name">Croque Madame</span>
-                <span class="menu-item-fill"></span>
-                <span class="menu-item-price">$17</span>
-                <span class="menu-item-desc">Ham, gruyère, béchamel, fried egg</span>
-            </div>
-            <div class="menu-item">
-                <span class="menu-item-name">Tagliatelle al Limone</span>
-                <span class="menu-item-fill"></span>
-                <span class="menu-item-price">$24</span>
-                <span class="menu-item-desc">Hand-cut pasta, lemon, parmesan, cracked pepper</span>
-            </div>
-            <div class="menu-item">
-                <span class="menu-item-name">Soupe à l'Oignon</span>
-                <span class="menu-item-fill"></span>
-                <span class="menu-item-price">$14</span>
-                <span class="menu-item-desc">Classic French onion soup, gruyère crust</span>
-            </div>
-        </div>
 
-        <div class="menu-panel" data-panel="dinner">
+            <div class="divider"></div>
+            <span class="eyebrow menu-sub-eyebrow">Also on the Menu</span>
+
             <div class="menu-item">
-                <span class="menu-item-name">Canard à l'Orange</span>
+                <span class="menu-item-name">Risotto al Barolo</span>
                 <span class="menu-item-fill"></span>
-                <span class="menu-item-price">$52</span>
-                <span class="menu-item-desc">Roasted duck breast, orange reduction, root vegetables</span>
+                <span class="menu-item-price">$34</span>
+                <span class="menu-item-desc">Barolo-braised risotto, bone marrow, gremolata</span>
             </div>
             <div class="menu-item">
-                <span class="menu-item-name">Branzino al Sale</span>
+                <span class="menu-item-name">Agnolotti del Plin</span>
                 <span class="menu-item-fill"></span>
-                <span class="menu-item-price">$48</span>
-                <span class="menu-item-desc">Salt-crusted sea bass, lemon, Ligurian olive oil</span>
+                <span class="menu-item-price">$36</span>
+                <span class="menu-item-desc">Veal &amp; herb agnolotti, brown butter, sage</span>
             </div>
             <div class="menu-item">
                 <span class="menu-item-name">Côte de Boeuf</span>
@@ -273,6 +259,27 @@ body { background: transparent; }
                 <span class="menu-item-fill"></span>
                 <span class="menu-item-price">$54</span>
                 <span class="menu-item-desc">Braised veal shank, saffron risotto, gremolata</span>
+            </div>
+        </div>
+
+        <div class="menu-panel" data-panel="dessert">
+            <div class="menu-item">
+                <span class="menu-item-name">Tiramisù</span>
+                <span class="menu-item-fill"></span>
+                <span class="menu-item-price">$16</span>
+                <span class="menu-item-desc">Espresso-soaked ladyfingers, mascarpone, cocoa</span>
+            </div>
+            <div class="menu-item">
+                <span class="menu-item-name">Tarte Tatin</span>
+                <span class="menu-item-fill"></span>
+                <span class="menu-item-price">$17</span>
+                <span class="menu-item-desc">Caramelized apple tart, crème fraîche</span>
+            </div>
+            <div class="menu-item">
+                <span class="menu-item-name">Panna Cotta al Caffè</span>
+                <span class="menu-item-fill"></span>
+                <span class="menu-item-price">$15</span>
+                <span class="menu-item-desc">Espresso panna cotta, hazelnut praline</span>
             </div>
         </div>
 
