@@ -47,6 +47,18 @@
     items.forEach(function (el) { io.observe(el); });
 }());
 
+/* ── Home page: sliding critic reviews ── */
+(function () {
+    var slides = document.querySelectorAll('.review-slide');
+    if (slides.length < 2) return;
+    var i = 0;
+    setInterval(function () {
+        slides[i].classList.remove('active');
+        i = (i + 1) % slides.length;
+        slides[i].classList.add('active');
+    }, 5500);
+}());
+
 /* ── Reservation form (front-end only — no backend wired up yet) ── */
 (function () {
     var form = document.getElementById('reservationForm');
