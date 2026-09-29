@@ -43,6 +43,9 @@ a { color: inherit; text-decoration: none; }
     letter-spacing: 1px;
     line-height: 1.15;
 }
+.logo-line2 {
+    margin-top: 2px;
+}
 
 @keyframes flicker {
     0%, 3%, 6%, 9%, 11%, 100% {
