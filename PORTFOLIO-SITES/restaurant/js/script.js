@@ -100,15 +100,118 @@
     });
 }());
 
-/* ── Reservation form (front-end only — no backend wired up yet) ── */
+/* ── Reservations page: calendar + time picker → details → thank you
+   (front-end only — no backend wired up yet) ── */
 (function () {
-    var form = document.getElementById('reservationForm');
-    if (!form) return;
-    var confirmEl = document.getElementById('reservationConfirm');
+    var calDays = document.getElementById('calDays');
+    if (!calDays) return;
+
+    var monthLabel  = document.getElementById('calMonthLabel');
+    var prevBtn     = document.getElementById('calPrev');
+    var nextBtn     = document.getElementById('calNext');
+    var timeGrid    = document.getElementById('timeGrid');
+    var detailsRow  = document.getElementById('detailsRow');
+    var submitWrap  = document.getElementById('reserveSubmitWrap');
+    var form        = document.getElementById('reservationForm');
+    var flow        = document.getElementById('reserveFlow');
+    var thanks      = document.getElementById('reserveThanks');
+    var thanksText  = document.getElementById('thanksSummary');
+
+    var MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    var viewYear  = today.getFullYear();
+    var viewMonth = today.getMonth();
+    var selectedDate = null;
+    var selectedTime = null;
+
+    function isSameDay(a, b) {
+        return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+    }
+
+    function renderCalendar() {
+        monthLabel.textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
+        calDays.innerHTML = '';
+
+        var firstDay      = new Date(viewYear, viewMonth, 1);
+        var startWeekday  = firstDay.getDay();
+        var daysInMonth   = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+        for (var i = 0; i < startWeekday; i++) {
+            var empty = document.createElement('span');
+            empty.className = 'cal-day empty';
+            calDays.appendChild(empty);
+        }
+
+        for (var d = 1; d <= daysInMonth; d++) {
+            var cellDate = new Date(viewYear, viewMonth, d);
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'cal-day';
+            btn.textContent = d;
+
+            var isPast   = cellDate < today;
+            var isMonday = cellDate.getDay() === 1; // closed Mondays
+
+            if (isPast || isMonday) {
+                btn.classList.add('disabled');
+                btn.disabled = true;
+            } else {
+                (function (dayDate, el) {
+                    el.addEventListener('click', function () {
+                        selectedDate = dayDate;
+                        calDays.querySelectorAll('.cal-day').forEach(function (c) { c.classList.remove('selected'); });
+                        el.classList.add('selected');
+                        checkReady();
+                    });
+                })(cellDate, btn);
+            }
+
+            if (selectedDate && isSameDay(cellDate, selectedDate)) btn.classList.add('selected');
+            calDays.appendChild(btn);
+        }
+    }
+
+    prevBtn.addEventListener('click', function () {
+        viewMonth--;
+        if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+        renderCalendar();
+    });
+    nextBtn.addEventListener('click', function () {
+        viewMonth++;
+        if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+        renderCalendar();
+    });
+
+    timeGrid.addEventListener('click', function (e) {
+        var btn = e.target.closest('.time-slot');
+        if (!btn) return;
+        timeGrid.querySelectorAll('.time-slot').forEach(function (t) { t.classList.remove('selected'); });
+        btn.classList.add('selected');
+        selectedTime = btn.textContent.trim();
+        checkReady();
+    });
+
+    function checkReady() {
+        if (selectedDate && selectedTime) {
+            detailsRow.classList.add('visible');
+            submitWrap.classList.add('visible');
+        }
+    }
 
     form.addEventListener('submit', function (e) {
         e.preventDefault();
-        form.style.display = 'none';
-        if (confirmEl) confirmEl.classList.add('visible');
+        if (!selectedDate || !selectedTime) return;
+
+        var guests  = document.getElementById('resGuests').value;
+        var dateStr = selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+        var party   = guests === '1' ? '1 guest' : guests + ' guests';
+
+        thanksText.textContent = 'We’ve reserved a table for ' + party + ' on ' + dateStr + ' at ' + selectedTime + '.';
+        flow.style.display = 'none';
+        thanks.classList.add('visible');
     });
+
+    renderCalendar();
 }());

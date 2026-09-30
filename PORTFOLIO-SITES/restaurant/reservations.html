@@ -34,48 +34,106 @@
     font-size: 16px;
 }
 
-.reserve-section { padding: 0 0 120px; }
-.reserve-grid {
-    max-width: 980px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1.15fr;
-    gap: 64px;
-    align-items: start;
-}
+.reserve-section { padding: 0 0 130px; }
+.reserve-flow { max-width: 760px; margin: 0 auto; }
 
-.reserve-info h3 {
-    font-size: 24px;
-    font-style: italic;
-    margin-bottom: 18px;
-}
-.reserve-info p {
-    color: var(--cream-dim);
-    font-size: 15.5px;
-    margin-bottom: 14px;
-}
-.reserve-info-block { margin-bottom: 40px; }
-.reserve-info-block:last-child { margin-bottom: 0; }
-.reserve-phone {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: 26px;
-    color: var(--amber-soft);
-    display: inline-block;
-    margin-top: 6px;
-}
-
-form#reservationForm {
-    background: var(--wall-beige);
-    padding: 44px;
-    border-radius: 2px;
-}
-.form-row {
+.picker-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 44px;
+    background: var(--wall-beige);
+    padding: 42px;
+    border-radius: 2px;
 }
-.field { margin-bottom: 22px; }
+
+/* ── Calendar ── */
+.cal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+.cal-head h3 {
+    font-size: 17px;
+    font-style: italic;
+}
+.cal-nav {
+    background: none;
+    border: none;
+    color: var(--cream-dim);
+    font-size: 15px;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: color 0.2s;
+}
+.cal-nav:hover { color: var(--amber-soft); }
+.cal-weekdays, .cal-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+.cal-weekdays span {
+    text-align: center;
+    font-family: var(--font-label);
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--cream-faint);
+    padding-bottom: 8px;
+}
+.cal-days { gap: 3px; }
+.cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-label);
+    font-size: 12.5px;
+    color: var(--cream-dim);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+.cal-day.empty { visibility: hidden; cursor: default; }
+.cal-day.disabled { color: rgba(242,232,216,0.16); cursor: default; }
+.cal-day:hover:not(.disabled):not(.empty) { border-color: rgba(217,154,78,0.5); }
+.cal-day.selected { background: var(--maroon); color: var(--cream); }
+
+/* ── Time ── */
+.time-box .eyebrow { display: block; margin-bottom: 18px; }
+.time-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+.time-slot {
+    font-family: var(--font-label);
+    font-size: 12.5px;
+    letter-spacing: 1px;
+    color: var(--cream-dim);
+    background: transparent;
+    border: 1px solid rgba(242,232,216,0.25);
+    padding: 11px 8px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+}
+.time-slot:hover { border-color: var(--amber); color: var(--cream); }
+.time-slot.selected { background: var(--maroon); border-color: var(--maroon); color: var(--cream); }
+
+/* ── Details row (revealed once date + time are chosen) ── */
+.details-row {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-top: 0;
+    transition: max-height 0.5s ease, opacity 0.5s ease, margin-top 0.5s ease;
+}
+.details-row.visible { max-height: 220px; opacity: 1; margin-top: 36px; }
+
 .field label {
     display: block;
     font-family: var(--font-label);
@@ -85,7 +143,7 @@ form#reservationForm {
     color: var(--cream-dim);
     margin-bottom: 8px;
 }
-.field input, .field select, .field textarea {
+.field input, .field select {
     width: 100%;
     background: rgba(21,17,13,0.35);
     border: 1px solid rgba(242,232,216,0.25);
@@ -96,37 +154,59 @@ form#reservationForm {
     border-radius: 2px;
     transition: border-color 0.25s;
 }
-.field input:focus, .field select:focus, .field textarea:focus {
+.field input:focus, .field select:focus {
     outline: none;
     border-color: var(--amber);
 }
-.field textarea { resize: vertical; min-height: 90px; }
-form#reservationForm .btn { width: 100%; text-align: center; border: none; }
 
-.reservation-confirm {
+.reserve-submit-wrap {
+    text-align: center;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    margin-top: 0;
+    transition: max-height 0.5s ease, opacity 0.5s ease, margin-top 0.5s ease;
+}
+.reserve-submit-wrap.visible { max-height: 100px; opacity: 1; margin-top: 34px; }
+.reserve-submit-wrap .btn { width: 100%; max-width: 320px; border: none; }
+
+/* ── Thank you ── */
+.reserve-thanks {
     display: none;
     background: var(--wall-beige);
-    padding: 60px 44px;
+    padding: 68px 44px;
     text-align: center;
     border-radius: 2px;
 }
-.reservation-confirm.visible { display: block; }
-.reservation-confirm .mark {
+.reserve-thanks.visible { display: block; }
+.reserve-thanks .mark {
     font-family: var(--font-display);
     font-style: italic;
-    font-size: 40px;
+    font-size: 42px;
     color: var(--amber-soft);
     margin-bottom: 18px;
 }
-.reservation-confirm h3 { font-size: 24px; font-style: italic; margin-bottom: 12px; }
-.reservation-confirm p { color: var(--cream-dim); font-size: 15px; }
+.reserve-thanks h3 { font-size: 27px; font-style: italic; margin-bottom: 14px; }
+.reserve-thanks p {
+    color: var(--cream-dim);
+    font-size: 15.5px;
+    max-width: 420px;
+    margin: 0 auto 10px;
+}
+.reserve-thanks .dress-note {
+    margin-top: 22px;
+    font-size: 13.5px;
+    font-style: italic;
+    color: var(--cream-faint);
+}
 
-@media (max-width: 860px) {
-    .reserve-grid { grid-template-columns: 1fr; gap: 50px; }
+@media (max-width: 720px) {
+    .picker-row { grid-template-columns: 1fr; gap: 36px; padding: 32px; }
+    .details-row.visible { max-height: 420px; }
 }
 @media (max-width: 520px) {
-    .form-row { grid-template-columns: 1fr; gap: 0; }
-    form#reservationForm { padding: 30px 24px; }
+    .details-row { grid-template-columns: 1fr; }
+    .details-row.visible { max-height: 320px; }
 }
 </style>
 </head>
@@ -164,79 +244,76 @@ form#reservationForm .btn { width: 100%; text-align: center; border: none; }
 
 <section class="reserve-section">
     <div class="container">
-        <div class="reserve-grid">
 
-            <div class="reserve-info reveal">
-                <div class="reserve-info-block">
-                    <h3>Hours</h3>
-                    <p>Tuesday &ndash; Sunday<br>5:30 PM &ndash; 10:30 PM</p>
-                    <p>Closed Mondays</p>
+        <div class="reserve-flow reveal" id="reserveFlow">
+            <div class="picker-row">
+
+                <div class="calendar-box">
+                    <div class="cal-head">
+                        <button type="button" class="cal-nav" id="calPrev" aria-label="Previous month">&#8249;</button>
+                        <h3 id="calMonthLabel">Month Year</h3>
+                        <button type="button" class="cal-nav" id="calNext" aria-label="Next month">&#8250;</button>
+                    </div>
+                    <div class="cal-weekdays">
+                        <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+                    </div>
+                    <div class="cal-days" id="calDays"></div>
                 </div>
-                <div class="reserve-info-block">
-                    <h3>Prefer to Call?</h3>
-                    <p>Our host stand is happy to help with large parties, private dining, or same-day requests.</p>
-                    <a href="tel:+10000000000" class="reserve-phone">(000) 000-0000</a>
+
+                <div class="time-box">
+                    <span class="eyebrow">Available Times</span>
+                    <div class="time-grid" id="timeGrid">
+                        <button type="button" class="time-slot">5:30 PM</button>
+                        <button type="button" class="time-slot">6:00 PM</button>
+                        <button type="button" class="time-slot">6:30 PM</button>
+                        <button type="button" class="time-slot">7:00 PM</button>
+                        <button type="button" class="time-slot">7:30 PM</button>
+                        <button type="button" class="time-slot">8:00 PM</button>
+                        <button type="button" class="time-slot">8:30 PM</button>
+                        <button type="button" class="time-slot">9:00 PM</button>
+                        <button type="button" class="time-slot">9:30 PM</button>
+                    </div>
                 </div>
-                <div class="reserve-info-block">
-                    <h3>Dress Code</h3>
-                    <p>Smart casual. We kindly ask that guests avoid athletic wear.</p>
-                </div>
+
             </div>
 
-            <div class="reveal">
-                <form id="reservationForm">
-                    <div class="form-row">
-                        <div class="field">
-                            <label for="resName">Full Name</label>
-                            <input type="text" id="resName" name="name" required>
-                        </div>
-                        <div class="field">
-                            <label for="resPhone">Phone</label>
-                            <input type="tel" id="resPhone" name="phone" required>
-                        </div>
+            <form id="reservationForm">
+                <div class="details-row" id="detailsRow">
+                    <div class="field">
+                        <label for="resName">Full Name</label>
+                        <input type="text" id="resName" name="name" required>
                     </div>
                     <div class="field">
-                        <label for="resEmail">Email</label>
-                        <input type="email" id="resEmail" name="email" required>
-                    </div>
-                    <div class="form-row">
-                        <div class="field">
-                            <label for="resDate">Date</label>
-                            <input type="date" id="resDate" name="date" required>
-                        </div>
-                        <div class="field">
-                            <label for="resTime">Time</label>
-                            <input type="time" id="resTime" name="time" required>
-                        </div>
+                        <label for="resPhone">Number</label>
+                        <input type="tel" id="resPhone" name="phone" required>
                     </div>
                     <div class="field">
                         <label for="resGuests">Party Size</label>
                         <select id="resGuests" name="guests" required>
                             <option value="">Select</option>
-                            <option>1 Guest</option>
-                            <option>2 Guests</option>
-                            <option>3 Guests</option>
-                            <option>4 Guests</option>
-                            <option>5 Guests</option>
-                            <option>6 Guests</option>
-                            <option>7+ Guests — please call</option>
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                            <option>6</option>
                         </select>
                     </div>
-                    <div class="field">
-                        <label for="resNotes">Special Requests <span style="opacity:0.6;">(optional)</span></label>
-                        <textarea id="resNotes" name="notes" placeholder="Allergies, celebrations, seating preferences..."></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Request Reservation</button>
-                </form>
-
-                <div class="reservation-confirm" id="reservationConfirm">
-                    <div class="mark">&#10003;</div>
-                    <h3>Request Received</h3>
-                    <p>Thank you — we'll confirm your table by phone or email shortly.</p>
                 </div>
-            </div>
 
+                <div class="reserve-submit-wrap" id="reserveSubmitWrap">
+                    <button type="submit" class="btn btn-primary">Submit Reservation</button>
+                </div>
+            </form>
         </div>
+
+        <div class="reserve-thanks" id="reserveThanks">
+            <div class="mark">&#10003;</div>
+            <h3>Thank You for Your Reservation</h3>
+            <p id="thanksSummary">We look forward to hosting you.</p>
+            <p class="dress-note">A reminder: smart casual dress is requested &mdash; we kindly ask guests to avoid athletic wear.</p>
+        </div>
+
     </div>
 </section>
 
