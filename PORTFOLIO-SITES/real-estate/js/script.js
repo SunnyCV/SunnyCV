@@ -43,13 +43,53 @@ function fillCitySelect(select) {
     });
 }
 
-/* ── Home: featured listings + hero search ── */
+/* ── Home: search, crossfading backdrop, rotating reviews ── */
 (function () {
-    var grid = document.getElementById('featuredGrid');
-    if (!grid) return;
-    grid.innerHTML = LISTINGS.filter(function (l) { return l.featured; })
-        .slice(0, 6).map(cardHTML).join('');
+    var backdrop = document.getElementById('backdrop');
+    if (!backdrop) return;
+
     fillCitySelect(document.getElementById('heroCity'));
+
+    var photos = (typeof HERO_PHOTOS !== 'undefined' && HERO_PHOTOS.length) ? HERO_PHOTOS : null;
+    var slides = [];
+
+    if (photos) {
+        photos.forEach(function (src) {
+            var s = document.createElement('div');
+            s.className = 'bg-slide';
+            s.style.backgroundImage = 'url("' + src + '")';
+            backdrop.appendChild(s);
+            slides.push(s);
+        });
+    } else {
+        LISTINGS.filter(function (l) { return l.featured; }).slice(0, 4).forEach(function (l) {
+            var s = document.createElement('div');
+            s.className = 'bg-slide placeholder';
+            s.innerHTML = sceneSVG(l.scene);
+            backdrop.appendChild(s);
+            slides.push(s);
+        });
+    }
+
+    var cur = 0;
+    slides[0].classList.add('active');
+    if (slides.length > 1) {
+        setInterval(function () {
+            slides[cur].classList.remove('active');
+            cur = (cur + 1) % slides.length;
+            slides[cur].classList.add('active');
+        }, 7000);
+    }
+
+    var reviews = document.querySelectorAll('.review');
+    if (reviews.length > 1) {
+        var r = 0;
+        setInterval(function () {
+            reviews[r].classList.remove('active');
+            r = (r + 1) % reviews.length;
+            reviews[r].classList.add('active');
+        }, 5500);
+    }
 }());
 
 /* ── Listings: filters + sort ── */
