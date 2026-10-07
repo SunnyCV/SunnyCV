@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>About &amp; Contact — [Agency Name]</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+
+.page-head {
+    padding: 72px 0 64px;
+    background:
+        radial-gradient(circle at 88% 10%, rgba(255,217,90,0.45) 0%, rgba(255,217,90,0) 30%),
+        linear-gradient(180deg, #CDEDFC 0%, #F2FAFF 100%);
+}
+.page-head h1 { font-size: clamp(36px, 5vw, 54px); margin-top: 10px; max-width: 720px; }
+.page-head p { color: var(--ink-soft); margin-top: 14px; max-width: 580px; font-size: 17px; }
+
+/* ── Story ── */
+.story-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+}
+.story-visual {
+    aspect-ratio: 4 / 3;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+.story-visual svg { width: 100%; height: 100%; display: block; }
+.story-text h2 { font-size: clamp(28px, 3.6vw, 38px); margin: 10px 0 18px; }
+.story-text p { color: var(--ink-soft); font-size: 16.5px; margin-bottom: 14px; }
+.story-stats { display: flex; gap: 40px; margin-top: 26px; flex-wrap: wrap; }
+.story-stats strong { display: block; font-family: var(--font-display); font-size: 32px; color: var(--sky-deep); }
+.story-stats span { font-size: 14px; color: var(--ink-soft); }
+
+/* ── Team ── */
+.team { background: var(--cream); }
+.team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+.team-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 28px;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+.team-avatar {
+    width: 96px; height: 96px;
+    border-radius: 50%;
+    margin: 0 auto 16px;
+}
+.team-card:nth-child(1) .team-avatar { background: linear-gradient(135deg, var(--sky), #7FD0F5); }
+.team-card:nth-child(2) .team-avatar { background: linear-gradient(135deg, var(--leaf), #8FDDAA); }
+.team-card:nth-child(3) .team-avatar { background: linear-gradient(135deg, var(--sun-deep), var(--sun)); }
+.team-card h3 { font-size: 20px; }
+.team-card span { display: block; font-size: 14px; color: var(--ink-soft); margin-top: 4px; }
+
+/* ── Contact ── */
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 48px;
+    align-items: start;
+}
+.contact-info h2 { font-size: clamp(28px, 3.6vw, 38px); margin: 10px 0 14px; }
+.contact-info > p { color: var(--ink-soft); margin-bottom: 28px; }
+.contact-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+.contact-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+.contact-item:nth-of-type(1) .contact-icon { background: var(--sky-soft); }
+.contact-item:nth-of-type(2) .contact-icon { background: var(--leaf-soft); }
+.contact-item:nth-of-type(3) .contact-icon { background: var(--sun-soft); }
+.contact-item:nth-of-type(4) .contact-icon { background: var(--sky-soft); }
+.contact-item strong { display: block; font-size: 15px; }
+.contact-item span { font-size: 14.5px; color: var(--ink-soft); }
+
+.contact-form {
+    background: var(--white);
+    border-radius: 22px;
+    box-shadow: var(--shadow-lg);
+    padding: 34px;
+    border-top: 6px solid var(--leaf);
+}
+.contact-form form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.contact-form .full { grid-column: 1 / -1; }
+.contact-form .btn { grid-column: 1 / -1; }
+
+.map {
+    margin-top: 56px;
+    height: 280px;
+    border-radius: 22px;
+    background:
+        linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px) 0 0 / 48px 48px,
+        linear-gradient(0deg, rgba(255,255,255,0.6) 1px, transparent 1px) 0 0 / 48px 48px,
+        linear-gradient(135deg, #D6F0DC 0%, #DCEFFB 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+.map-pin {
+    background: var(--white);
+    padding: 12px 20px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: var(--shadow-lg);
+    display: flex; align-items: center; gap: 8px;
+}
+.map-pin::before {
+    content: '';
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--sun-deep);
+    box-shadow: 0 0 0 5px rgba(255,201,60,0.35);
+}
+
+@media (max-width: 900px) {
+    .story-grid, .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+    .team-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+    .contact-form { padding: 24px; }
+    .contact-form form { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-nav">
+    <div class="container nav-inner">
+        <a href="index.html" class="logo"><span class="logo-mark"></span>[Agency Name]</a>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="listings.html">Listings</a>
+            <a href="about.html" class="active">About &amp; Contact</a>
+        </nav>
+        <a href="#contact" class="btn btn-sun nav-cta">Talk to an Agent</a>
+        <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="index.html">Home</a>
+        <a href="listings.html">Listings</a>
+        <a href="about.html" class="active">About &amp; Contact</a>
+        <a href="#contact" class="btn btn-sun">Talk to an Agent</a>
+    </div>
+</header>
+
+<section class="page-head">
+    <div class="container">
+        <span class="eyebrow">About Us</span>
+        <h1>We help people start their next chapter.</h1>
+        <p>A local agency built around one simple idea: the right home changes everything. Our job is to find it and make getting there easy.</p>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container story-grid">
+        <div class="story-visual" id="storyVisual"></div>
+        <div class="story-text">
+            <span class="eyebrow">Our Story</span>
+            <h2>Homes first. Always.</h2>
+            <p>We started with a handful of listings and a belief that buying a home should feel hopeful, not stressful. Every property we take on is one we&rsquo;d be proud to call home ourselves.</p>
+            <p>Today we serve five neighborhoods, but the approach hasn&rsquo;t changed &mdash; honest pricing, quick answers, and a lot of care for the families moving in.</p>
+            <div class="story-stats">
+                <div><strong>120+</strong><span>Homes sold this year</span></div>
+                <div><strong>98%</strong><span>Clients who&rsquo;d refer us</span></div>
+                <div><strong>10 yrs</strong><span>In the community</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section team">
+    <div class="container">
+        <div class="section-head">
+            <div>
+                <span class="eyebrow">The Team</span>
+                <h2>The people behind the keys</h2>
+            </div>
+        </div>
+        <div class="team-grid">
+            <div class="team-card"><div class="team-avatar"></div><h3>Agent Name</h3><span>Founder &amp; Lead Agent</span></div>
+            <div class="team-card"><div class="team-avatar"></div><h3>Agent Name</h3><span>Buyer&rsquo;s Specialist</span></div>
+            <div class="team-card"><div class="team-avatar"></div><h3>Agent Name</h3><span>Listing Coordinator</span></div>
+        </div>
+    </div>
+</section>
+
+<section class="section" id="contact">
+    <div class="container">
+        <div class="contact-grid">
+            <div class="contact-info">
+                <span class="eyebrow">Get in Touch</span>
+                <h2>Let&rsquo;s find your new home</h2>
+                <p>Questions about a listing, ready to tour, or thinking about selling? Reach out &mdash; we usually reply within a few hours.</p>
+
+                <div class="contact-item">
+                    <div class="contact-icon">&#9742;</div>
+                    <div><strong>Call</strong><span>(000) 000-0000</span></div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">&#9993;</div>
+                    <div><strong>Email</strong><span>hello@agency.com</span></div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">&#9873;</div>
+                    <div><strong>Office</strong><span>100 Placeholder Ave, Suite 2<br>City, State 00000</span></div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">&#9728;</div>
+                    <div><strong>Hours</strong><span>Mon&ndash;Sat, 9 AM &ndash; 6 PM<br>Sundays by appointment</span></div>
+                </div>
+            </div>
+
+            <div class="contact-form">
+                <form data-success="contactSuccess">
+                    <div class="field">
+                        <label for="cName">Full Name</label>
+                        <input type="text" id="cName" required>
+                    </div>
+                    <div class="field">
+                        <label for="cPhone">Phone</label>
+                        <input type="tel" id="cPhone">
+                    </div>
+                    <div class="field full">
+                        <label for="cEmail">Email</label>
+                        <input type="email" id="cEmail" required>
+                    </div>
+                    <div class="field full">
+                        <label for="cTopic">I&rsquo;m interested in</label>
+                        <select id="cTopic">
+                            <option>Buying a home</option>
+                            <option>Selling my home</option>
+                            <option>Touring a listing</option>
+                            <option>Something else</option>
+                        </select>
+                    </div>
+                    <div class="field full">
+                        <label for="cMsg">Message</label>
+                        <textarea id="cMsg" placeholder="Tell us about the home you're dreaming of..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-leaf">Send Message</button>
+                </form>
+                <div class="form-success" id="contactSuccess">
+                    <div class="check">&#10003;</div>
+                    <h3>Thanks for reaching out!</h3>
+                    <p>One of our agents will be in touch very soon.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="map"><div class="map-pin">[Agency Name] &middot; Map embed here</div></div>
+    </div>
+</section>
+
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <a href="index.html" class="logo"><span class="logo-mark"></span>[Agency Name]</a>
+                <p class="footer-about">Helping families find bright, welcoming homes and brand-new beginnings.</p>
+            </div>
+            <div>
+                <h4>Explore</h4>
+                <ul>
+                    <li><a href="listings.html">All Listings</a></li>
+                    <li><a href="listings.html?type=House">Houses</a></li>
+                    <li><a href="listings.html?type=Townhouse">Townhouses</a></li>
+                    <li><a href="listings.html?type=Condo">Condos</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Agency</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>Visit</h4>
+                <ul>
+                    <li>100 Placeholder Ave, Suite 2</li>
+                    <li>(000) 000-0000</li>
+                    <li>hello@agency.com</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">&copy; 2026 [Agency Name]. All rights reserved.</div>
+    </div>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/script.js"></script>
+<script>
+document.getElementById('storyVisual').innerHTML = sceneSVG({ sky: '#7CCBF5', house: '#FFFFFF', roof: '#2FB36A', sun: 'right', kind: 'house' });
+</script>
+</body>
+</html>
