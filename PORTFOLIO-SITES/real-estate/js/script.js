@@ -1,12 +1,23 @@
-/* ── Mobile nav ── */
+/* ── Nav dropdown menu ── */
 (function () {
-    var btn  = document.getElementById('hamburger');
-    var menu = document.getElementById('mobileMenu');
-    if (!btn || !menu) return;
-    btn.addEventListener('click', function () {
-        var open = menu.classList.toggle('open');
-        btn.classList.toggle('open', open);
+    var btn  = document.getElementById('menuBtn');
+    var drop = document.getElementById('menuDrop');
+    if (!btn || !drop) return;
+    function set(open) {
+        drop.classList.toggle('open', open);
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        set(!drop.classList.contains('open'));
     });
+    document.addEventListener('click', function (e) {
+        if (!drop.contains(e.target)) set(false);
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && drop.classList.contains('open')) { set(false); btn.focus(); }
+    });
+    drop.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', function () { set(false); }); });
 }());
 
 /* `back` is the listings URL the property page's back arrow should return to. */
