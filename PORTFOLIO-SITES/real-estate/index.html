@@ -10,13 +10,6 @@
 <link rel="stylesheet" href="css/style.css">
 <style>
 
-/* Landing page: the nav floats over the photo backdrop */
-.site-nav {
-    position: absolute;
-    left: 0; right: 0;
-    background: rgba(255,255,255,0.78);
-}
-
 .landing {
     position: relative;
     min-height: 100vh;
@@ -62,7 +55,31 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 130px 24px 40px;
+    padding: 60px 24px 40px;
+}
+
+.landing-logo {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 30px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(34px, 5vw, 52px);
+    color: var(--ink);
+    text-shadow: 0 2px 16px rgba(255,255,255,0.7);
+}
+.landing-logo .logo-mark {
+    width: 58px; height: 58px;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+.landing-logo .logo-mark::before { width: 22px; height: 22px; top: 9px; right: 9px; }
+.landing-logo .logo-mark::after {
+    left: 11px; bottom: 9px;
+    border-left-width: 15px;
+    border-right-width: 15px;
+    border-bottom-width: 15px;
 }
 
 .search-card {
@@ -152,7 +169,7 @@
 .review span::before { content: '\2605\2605\2605\2605\2605'; color: var(--sun-deep); letter-spacing: 2px; margin-right: 8px; }
 
 .legal {
-    text-align: right;
+    text-align: left;
     margin-top: 18px;
     font-size: 13px;
     font-weight: 600;
@@ -164,38 +181,27 @@
     .search-card .btn { grid-column: 1 / -1; }
 }
 @media (max-width: 560px) {
-    .landing-main { padding: 110px 20px 32px; }
+    .landing-main { padding: 48px 20px 28px; }
+    .landing-logo { gap: 12px; margin-bottom: 24px; font-size: 30px; }
+    .landing-logo .logo-mark { width: 44px; height: 44px; border-radius: 12px; }
+    .landing-logo .logo-mark::before { width: 16px; height: 16px; top: 7px; right: 7px; }
+    .landing-logo .logo-mark::after { left: 8px; bottom: 7px; border-left-width: 11px; border-right-width: 11px; border-bottom-width: 11px; }
     .search-card { grid-template-columns: 1fr; padding: 16px; }
+    .landing-links { margin-top: 26px; }
     .review p { font-size: 16px; }
-    .legal { text-align: center; }
+    .landing-bottom { padding: 0 20px 20px; }
+    .legal { font-size: 12px; }
 }
 </style>
 </head>
 <body>
 
-<header class="site-nav">
-    <div class="container nav-inner">
-        <a href="index.html" class="logo"><span class="logo-mark"></span>[Agency Name]</a>
-        <nav class="nav-links">
-            <a href="index.html" class="active">Home</a>
-            <a href="listings.html">Listings</a>
-            <a href="about.html">About &amp; Contact</a>
-        </nav>
-        <a href="about.html#contact" class="btn btn-sun nav-cta">Talk to an Agent</a>
-        <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
-    </div>
-    <div class="mobile-menu" id="mobileMenu">
-        <a href="index.html" class="active">Home</a>
-        <a href="listings.html">Listings</a>
-        <a href="about.html">About &amp; Contact</a>
-        <a href="about.html#contact" class="btn btn-sun">Talk to an Agent</a>
-    </div>
-</header>
-
 <main class="landing">
     <div class="backdrop" id="backdrop"></div>
 
     <div class="landing-main">
+        <h1 class="landing-logo"><span class="logo-mark"></span>[Agency Name]</h1>
+
         <form class="search-card" action="listings.html" method="get">
             <div class="field">
                 <label for="heroCity">Location</label>
