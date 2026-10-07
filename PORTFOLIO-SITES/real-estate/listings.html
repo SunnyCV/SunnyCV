@@ -10,70 +10,316 @@
 <link rel="stylesheet" href="css/style.css">
 <style>
 
-.page-head {
-    padding: 64px 0 56px;
-    background:
-        radial-gradient(circle at 88% 10%, rgba(255,217,90,0.45) 0%, rgba(255,217,90,0) 30%),
-        linear-gradient(180deg, #CDEDFC 0%, #F2FAFF 100%);
-}
-.page-head h1 { font-size: clamp(36px, 5vw, 54px); margin-top: 10px; }
-.page-head p { color: var(--ink-soft); margin-top: 12px; max-width: 520px; font-size: 17px; }
+[hidden] { display: none !important; }
 
-.filter-bar {
-    position: sticky;
-    top: 76px;
-    z-index: 100;
-    background: var(--white);
-    border-bottom: 1px solid var(--line);
-    box-shadow: 0 6px 18px rgba(27,111,168,0.06);
+/* ══════════════════════════════════════
+   HEAD + SEARCH
+══════════════════════════════════════ */
+.listings-head {
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    padding: 110px 0 170px;
+    background:
+        radial-gradient(circle at 85% 12%, rgba(255,217,90,0.5) 0%, rgba(255,217,90,0) 30%),
+        linear-gradient(180deg, #C6EAFC 0%, #EAF6FD 60%, #FFFCF3 100%);
 }
-.filter-inner {
+body.searched .listings-head { padding: 56px 0 96px; }
+.listings-head h1 { font-size: clamp(38px, 5.6vw, 64px); }
+.listings-head .hills {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    width: 100%;
+    height: 110px;
+}
+
+.search-bar {
+    position: relative;
+    z-index: 2;
     display: grid;
-    grid-template-columns: repeat(4, 1fr) auto;
+    grid-template-columns: 1fr 1fr 1fr auto;
     gap: 14px;
     align-items: end;
-    padding: 18px 0;
+    max-width: 900px;
+    margin: 34px auto 0;
+    padding: 20px;
+    background: var(--white);
+    border-radius: 22px;
+    box-shadow: var(--shadow-lg);
+    text-align: left;
 }
-.filter-inner .btn { height: 48px; padding: 0 22px; }
+.search-bar .btn { height: 50px; padding: 0 34px; }
 
-.results-head {
+.view-all {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 26px;
+    padding: 10px 6px;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--ink);
+    background: none;
+    border: none;
+    border-bottom: 2.5px solid var(--sun);
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: color 0.2s, border-color 0.2s;
+}
+.view-all:hover { color: var(--sky-deep); border-color: var(--sky); }
+
+/* ══════════════════════════════════════
+   RESULTS BAR + VIEW TOGGLE
+══════════════════════════════════════ */
+#results { scroll-margin-top: 76px; }
+.results-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    margin: 40px 0 26px;
+    padding-top: 22px;
+    padding-bottom: 22px;
     flex-wrap: wrap;
 }
 .result-count { font-family: var(--font-display); font-size: 26px; font-weight: 600; }
-.sort { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--ink-soft); font-weight: 600; }
-.sort select {
+.result-count small { display: block; font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--ink-soft); }
+
+.view-toggle {
+    display: inline-flex;
+    padding: 5px;
+    background: var(--sky-soft);
+    border-radius: 999px;
+}
+.view-toggle button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     font-family: var(--font-body);
     font-size: 14px;
-    font-weight: 600;
-    color: var(--ink);
-    border: 1.5px solid var(--line);
+    font-weight: 700;
+    color: var(--ink-soft);
+    background: none;
+    border: none;
+    padding: 10px 20px;
     border-radius: 999px;
-    padding: 9px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.view-toggle button.active {
     background: var(--white);
+    color: var(--ink);
+    box-shadow: 0 4px 12px rgba(27,111,168,0.15);
+}
+.view-toggle svg { width: 16px; height: 16px; }
+
+/* ══════════════════════════════════════
+   SLIDESHOW
+══════════════════════════════════════ */
+.showcase {
+    position: relative;
+    height: min(78vh, 740px);
+    min-height: 540px;
+    overflow: hidden;
+    background: var(--sky-soft);
+    user-select: none;
+    -webkit-user-select: none;
+}
+.track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.7s cubic-bezier(0.22, 0.8, 0.2, 1);
+    touch-action: pan-y;
+    cursor: grab;
+}
+.track.dragging { cursor: grabbing; }
+.slot {
+    position: relative;
+    flex: 0 0 100%;
+    height: 100%;
+    overflow: hidden;
+}
+.slot-img {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.4s ease;
+}
+.slot-img.active { opacity: 1; }
+.slot-img svg, .slot-img img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+.slot.current .slot-img.active svg,
+.slot.current .slot-img.active img { animation: kenburns 9s ease-out both; }
+@keyframes kenburns {
+    from { transform: scale(1.08); }
+    to   { transform: scale(1); }
+}
+.slot-shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(255,252,243,0.55) 0%, rgba(255,252,243,0.2) 40%, rgba(255,252,243,0) 65%);
+    pointer-events: none;
 }
 
+.slot-info {
+    position: absolute;
+    top: 50%;
+    left: max(24px, calc((100% - 1200px) / 2 + 28px));
+    width: min(440px, calc(100% - 48px));
+    transform: translateY(-50%);
+    padding: 34px;
+    background: rgba(255,255,255,0.78);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1.5px solid rgba(255,255,255,0.9);
+    border-radius: 24px;
+    box-shadow: var(--shadow-lg);
+}
+.slot-info > * { opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.slot.current .slot-info > * { opacity: 1; transform: none; }
+.slot.current .slot-info > *:nth-child(2) { transition-delay: 0.08s; }
+.slot.current .slot-info > *:nth-child(3) { transition-delay: 0.14s; }
+.slot.current .slot-info > *:nth-child(4) { transition-delay: 0.2s; }
+.slot.current .slot-info > *:nth-child(5) { transition-delay: 0.26s; }
+.slot.current .slot-info > *:nth-child(6) { transition-delay: 0.32s; }
+.slot.current .slot-info > *:nth-child(7) { transition-delay: 0.38s; }
+
+.slot-tag {
+    display: inline-flex;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: var(--leaf-soft);
+    color: var(--leaf-deep);
+}
+.slot-tag.new { background: var(--sun); color: var(--ink); }
+.slot-info h2 { font-size: clamp(28px, 3vw, 38px); margin-top: 14px; }
+.slot-addr { color: var(--ink-soft); font-size: 15px; margin-top: 6px; }
+.slot-price { font-family: var(--font-display); font-size: 34px; font-weight: 700; color: var(--sky-deep); margin-top: 14px; }
+.slot-specs { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.slot-specs span {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    background: var(--white);
+    padding: 7px 12px;
+    border-radius: 10px;
+}
+.slot-specs strong { color: var(--ink); }
+.slot-desc {
+    margin-top: 16px;
+    font-size: 15px;
+    color: var(--ink-soft);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.slot-info .btn { margin-top: 22px; }
+
+.ss-arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 5;
+    width: 58px; height: 58px;
+    margin-top: -29px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--ink);
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: background-color 0.2s, transform 0.2s;
+}
+.ss-arrow:hover { background: var(--white); transform: scale(1.06); }
+.ss-arrow.prev { left: 22px; }
+.ss-arrow.next { right: 22px; }
+
+.ss-dots {
+    position: absolute;
+    bottom: 24px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    display: flex;
+    gap: 8px;
+}
+.ss-dots button {
+    width: 10px; height: 10px;
+    padding: 0;
+    border: none;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.75);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    cursor: pointer;
+    transition: width 0.3s, background-color 0.3s;
+}
+.ss-dots button.active { width: 28px; background: var(--sun); }
+.ss-count {
+    position: absolute;
+    bottom: 20px;
+    right: max(24px, calc((100% - 1200px) / 2 + 28px));
+    z-index: 5;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ink);
+    background: rgba(255,255,255,0.75);
+    padding: 6px 14px;
+    border-radius: 999px;
+}
+
+/* ══════════════════════════════════════
+   GRID + EMPTY
+══════════════════════════════════════ */
+.grid-view { padding-top: 6px; }
 .no-results {
-    display: none;
     text-align: center;
     padding: 70px 20px;
     background: var(--sun-soft);
     border-radius: var(--radius);
+    margin-top: 6px;
 }
 .no-results h3 { font-size: 26px; margin-bottom: 8px; }
 .no-results p { color: var(--ink-soft); }
+.no-results a { color: var(--sky-deep); font-weight: 700; }
 
 @media (max-width: 900px) {
-    .filter-bar { position: static; }
-    .filter-inner { grid-template-columns: 1fr 1fr; }
-    .filter-inner .btn { grid-column: 1 / -1; }
+    .search-bar { grid-template-columns: 1fr 1fr; }
+    .search-bar .btn { grid-column: 1 / -1; }
+}
+@media (max-width: 760px) {
+    .listings-head { padding: 64px 0 120px; }
+    body.searched .listings-head { padding: 40px 0 80px; }
+    .showcase { height: 82vh; min-height: 560px; }
+    .slot-shade { background: linear-gradient(0deg, rgba(255,252,243,0.6) 0%, rgba(255,252,243,0) 55%); }
+    .slot-info {
+        top: auto;
+        bottom: 64px;
+        left: 16px;
+        width: auto;
+        right: 16px;
+        transform: none;
+        padding: 22px;
+    }
+    .slot-price { font-size: 28px; margin-top: 10px; }
+    .slot-desc { display: none; }
+    .slot-info .btn { width: 100%; margin-top: 18px; }
+    .ss-arrow { width: 44px; height: 44px; margin-top: 0; top: 26%; font-size: 20px; }
+    .ss-arrow.prev { left: 12px; }
+    .ss-arrow.next { right: 12px; }
+    .ss-dots { bottom: 26px; }
+    .ss-count { top: 16px; bottom: auto; right: 16px; font-size: 15px; }
+    .view-toggle button { padding: 9px 14px; }
 }
 @media (max-width: 560px) {
-    .filter-inner { grid-template-columns: 1fr; }
+    .search-bar { grid-template-columns: 1fr; padding: 16px; }
+    .results-bar { flex-direction: column; align-items: flex-start; }
 }
 </style>
 </head>
@@ -98,72 +344,75 @@
     </div>
 </header>
 
-<section class="page-head">
+<section class="listings-head">
     <div class="container">
-        <span class="eyebrow">Available Homes</span>
-        <h1>Explore our listings</h1>
-        <p>Filter by neighborhood, type, price, and bedrooms to find the place that feels like home.</p>
+        <h1>Explore Our Listings</h1>
+
+        <form class="search-bar" id="searchForm">
+            <div class="field">
+                <label for="sCity">Location</label>
+                <select id="sCity"><option value="">Any neighborhood</option></select>
+            </div>
+            <div class="field">
+                <label for="sPrice">Max Price</label>
+                <select id="sPrice">
+                    <option value="">No max</option>
+                    <option value="300000">$300,000</option>
+                    <option value="450000">$450,000</option>
+                    <option value="600000">$600,000</option>
+                    <option value="800000">$800,000</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="sType">Property Type</label>
+                <select id="sType">
+                    <option value="">Any type</option>
+                    <option>House</option>
+                    <option>Townhouse</option>
+                    <option>Condo</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-leaf">Search</button>
+        </form>
+
+        <button type="button" class="view-all" id="viewAll">View All Properties</button>
     </div>
+
+    <svg class="hills" viewBox="0 0 1440 110" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0,60 C260,10 460,90 760,50 C1040,15 1220,85 1440,45 L1440,110 L0,110 Z" fill="#8FD9A2"/>
+        <path d="M0,85 C320,50 560,110 860,80 C1120,58 1300,100 1440,78 L1440,110 L0,110 Z" fill="#5FC27C"/>
+        <path d="M0,102 C380,88 720,114 1060,98 C1260,90 1370,104 1440,98 L1440,110 L0,110 Z" fill="#FFFFFF"/>
+    </svg>
 </section>
 
-<div class="filter-bar">
-    <div class="container filter-inner">
-        <div class="field">
-            <label for="fCity">Location</label>
-            <select id="fCity"><option value="">Any neighborhood</option></select>
+<section id="results" hidden>
+    <div class="container results-bar">
+        <div class="result-count" id="resultCount"></div>
+        <div class="view-toggle" role="group" aria-label="Choose view">
+            <button type="button" data-view="slides">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1.5" y="3" width="13" height="10" rx="2"/><path d="M6 6.5l3 1.5-3 1.5z" fill="currentColor"/></svg>
+                Slideshow
+            </button>
+            <button type="button" data-view="grid">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
+                Grid
+            </button>
         </div>
-        <div class="field">
-            <label for="fType">Property Type</label>
-            <select id="fType">
-                <option value="">Any type</option>
-                <option>House</option>
-                <option>Townhouse</option>
-                <option>Condo</option>
-            </select>
-        </div>
-        <div class="field">
-            <label for="fPrice">Max Price</label>
-            <select id="fPrice">
-                <option value="">No max</option>
-                <option value="300000">$300,000</option>
-                <option value="450000">$450,000</option>
-                <option value="600000">$600,000</option>
-                <option value="800000">$800,000</option>
-            </select>
-        </div>
-        <div class="field">
-            <label for="fBeds">Bedrooms</label>
-            <select id="fBeds">
-                <option value="">Any</option>
-                <option value="1">1+</option>
-                <option value="2">2+</option>
-                <option value="3">3+</option>
-                <option value="4">4+</option>
-            </select>
-        </div>
-        <button type="button" class="btn btn-ghost" id="fReset">Reset</button>
     </div>
-</div>
 
-<section>
+    <div class="showcase" id="showcase" hidden>
+        <div class="track" id="track"></div>
+        <button type="button" class="ss-arrow prev" id="ssPrev" aria-label="Previous property">&#8249;</button>
+        <button type="button" class="ss-arrow next" id="ssNext" aria-label="Next property">&#8250;</button>
+        <div class="ss-dots" id="ssDots"></div>
+        <div class="ss-count" id="ssCount"></div>
+    </div>
+
     <div class="container">
-        <div class="results-head">
-            <div class="result-count" id="resultCount"></div>
-            <label class="sort">Sort by
-                <select id="fSort">
-                    <option value="featured">Featured</option>
-                    <option value="low">Price: Low to High</option>
-                    <option value="high">Price: High to Low</option>
-                    <option value="size">Largest First</option>
-                </select>
-            </label>
-        </div>
-
-        <div class="listing-grid" id="listingsGrid"></div>
-
-        <div class="no-results" id="noResults">
+        <div class="listing-grid grid-view" id="gridView" hidden></div>
+        <div class="no-results" id="noResults" hidden>
             <h3>No homes match just yet</h3>
-            <p>Try widening your search &mdash; or <a href="about.html#contact" style="color:var(--sky-deep);font-weight:700;">tell us what you want</a> and we&rsquo;ll keep an eye out.</p>
+            <p>Try widening your search &mdash; or <a href="about.html#contact">tell us what you want</a> and we&rsquo;ll keep an eye out.</p>
         </div>
     </div>
 </section>
@@ -178,7 +427,7 @@
             <div>
                 <h4>Explore</h4>
                 <ul>
-                    <li><a href="listings.html">All Listings</a></li>
+                    <li><a href="listings.html?view=grid">All Listings</a></li>
                     <li><a href="listings.html?type=House">Houses</a></li>
                     <li><a href="listings.html?type=Townhouse">Townhouses</a></li>
                     <li><a href="listings.html?type=Condo">Condos</a></li>

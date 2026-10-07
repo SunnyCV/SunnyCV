@@ -9,10 +9,15 @@
     });
 }());
 
-function cardHTML(l) {
+/* `back` is the listings URL the property page's back arrow should return to. */
+function propertyHref(id, back) {
+    return 'property.html?id=' + encodeURIComponent(id) + (back ? '&back=' + encodeURIComponent(back) : '');
+}
+
+function cardHTML(l, back) {
     var badgeClass = l.status === 'New Listing' ? 'badge new' : 'badge';
     return '' +
-        '<a class="card" href="property.html?id=' + l.id + '">' +
+        '<a class="card" data-pid="' + l.id + '" href="' + propertyHref(l.id, back) + '">' +
             '<div class="card-photo">' +
                 photoHTML(l, 0) +
                 '<span class="' + badgeClass + '">' + l.status + '</span>' +
@@ -92,53 +97,223 @@ function fillCitySelect(select) {
     }
 }());
 
-/* ── Listings: filters + sort ── */
+/* ── Listings: search → immersive slideshow, or grid view ──
+   The full state (search, view, current slide) lives in the URL so the
+   property page's back arrow can return to exactly the same spot. */
 (function () {
-    var grid = document.getElementById('listingsGrid');
-    if (!grid) return;
+    var form = document.getElementById('searchForm');
+    if (!form) return;
 
-    var city  = document.getElementById('fCity');
-    var type  = document.getElementById('fType');
-    var price = document.getElementById('fPrice');
-    var beds  = document.getElementById('fBeds');
-    var sort  = document.getElementById('fSort');
-    var count = document.getElementById('resultCount');
-    var reset = document.getElementById('fReset');
-    var empty = document.getElementById('noResults');
+    function $(id) { return document.getElementById(id); }
+    var city = $('sCity'), price = $('sPrice'), type = $('sType');
+    var results = $('results'), countEl = $('resultCount');
+    var showcase = $('showcase'), track = $('track'), dotsEl = $('ssDots'), ssCount = $('ssCount');
+    var prevBtn = $('ssPrev'), nextBtn = $('ssNext');
+    var gridView = $('gridView'), empty = $('noResults');
+    var toggles = document.querySelectorAll('.view-toggle button');
 
     fillCitySelect(city);
 
-    var params = new URLSearchParams(window.location.search);
-    if (params.get('city'))  city.value  = params.get('city');
-    if (params.get('type'))  type.value  = params.get('type');
-    if (params.get('price')) price.value = params.get('price');
+    var state = { view: null, i: 0 };
+    var list = [];
+    var imgTimer = null;
 
-    function render() {
-        var maxPrice = parseInt(price.value, 10) || Infinity;
-        var minBeds  = parseInt(beds.value, 10) || 0;
+    function currentURL() {
+        var p = new URLSearchParams();
+        if (city.value)  p.set('city', city.value);
+        if (price.value) p.set('price', price.value);
+        if (type.value)  p.set('type', type.value);
+        if (state.view)  p.set('view', state.view);
+        if (state.view === 'slides' && state.i) p.set('i', state.i);
+        var qs = p.toString();
+        return 'listings.html' + (qs ? '?' + qs : '');
+    }
+    function syncURL() { history.replaceState(null, '', currentURL()); }
 
-        var results = LISTINGS.filter(function (l) {
+    function filtered() {
+        var max = parseInt(price.value, 10) || Infinity;
+        return LISTINGS.filter(function (l) {
             return (!city.value || l.city === city.value) &&
                    (!type.value || l.type === type.value) &&
-                   l.price <= maxPrice &&
-                   l.beds >= minBeds;
+                   l.price <= max;
         });
-
-        if (sort.value === 'low')  results.sort(function (a, b) { return a.price - b.price; });
-        if (sort.value === 'high') results.sort(function (a, b) { return b.price - a.price; });
-        if (sort.value === 'size') results.sort(function (a, b) { return b.sqft - a.sqft; });
-
-        grid.innerHTML = results.map(cardHTML).join('');
-        count.textContent = results.length + (results.length === 1 ? ' home' : ' homes');
-        empty.style.display = results.length ? 'none' : 'block';
     }
 
-    [city, type, price, beds, sort].forEach(function (el) { el.addEventListener('change', render); });
-    reset.addEventListener('click', function () {
-        city.value = ''; type.value = ''; price.value = ''; beds.value = ''; sort.value = 'featured';
-        render();
+    function summary() {
+        var bits = [];
+        if (type.value)  bits.push(type.value + 's');
+        if (city.value)  bits.push('in ' + city.value);
+        if (price.value) bits.push('under ' + formatPrice(parseInt(price.value, 10)));
+        return bits.length ? bits.join(' ') : 'All neighborhoods, all types';
+    }
+
+    function render() {
+        list = filtered();
+        document.body.classList.toggle('searched', !!state.view);
+        results.hidden = !state.view;
+        if (!state.view) { syncURL(); return; }
+
+        countEl.innerHTML = list.length + (list.length === 1 ? ' home' : ' homes') + ' found<small>' + summary() + '</small>';
+        toggles.forEach(function (b) { b.classList.toggle('active', b.dataset.view === state.view); });
+
+        empty.hidden    = list.length > 0;
+        showcase.hidden = state.view !== 'slides' || !list.length;
+        gridView.hidden = state.view !== 'grid'   || !list.length;
+
+        clearInterval(imgTimer);
+        if (state.view === 'slides' && list.length) buildSlides();
+        if (state.view === 'grid') gridView.innerHTML = list.map(function (l) { return cardHTML(l); }).join('');
+        syncURL();
+    }
+
+    /* ── Slideshow ── */
+    function slotHTML(l, idx) {
+        var n = (l.photos && l.photos.length) || 4;
+        var imgs = '';
+        for (var k = 0; k < n; k++) {
+            imgs += '<div class="slot-img' + (k === 0 ? ' active' : '') + '">' + photoHTML(l, k) + '</div>';
+        }
+        return '' +
+            '<article class="slot" data-i="' + idx + '">' +
+                '<div class="slot-bg">' + imgs + '</div>' +
+                '<div class="slot-shade"></div>' +
+                '<div class="slot-info">' +
+                    '<span class="slot-tag' + (l.status === 'New Listing' ? ' new' : '') + '">' + l.status + ' &middot; ' + l.type + '</span>' +
+                    '<h2>' + l.title + '</h2>' +
+                    '<p class="slot-addr">' + l.address + ', ' + l.city + '</p>' +
+                    '<div class="slot-price">' + formatPrice(l.price) + '</div>' +
+                    '<div class="slot-specs">' +
+                        '<span><strong>' + l.beds + '</strong> Beds</span>' +
+                        '<span><strong>' + l.baths + '</strong> Baths</span>' +
+                        '<span><strong>' + l.sqft.toLocaleString('en-US') + '</strong> sqft</span>' +
+                    '</div>' +
+                    '<p class="slot-desc">' + l.description + '</p>' +
+                    '<a class="btn btn-sun" data-pid="' + l.id + '" href="' + propertyHref(l.id) + '">View Full Details &rarr;</a>' +
+                '</div>' +
+            '</article>';
+    }
+
+    function buildSlides() {
+        track.innerHTML = list.map(slotHTML).join('');
+        dotsEl.innerHTML = list.map(function (_, k) {
+            return '<button type="button" aria-label="Go to property ' + (k + 1) + '" data-i="' + k + '"></button>';
+        }).join('');
+        var many = list.length > 1;
+        prevBtn.hidden = nextBtn.hidden = dotsEl.hidden = !many;
+        go(Math.min(state.i, list.length - 1), false);
+    }
+
+    function go(i, animate) {
+        if (!list.length) return;
+        state.i = (i + list.length) % list.length;
+        track.style.transition = animate === false ? 'none' : '';
+        track.style.transform = 'translateX(' + (-state.i * 100) + '%)';
+        if (animate === false) { void track.offsetWidth; track.style.transition = ''; }
+
+        track.querySelectorAll('.slot').forEach(function (s, k) { s.classList.toggle('current', k === state.i); });
+        dotsEl.querySelectorAll('button').forEach(function (d, k) { d.classList.toggle('active', k === state.i); });
+        ssCount.textContent = pad(state.i + 1) + ' / ' + pad(list.length);
+        cycleImages();
+        syncURL();
+    }
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+    function cycleImages() {
+        clearInterval(imgTimer);
+        var slot = track.querySelector('.slot.current');
+        if (!slot) return;
+        var imgs = slot.querySelectorAll('.slot-img');
+        if (imgs.length < 2) return;
+        var k = 0;
+        imgs.forEach(function (im, j) { im.classList.toggle('active', j === 0); });
+        imgTimer = setInterval(function () {
+            imgs[k].classList.remove('active');
+            k = (k + 1) % imgs.length;
+            imgs[k].classList.add('active');
+        }, 3800);
+    }
+
+    prevBtn.addEventListener('click', function () { go(state.i - 1); });
+    nextBtn.addEventListener('click', function () { go(state.i + 1); });
+    dotsEl.addEventListener('click', function (e) {
+        var d = e.target.closest('button');
+        if (d) go(parseInt(d.dataset.i, 10));
+    });
+    document.addEventListener('keydown', function (e) {
+        if (state.view !== 'slides' || list.length < 2) return;
+        if (/^(SELECT|INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) return;
+        if (e.key === 'ArrowLeft')  go(state.i - 1);
+        if (e.key === 'ArrowRight') go(state.i + 1);
     });
 
+    /* Swipe / drag between properties */
+    var startX = null, dx = 0, dragged = false;
+    track.addEventListener('pointerdown', function (e) {
+        if (list.length < 2 || e.target.closest('a, button')) return;
+        startX = e.clientX; dx = 0; dragged = false;
+        track.style.transition = 'none';
+        track.classList.add('dragging');
+        track.setPointerCapture(e.pointerId);
+    });
+    track.addEventListener('pointermove', function (e) {
+        if (startX === null) return;
+        dx = e.clientX - startX;
+        if (Math.abs(dx) > 5) dragged = true;
+        track.style.transform = 'translateX(calc(' + (-state.i * 100) + '% + ' + dx + 'px))';
+    });
+    function endDrag() {
+        if (startX === null) return;
+        startX = null;
+        track.style.transition = '';
+        track.classList.remove('dragging');
+        var threshold = Math.min(80, showcase.offsetWidth * 0.15);
+        if (dx < -threshold) go(state.i + 1);
+        else if (dx > threshold) go(state.i - 1);
+        else go(state.i);
+    }
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('click', function (e) { if (dragged) { e.preventDefault(); dragged = false; } }, true);
+
+    /* Point "View Full Details" / grid cards at the current state, so the
+       property page's back arrow returns right here. */
+    results.addEventListener('click', function (e) {
+        var a = e.target.closest('a[data-pid]');
+        if (a) a.href = propertyHref(a.dataset.pid, currentURL());
+    });
+
+    /* ── Controls ── */
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (!state.view) state.view = 'slides';
+        state.i = 0;
+        render();
+        results.scrollIntoView({ behavior: 'smooth' });
+    });
+    $('viewAll').addEventListener('click', function () {
+        city.value = ''; price.value = ''; type.value = '';
+        state.view = 'grid';
+        state.i = 0;
+        render();
+        results.scrollIntoView({ behavior: 'smooth' });
+    });
+    toggles.forEach(function (b) {
+        b.addEventListener('click', function () {
+            if (state.view === b.dataset.view) return;
+            state.view = b.dataset.view;
+            render();
+        });
+    });
+
+    /* ── Restore state from the URL (incoming search or back navigation) ── */
+    var params = new URLSearchParams(window.location.search);
+    city.value  = params.get('city')  || '';
+    price.value = params.get('price') || '';
+    type.value  = params.get('type')  || '';
+    var v = params.get('view');
+    if (v === 'slides' || v === 'grid') state.view = v;
+    else if (city.value || price.value || type.value) state.view = 'slides';
+    state.i = parseInt(params.get('i'), 10) || 0;
     render();
 }());
 
@@ -147,8 +322,20 @@ function fillCitySelect(select) {
     var root = document.getElementById('propertyRoot');
     if (!root) return;
 
-    var id = new URLSearchParams(window.location.search).get('id');
-    var l  = findListing(id) || LISTINGS[0];
+    var params = new URLSearchParams(window.location.search);
+    var l = findListing(params.get('id')) || LISTINGS[0];
+
+    /* Back arrow: return to the exact listings view the visitor came from. */
+    var back = params.get('back');
+    if (!back || back.indexOf('listings.html') !== 0) back = null;
+    var backLink = document.getElementById('backLink');
+    if (back) backLink.href = back;
+    backLink.addEventListener('click', function (e) {
+        if (document.referrer && document.referrer.indexOf('listings.html') !== -1 && history.length > 1) {
+            e.preventDefault();
+            history.back();
+        }
+    });
 
     document.title = l.title + ' — [Agency Name]';
 
@@ -183,7 +370,7 @@ function fillCitySelect(select) {
     document.getElementById('inquiryMsg').value     = 'Hi, I’m interested in ' + l.address + ' and would like to schedule a viewing.';
 
     var similar = LISTINGS.filter(function (x) { return x.id !== l.id && (x.city === l.city || x.type === l.type); }).slice(0, 3);
-    document.getElementById('similarGrid').innerHTML = similar.map(cardHTML).join('');
+    document.getElementById('similarGrid').innerHTML = similar.map(function (x) { return cardHTML(x, back); }).join('');
 }());
 
 /* ── Forms (front-end only — no backend wired up yet) ── */
