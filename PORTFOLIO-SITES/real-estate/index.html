@@ -182,10 +182,12 @@
 }
 @media (max-width: 560px) {
     .landing-main { padding: 48px 20px 28px; }
-    .landing-logo { gap: 12px; margin-bottom: 24px; font-size: 30px; }
-    .landing-logo .logo-mark { width: 44px; height: 44px; border-radius: 12px; }
-    .landing-logo .logo-mark::before { width: 16px; height: 16px; top: 7px; right: 7px; }
-    .landing-logo .logo-mark::after { left: 8px; bottom: 7px; border-left-width: 11px; border-right-width: 11px; border-bottom-width: 11px; }
+    /* Font size is set by a script so the logo spans the search card exactly;
+       the mark is sized in em so it scales with the name. */
+    .landing-logo { gap: 0.4em; margin-bottom: 24px; font-size: 30px; white-space: nowrap; }
+    .landing-logo .logo-mark { width: 1.3em; height: 1.3em; border-radius: 0.34em; }
+    .landing-logo .logo-mark::before { width: 0.48em; height: 0.48em; top: 0.2em; right: 0.2em; }
+    .landing-logo .logo-mark::after { left: 0.24em; bottom: 0.2em; border-left-width: 0.34em; border-right-width: 0.34em; border-bottom-width: 0.34em; }
     .search-card { grid-template-columns: 1fr; padding: 16px; }
     .landing-links { margin-top: 26px; }
     .review p { font-size: 16px; }
@@ -265,5 +267,22 @@
 var HERO_PHOTOS = [];
 </script>
 <script src="js/script.js"></script>
+<script>
+/* Mobile: scale the logo so it's exactly as wide as the search card. */
+(function () {
+    var logo = document.querySelector('.landing-logo');
+    var card = document.querySelector('.search-card');
+    var BASE = 30;
+    function fit() {
+        if (window.innerWidth > 560) { logo.style.fontSize = ''; return; }
+        logo.style.fontSize = BASE + 'px';
+        var size = BASE * card.offsetWidth / logo.scrollWidth;
+        logo.style.fontSize = Math.min(size, 52) + 'px';
+    }
+    window.addEventListener('resize', fit);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+    fit();
+}());
+</script>
 </body>
 </html>
