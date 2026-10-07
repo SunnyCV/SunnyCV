@@ -108,32 +108,46 @@ function fillCitySelect(select) {
     }
 }());
 
-/* ── Listings: search → immersive slideshow, or grid view ──
-   The full state (search, view, current slide) lives in the URL so the
-   property page's back arrow can return to exactly the same spot. */
+/* ── Listings: a search screen that transitions into its own results
+   page (immersive slideshow or grid), each with a tucked-away search.
+   Search, view, and current slide live in the URL so the browser back
+   button and the property page's back arrow return to the same spot. ── */
 (function () {
-    var form = document.getElementById('searchForm');
-    if (!form) return;
+    var searchForm = document.getElementById('searchForm');
+    if (!searchForm) return;
 
     function $(id) { return document.getElementById(id); }
-    var city = $('sCity'), price = $('sPrice'), type = $('sType');
+    var head = document.querySelector('.listings-head');
     var results = $('results'), countEl = $('resultCount');
     var showcase = $('showcase'), track = $('track'), dotsEl = $('ssDots'), ssCount = $('ssCount');
     var prevBtn = $('ssPrev'), nextBtn = $('ssNext');
     var gridView = $('gridView'), empty = $('noResults');
     var toggles = document.querySelectorAll('.view-toggle button');
+    var refineBtn = $('refineBtn'), refinePanel = $('refinePanel'), refineForm = $('refineForm');
 
-    fillCitySelect(city);
+    var forms = {
+        search: { city: $('sCity'), price: $('sPrice'), type: $('sType') },
+        refine: { city: $('rCity'), price: $('rPrice'), type: $('rType') }
+    };
+    fillCitySelect(forms.search.city);
+    fillCitySelect(forms.refine.city);
 
-    var state = { view: null, i: 0 };
+    var state = { city: '', price: '', type: '', view: null, i: 0 };
     var list = [];
     var imgTimer = null;
 
+    function readForm(f) { state.city = f.city.value; state.price = f.price.value; state.type = f.type.value; }
+    function fillForms() {
+        [forms.search, forms.refine].forEach(function (f) {
+            f.city.value = state.city; f.price.value = state.price; f.type.value = state.type;
+        });
+    }
+
     function currentURL() {
         var p = new URLSearchParams();
-        if (city.value)  p.set('city', city.value);
-        if (price.value) p.set('price', price.value);
-        if (type.value)  p.set('type', type.value);
+        if (state.city)  p.set('city', state.city);
+        if (state.price) p.set('price', state.price);
+        if (state.type)  p.set('type', state.type);
         if (state.view)  p.set('view', state.view);
         if (state.view === 'slides' && state.i) p.set('i', state.i);
         var qs = p.toString();
@@ -142,27 +156,32 @@ function fillCitySelect(select) {
     function syncURL() { history.replaceState(null, '', currentURL()); }
 
     function filtered() {
-        var max = parseInt(price.value, 10) || Infinity;
+        var max = parseInt(state.price, 10) || Infinity;
         return LISTINGS.filter(function (l) {
-            return (!city.value || l.city === city.value) &&
-                   (!type.value || l.type === type.value) &&
+            return (!state.city || l.city === state.city) &&
+                   (!state.type || l.type === state.type) &&
                    l.price <= max;
         });
     }
 
     function summary() {
         var bits = [];
-        if (type.value)  bits.push(type.value + 's');
-        if (city.value)  bits.push('in ' + city.value);
-        if (price.value) bits.push('under ' + formatPrice(parseInt(price.value, 10)));
+        if (state.type)  bits.push(state.type + 's');
+        if (state.city)  bits.push('in ' + state.city);
+        if (state.price) bits.push('under ' + formatPrice(parseInt(state.price, 10)));
         return bits.length ? bits.join(' ') : 'All neighborhoods, all types';
     }
 
     function render() {
+        fillForms();
         list = filtered();
-        document.body.classList.toggle('searched', !!state.view);
-        results.hidden = !state.view;
-        if (!state.view) { syncURL(); return; }
+        var inResults = !!state.view;
+        head.hidden = inResults;
+        head.classList.remove('leaving');
+        results.hidden = !inResults;
+        clearInterval(imgTimer);
+        setRefine(false);
+        if (!inResults) return;
 
         countEl.innerHTML = list.length + (list.length === 1 ? ' home' : ' homes') + ' found<small>' + summary() + '</small>';
         toggles.forEach(function (b) { b.classList.toggle('active', b.dataset.view === state.view); });
@@ -171,10 +190,23 @@ function fillCitySelect(select) {
         showcase.hidden = state.view !== 'slides' || !list.length;
         gridView.hidden = state.view !== 'grid'   || !list.length;
 
-        clearInterval(imgTimer);
         if (state.view === 'slides' && list.length) buildSlides();
         if (state.view === 'grid') gridView.innerHTML = list.map(function (l) { return cardHTML(l); }).join('');
-        syncURL();
+    }
+
+    /* Search screen → results page, with a short fade-out / fade-in */
+    function enterResults(view) {
+        state.view = view;
+        state.i = 0;
+        head.classList.add('leaving');
+        setTimeout(function () {
+            history.pushState(null, '', currentURL());
+            render();
+            window.scrollTo(0, 0);
+            results.classList.remove('entering');
+            void results.offsetWidth;
+            results.classList.add('entering');
+        }, 380);
     }
 
     /* ── Slideshow ── */
@@ -251,7 +283,8 @@ function fillCitySelect(select) {
         if (d) go(parseInt(d.dataset.i, 10));
     });
     document.addEventListener('keydown', function (e) {
-        if (state.view !== 'slides' || list.length < 2) return;
+        if (e.key === 'Escape' && refinePanel.classList.contains('open')) { setRefine(false); refineBtn.focus(); return; }
+        if (state.view !== 'slides' || list.length < 2 || refinePanel.classList.contains('open')) return;
         if (/^(SELECT|INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) return;
         if (e.key === 'ArrowLeft')  go(state.i - 1);
         if (e.key === 'ArrowRight') go(state.i + 1);
@@ -293,39 +326,75 @@ function fillCitySelect(select) {
         if (a) a.href = propertyHref(a.dataset.pid, currentURL());
     });
 
-    /* ── Controls ── */
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        if (!state.view) state.view = 'slides';
+    /* ── Tucked-away search on the results page ── */
+    function setRefine(open) {
+        refinePanel.classList.toggle('open', open);
+        refineBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    refineBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var open = !refinePanel.classList.contains('open');
+        if (open) fillForms();
+        setRefine(open);
+    });
+    document.addEventListener('click', function (e) {
+        if (refinePanel.classList.contains('open') && !refinePanel.contains(e.target)) setRefine(false);
+    });
+    function applyRefine() {
         state.i = 0;
         render();
-        results.scrollIntoView({ behavior: 'smooth' });
+        syncURL();
+        window.scrollTo(0, 0);
+    }
+    refineForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        readForm(forms.refine);
+        applyRefine();
+    });
+    $('refineAll').addEventListener('click', function () {
+        state.city = state.price = state.type = '';
+        state.view = 'grid';
+        applyRefine();
+    });
+    $('refineClear').addEventListener('click', function () {
+        state.city = state.price = state.type = '';
+        applyRefine();
+    });
+
+    /* ── Search screen ── */
+    searchForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        readForm(forms.search);
+        enterResults('slides');
     });
     $('viewAll').addEventListener('click', function () {
-        city.value = ''; price.value = ''; type.value = '';
-        state.view = 'grid';
-        state.i = 0;
-        render();
-        results.scrollIntoView({ behavior: 'smooth' });
+        state.city = state.price = state.type = '';
+        enterResults('grid');
     });
     toggles.forEach(function (b) {
         b.addEventListener('click', function () {
             if (state.view === b.dataset.view) return;
             state.view = b.dataset.view;
             render();
+            syncURL();
         });
     });
 
-    /* ── Restore state from the URL (incoming search or back navigation) ── */
-    var params = new URLSearchParams(window.location.search);
-    city.value  = params.get('city')  || '';
-    price.value = params.get('price') || '';
-    type.value  = params.get('type')  || '';
-    var v = params.get('view');
-    if (v === 'slides' || v === 'grid') state.view = v;
-    else if (city.value || price.value || type.value) state.view = 'slides';
-    state.i = parseInt(params.get('i'), 10) || 0;
-    render();
+    /* ── Restore state from the URL (incoming search, back/forward) ── */
+    function loadFromURL() {
+        var params = new URLSearchParams(window.location.search);
+        state.city  = params.get('city')  || '';
+        state.price = params.get('price') || '';
+        state.type  = params.get('type')  || '';
+        var v = params.get('view');
+        state.view = (v === 'slides' || v === 'grid') ? v
+                   : (state.city || state.price || state.type) ? 'slides' : null;
+        state.i = parseInt(params.get('i'), 10) || 0;
+        render();
+        if (state.view) syncURL();
+    }
+    window.addEventListener('popstate', function () { loadFromURL(); window.scrollTo(0, 0); });
+    loadFromURL();
 }());
 
 /* ── Property detail ── */

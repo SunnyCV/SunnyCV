@@ -15,17 +15,32 @@
 /* ══════════════════════════════════════
    HEAD + SEARCH
 ══════════════════════════════════════ */
+/* Search screen: its own full-screen step before the results */
 .listings-head {
     position: relative;
     overflow: hidden;
     text-align: center;
-    padding: 110px 0 170px;
+    min-height: calc(100vh - 76px);
+    min-height: calc(100svh - 76px);
+    display: flex;
+    align-items: center;
+    padding: 60px 0 150px;
     background:
         radial-gradient(circle at 85% 12%, rgba(255,217,90,0.5) 0%, rgba(255,217,90,0) 30%),
         linear-gradient(180deg, #C6EAFC 0%, #EAF6FD 60%, #FFFCF3 100%);
 }
-body.searched .listings-head { padding: 56px 0 96px; }
+.listings-head > .container {
+    width: 100%;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.listings-head.leaving > .container { opacity: 0; transform: translateY(-28px); }
 .listings-head h1 { font-size: clamp(38px, 5.6vw, 64px); }
+
+#results.entering { animation: resultsIn 0.6s ease both; }
+@keyframes resultsIn {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: none; }
+}
 .listings-head .hills {
     position: absolute;
     left: 0; right: 0; bottom: 0;
@@ -73,18 +88,82 @@ body.searched .listings-head { padding: 56px 0 96px; }
 /* ══════════════════════════════════════
    RESULTS BAR + VIEW TOGGLE
 ══════════════════════════════════════ */
-#results { scroll-margin-top: 76px; }
 .results-bar {
+    position: relative;
+    z-index: 30;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    padding-top: 22px;
-    padding-bottom: 22px;
+    padding-top: 16px;
+    padding-bottom: 16px;
     flex-wrap: wrap;
 }
-.result-count { font-family: var(--font-display); font-size: 26px; font-weight: 600; }
-.result-count small { display: block; font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--ink-soft); }
+.result-count { font-family: var(--font-display); font-size: 22px; font-weight: 600; line-height: 1.2; }
+.result-count small { display: block; font-family: var(--font-body); font-size: 13px; font-weight: 500; color: var(--ink-soft); margin-top: 2px; }
+.bar-actions { display: flex; align-items: center; gap: 10px; }
+
+/* ── Tucked-away search ── */
+.refine-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 46px;
+    padding: 0 18px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    background: var(--white);
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+.refine-btn:hover, .refine-btn[aria-expanded="true"] { border-color: var(--sky); background: var(--sky-soft); }
+.refine-btn svg { width: 16px; height: 16px; }
+
+.refine-panel {
+    position: absolute;
+    top: calc(100% - 4px);
+    right: 28px;
+    width: min(880px, calc(100% - 56px));
+    padding: 18px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.22s, transform 0.22s, visibility 0.22s;
+}
+.refine-panel.open { opacity: 1; visibility: visible; transform: none; }
+.refine-panel form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+}
+.refine-panel .btn { height: 48px; padding: 0 28px; }
+.refine-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    font-size: 13px;
+}
+.refine-foot button {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--sky-deep);
+    background: none;
+    border: none;
+    padding: 4px 0;
+    cursor: pointer;
+}
+.refine-foot button:hover { color: var(--sky); }
 
 .view-toggle {
     display: inline-flex;
@@ -119,8 +198,9 @@ body.searched .listings-head { padding: 56px 0 96px; }
 ══════════════════════════════════════ */
 .showcase {
     position: relative;
-    height: min(78vh, 740px);
-    min-height: 540px;
+    height: calc(100vh - 157px);
+    height: calc(100svh - 157px);
+    min-height: 520px;
     overflow: hidden;
     background: var(--sky-soft);
     user-select: none;
@@ -316,10 +396,17 @@ body.searched .listings-head { padding: 56px 0 96px; }
     .ss-dots { bottom: 26px; }
     .ss-count { top: 16px; bottom: auto; left: 16px; font-size: 13px; }
     .view-toggle button { padding: 9px 14px; }
+    .refine-panel form { grid-template-columns: 1fr 1fr; }
+    .refine-panel .btn { grid-column: 1 / -1; }
 }
 @media (max-width: 560px) {
+    .listings-head { min-height: calc(100svh - 68px); padding: 40px 0 120px; }
     .search-bar { grid-template-columns: 1fr; padding: 16px; }
-    .results-bar { flex-direction: column; align-items: flex-start; }
+    .results-bar { flex-direction: column; align-items: stretch; gap: 12px; padding-top: 14px; padding-bottom: 14px; }
+    .bar-actions { justify-content: space-between; }
+    .refine-panel { left: 20px; right: 20px; width: auto; padding: 16px; }
+    .refine-panel form { grid-template-columns: 1fr; }
+    .showcase { height: calc(100svh - 199px); min-height: 500px; }
 }
 </style>
 </head>
@@ -389,6 +476,11 @@ body.searched .listings-head { padding: 56px 0 96px; }
 <section id="results" hidden>
     <div class="container results-bar">
         <div class="result-count" id="resultCount"></div>
+        <div class="bar-actions">
+        <button type="button" class="refine-btn" id="refineBtn" aria-expanded="false" aria-controls="refinePanel">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5" stroke-linecap="round"/></svg>
+            Search
+        </button>
         <div class="view-toggle" role="group" aria-label="Choose view">
             <button type="button" data-view="slides">
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1.5" y="3" width="13" height="10" rx="2"/><path d="M6 6.5l3 1.5-3 1.5z" fill="currentColor"/></svg>
@@ -398,6 +490,40 @@ body.searched .listings-head { padding: 56px 0 96px; }
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1.5" y="1.5" width="5" height="5" rx="1"/><rect x="9.5" y="1.5" width="5" height="5" rx="1"/><rect x="1.5" y="9.5" width="5" height="5" rx="1"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg>
                 Grid
             </button>
+        </div>
+        </div>
+
+        <div class="refine-panel" id="refinePanel">
+            <form id="refineForm">
+                <div class="field">
+                    <label for="rCity">Location</label>
+                    <select id="rCity"><option value="">Any neighborhood</option></select>
+                </div>
+                <div class="field">
+                    <label for="rPrice">Max Price</label>
+                    <select id="rPrice">
+                        <option value="">No max</option>
+                        <option value="300000">$300,000</option>
+                        <option value="450000">$450,000</option>
+                        <option value="600000">$600,000</option>
+                        <option value="800000">$800,000</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="rType">Property Type</label>
+                    <select id="rType">
+                        <option value="">Any type</option>
+                        <option>House</option>
+                        <option>Townhouse</option>
+                        <option>Condo</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-leaf">Search</button>
+            </form>
+            <div class="refine-foot">
+                <button type="button" id="refineAll">View All Properties</button>
+                <button type="button" id="refineClear">Clear filters</button>
+            </div>
         </div>
     </div>
 
