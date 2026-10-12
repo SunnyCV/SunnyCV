@@ -10,55 +10,94 @@
 <link rel="stylesheet" href="css/style.css">
 <style>
 
-.page-head {
-    padding: 72px 0 64px;
+/* ── Intro: staff photo, then the quote, then the story (all centered) ── */
+.about-intro {
+    padding: 56px 0 24px;
+    text-align: center;
     background:
-        radial-gradient(circle at 88% 10%, rgba(255,217,90,0.45) 0%, rgba(255,217,90,0) 30%),
-        linear-gradient(180deg, #CDEDFC 0%, #F2FAFF 100%);
+        radial-gradient(circle at 88% 8%, rgba(255,217,90,0.45) 0%, rgba(255,217,90,0) 28%),
+        linear-gradient(180deg, #CDEDFC 0%, #F2FAFF 55%, #FFFFFF 100%);
 }
-.page-head h1 { font-size: clamp(36px, 5vw, 54px); margin-top: 10px; max-width: 720px; }
-.page-head p { color: var(--ink-soft); margin-top: 14px; max-width: 580px; font-size: 17px; }
+.centered { max-width: 760px; margin: 0 auto; text-align: center; }
 
-/* ── Story ── */
-.story-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 64px;
-    align-items: center;
-}
-.story-visual {
-    aspect-ratio: 4 / 3;
-    border-radius: 24px;
+.staff-photo {
+    max-width: 980px;
+    margin: 0 auto 48px;
+    aspect-ratio: 21 / 9;
+    border-radius: 28px;
     overflow: hidden;
     box-shadow: var(--shadow-lg);
+    background: var(--sky-soft);
 }
-.story-visual svg { width: 100%; height: 100%; display: block; }
-.story-text h2 { font-size: clamp(28px, 3.6vw, 38px); margin: 10px 0 18px; }
-.story-text p { color: var(--ink-soft); font-size: 16.5px; margin-bottom: 14px; }
-.story-stats { display: flex; gap: 40px; margin-top: 26px; flex-wrap: wrap; }
+.staff-photo svg, .staff-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.about-intro h1 { font-size: clamp(34px, 5vw, 54px); margin-top: 10px; }
+.about-intro .lead { color: var(--ink-soft); font-size: 18px; margin: 16px auto 0; max-width: 600px; }
+
+.story { padding: 64px 0 96px; }
+.story .divider-dot {
+    width: 56px; height: 4px;
+    border-radius: 4px;
+    margin: 0 auto 40px;
+    background: linear-gradient(90deg, var(--sky), var(--leaf), var(--sun));
+}
+.story h2 { font-size: clamp(28px, 3.6vw, 38px); margin: 10px 0 18px; }
+.story p { color: var(--ink-soft); font-size: 16.5px; margin: 0 auto 14px; max-width: 640px; }
+.story-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 640px;
+    margin: 36px auto 0;
+}
+.story-stats div {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 20px 12px;
+    box-shadow: var(--shadow);
+}
 .story-stats strong { display: block; font-family: var(--font-display); font-size: 32px; color: var(--sky-deep); }
 .story-stats span { font-size: 14px; color: var(--ink-soft); }
 
 /* ── Team ── */
-.team { background: var(--cream); }
+.team { background: var(--cream); text-align: center; }
+.team .section-head { justify-content: center; text-align: center; }
+.team .section-head p { margin: 10px auto 0; }
 .team-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
 .team-card {
     background: var(--white);
-    border-radius: var(--radius);
-    padding: 28px;
+    border-radius: 22px;
+    padding: 36px 28px 30px;
     text-align: center;
     box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 .team-avatar {
-    width: 96px; height: 96px;
+    width: 160px; height: 160px;
     border-radius: 50%;
-    margin: 0 auto 16px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 0 0 6px var(--white), 0 0 0 9px var(--line);
 }
-.team-card:nth-child(1) .team-avatar { background: linear-gradient(135deg, var(--sky), #7FD0F5); }
-.team-card:nth-child(2) .team-avatar { background: linear-gradient(135deg, var(--leaf), #8FDDAA); }
-.team-card:nth-child(3) .team-avatar { background: linear-gradient(135deg, var(--sun-deep), var(--sun)); }
-.team-card h3 { font-size: 20px; }
-.team-card span { display: block; font-size: 14px; color: var(--ink-soft); margin-top: 4px; }
+.team-avatar svg, .team-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.team-card:nth-child(1) .team-avatar { background: linear-gradient(135deg, var(--sky), #8FD6F6); }
+.team-card:nth-child(2) .team-avatar { background: linear-gradient(135deg, var(--leaf), #9BE0B4); }
+.team-card:nth-child(3) .team-avatar { background: linear-gradient(135deg, var(--sun-deep), #FFDD7A); }
+.team-card h3 { font-size: 23px; }
+.team-role { display: block; font-size: 14px; font-weight: 700; color: var(--leaf-deep); margin-top: 4px; }
+.team-facts { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 16px 0 14px; }
+.team-facts span {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--sky-soft);
+    padding: 6px 12px;
+    border-radius: 999px;
+}
+.team-facts span:nth-child(2) { background: var(--sun-soft); }
+.team-card p { font-size: 14.5px; color: var(--ink-soft); line-height: 1.65; }
 
 /* ── Contact ── */
 .contact-grid {
@@ -131,11 +170,19 @@
 }
 
 @media (max-width: 900px) {
-    .story-grid, .contact-grid { grid-template-columns: 1fr; gap: 40px; }
-    .team-grid { grid-template-columns: 1fr; }
+    .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+    .team-grid { grid-template-columns: 1fr; max-width: 440px; margin: 0 auto; }
 }
 @media (max-width: 560px) {
     .contact-form { padding: 24px; }
+    .about-intro { padding-top: 28px; }
+    .staff-photo { aspect-ratio: 4 / 3; border-radius: 20px; margin-bottom: 32px; }
+    .about-intro .lead { font-size: 16.5px; }
+    .story { padding: 48px 0 72px; }
+    .story-stats { gap: 10px; }
+    .story-stats div { padding: 16px 6px; }
+    .story-stats strong { font-size: 24px; }
+    .story-stats span { font-size: 12px; }
     .contact-form form { grid-template-columns: 1fr; }
 }
 </style>
@@ -162,27 +209,28 @@
     </div>
 </header>
 
-<section class="page-head">
+<section class="about-intro">
     <div class="container">
-        <span class="eyebrow">About Us</span>
-        <h1>We help people start their next chapter.</h1>
-        <p>A local agency built around one simple idea: the right home changes everything. Our job is to find it and make getting there easy.</p>
+        <div class="staff-photo" id="staffPhoto"></div>
+        <div class="centered">
+            <span class="eyebrow">About Us</span>
+            <h1>We help people start their next chapter.</h1>
+            <p class="lead">A local agency built around one simple idea: the right home changes everything. Our job is to find it and make getting there easy.</p>
+        </div>
     </div>
 </section>
 
-<section class="section">
-    <div class="container story-grid">
-        <div class="story-visual" id="storyVisual"></div>
-        <div class="story-text">
-            <span class="eyebrow">Our Story</span>
-            <h2>Homes first. Always.</h2>
-            <p>We started with a handful of listings and a belief that buying a home should feel hopeful, not stressful. Every property we take on is one we&rsquo;d be proud to call home ourselves.</p>
-            <p>Today we serve five neighborhoods, but the approach hasn&rsquo;t changed &mdash; honest pricing, quick answers, and a lot of care for the families moving in.</p>
-            <div class="story-stats">
-                <div><strong>120+</strong><span>Homes sold this year</span></div>
-                <div><strong>98%</strong><span>Clients who&rsquo;d refer us</span></div>
-                <div><strong>10 yrs</strong><span>In the community</span></div>
-            </div>
+<section class="story">
+    <div class="container centered">
+        <div class="divider-dot"></div>
+        <span class="eyebrow">Our Story</span>
+        <h2>Homes first. Always.</h2>
+        <p>We started with a handful of listings and a belief that buying a home should feel hopeful, not stressful. Every property we take on is one we&rsquo;d be proud to call home ourselves.</p>
+        <p>Today we serve five neighborhoods, but the approach hasn&rsquo;t changed &mdash; honest pricing, quick answers, and a lot of care for the families moving in.</p>
+        <div class="story-stats">
+            <div><strong>120+</strong><span>Homes sold this year</span></div>
+            <div><strong>98%</strong><span>Clients who&rsquo;d refer us</span></div>
+            <div><strong>10 yrs</strong><span>In the community</span></div>
         </div>
     </div>
 </section>
@@ -193,12 +241,31 @@
             <div>
                 <span class="eyebrow">The Team</span>
                 <h2>The people behind the keys</h2>
+                <p>A small team that knows these neighborhoods by heart.</p>
             </div>
         </div>
         <div class="team-grid">
-            <div class="team-card"><div class="team-avatar"></div><h3>Agent Name</h3><span>Founder &amp; Lead Agent</span></div>
-            <div class="team-card"><div class="team-avatar"></div><h3>Agent Name</h3><span>Buyer&rsquo;s Specialist</span></div>
-            <div class="team-card"><div class="team-avatar"></div><h3>Agent Name</h3><span>Listing Coordinator</span></div>
+            <div class="team-card">
+                <div class="team-avatar" data-portrait="#F1C9A5"></div>
+                <h3>Agent Name</h3>
+                <span class="team-role">Founder &amp; Lead Agent</span>
+                <div class="team-facts"><span>15 yrs experience</span><span>Maple Grove &middot; Lakeview</span></div>
+                <p>Grew up in Maple Grove and has helped more than 400 families find their first, second, and forever homes.</p>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar" data-portrait="#8D5B3E"></div>
+                <h3>Agent Name</h3>
+                <span class="team-role">Buyer&rsquo;s Specialist</span>
+                <div class="team-facts"><span>8 yrs experience</span><span>First-time buyers</span></div>
+                <p>Walks buyers through every step, from pre-approval and tours to offers and the final walkthrough.</p>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar" data-portrait="#C58C63"></div>
+                <h3>Agent Name</h3>
+                <span class="team-role">Listing Coordinator</span>
+                <div class="team-facts"><span>6 yrs experience</span><span>Staging &amp; marketing</span></div>
+                <p>Handles staging, photography, and every listing detail so each home shows at its brightest.</p>
+            </div>
         </div>
     </div>
 </section>
@@ -309,7 +376,34 @@
 <script src="js/data.js"></script>
 <script src="js/script.js"></script>
 <script>
-document.getElementById('storyVisual').innerHTML = sceneSVG({ sky: '#7CCBF5', house: '#FFFFFF', roof: '#2FB36A', sun: 'right', kind: 'house' });
+/* Placeholders until real photos are added: set STAFF_PHOTO to an image
+   path, and put an <img> inside each .team-avatar for agent headshots. */
+var STAFF_PHOTO = '';
+var staff = document.getElementById('staffPhoto');
+staff.innerHTML = STAFF_PHOTO ? '<img src="' + STAFF_PHOTO + '" alt="Our team">' :
+    '<svg viewBox="0 0 840 360" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' +
+        '<defs><linearGradient id="staffSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8FD3F7"/><stop offset="1" stop-color="#F2FAFF"/></linearGradient></defs>' +
+        '<rect width="840" height="360" fill="url(#staffSky)"/>' +
+        '<circle cx="690" cy="80" r="44" fill="#FFD95A"/><circle cx="690" cy="80" r="64" fill="#FFD95A" opacity="0.25"/>' +
+        '<ellipse cx="180" cy="360" rx="360" ry="110" fill="#8FD9A2"/><ellipse cx="680" cy="370" rx="340" ry="105" fill="#5FC27C"/>' +
+        '<rect x="300" y="120" width="240" height="150" fill="#FFFFFF"/><polygon points="285,126 420,52 555,126" fill="#2FB36A"/>' +
+        '<rect x="402" y="200" width="36" height="70" rx="3" fill="#2D9CDB"/>' +
+        '<rect x="0" y="300" width="840" height="60" fill="#4FB36A"/>' +
+        person(300, '#F1C9A5', '#2D9CDB') + person(420, '#8D5B3E', '#2FB36A') + person(540, '#C58C63', '#F0A800') +
+    '</svg>';
+
+function person(x, skin, shirt) {
+    return '<path d="M' + (x - 46) + ',360 C' + (x - 46) + ',290 ' + (x + 46) + ',290 ' + (x + 46) + ',360 Z" fill="' + shirt + '"/>' +
+           '<circle cx="' + x + '" cy="262" r="30" fill="' + skin + '"/>';
+}
+
+document.querySelectorAll('.team-avatar[data-portrait]').forEach(function (el) {
+    if (el.querySelector('img')) return;
+    el.innerHTML = '<svg viewBox="0 0 160 160" aria-hidden="true">' +
+        '<circle cx="80" cy="66" r="30" fill="' + el.dataset.portrait + '"/>' +
+        '<path d="M28,160 C28,112 132,112 132,160 Z" fill="#FFFFFF" opacity="0.92"/>' +
+    '</svg>';
+});
 </script>
 </body>
 </html>
