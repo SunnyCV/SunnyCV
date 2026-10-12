@@ -35,7 +35,7 @@
 }
 
 /* ── Story ── */
-.story { padding: 0 0 120px; }
+.story { padding: 0 0 110px; }
 .story-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -81,85 +81,101 @@
     display: block;
 }
 
-/* ── Hours & Location ── */
-.contact-band {
-    padding: 100px 0;
-    background: var(--wall-beige);
-}
-.contact-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 50px;
-    text-align: center;
-}
-.contact-card .eyebrow { display: block; margin-bottom: 14px; }
-.contact-card h3 { font-size: 22px; font-style: italic; margin-bottom: 14px; }
-.contact-card p { color: var(--cream-dim); font-size: 15.5px; line-height: 1.8; }
-.contact-card a { color: var(--amber-soft); transition: color 0.25s; }
-.contact-card a:hover { color: var(--cream); }
-
-.map-placeholder {
-    margin-top: 60px;
-    aspect-ratio: 16 / 5;
-    min-height: 180px;
-    border: 1px solid rgba(217,154,78,0.25);
-    background: rgba(21,17,13,0.25);
-    display: flex;
+/* ── Reviews link ── */
+.reviews-link {
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
+    padding-bottom: 6px;
     font-family: var(--font-label);
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--cream-faint);
-}
-
-/* ── Press ── */
-.press-section { padding: 120px 0; text-align: center; }
-.press-section .section-head { margin-bottom: 56px; }
-.press-section h2 { font-size: clamp(28px, 4vw, 38px); font-style: italic; margin-top: 12px; }
-.press-list {
-    max-width: 640px;
-    margin: 0 auto;
-    text-align: left;
-}
-.press-link {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    padding: 26px 4px;
-    border-bottom: 1px solid rgba(217,154,78,0.15);
-    transition: opacity 0.25s;
-}
-.press-link:hover { opacity: 0.72; }
-.press-link:last-child { border-bottom: none; }
-.press-link-pub {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: 22px;
-    color: var(--cream);
-}
-.press-link-quote {
-    font-size: 14px;
-    color: var(--cream-faint);
-    margin-top: 4px;
-}
-.press-link-arrow {
-    font-family: var(--font-label);
-    font-size: 11px;
-    letter-spacing: 2px;
+    font-size: 12px;
+    letter-spacing: 2.5px;
     text-transform: uppercase;
     color: var(--amber-soft);
-    white-space: nowrap;
+    border-bottom: 1px solid rgba(217,154,78,0.35);
+    transition: color 0.25s, border-color 0.25s, gap 0.25s;
+}
+.reviews-link:hover { color: var(--cream); border-color: var(--amber); gap: 14px; }
+
+/* ── Visit: address, hours, contact, map ── */
+.visit { padding: 0 0 130px; text-align: center; }
+.visit .divider { margin: 0 auto 56px; }
+.visit-address {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(28px, 4vw, 42px);
+    line-height: 1.3;
+    color: var(--cream);
+}
+.addr-sep { color: var(--amber); margin: 0 18px; font-style: normal; }
+
+.visit-details {
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    gap: 56px;
+    max-width: 620px;
+    margin: 48px auto 0;
+}
+.visit-rule { background: linear-gradient(to bottom, transparent, rgba(217,154,78,0.45), transparent); }
+.visit-col .eyebrow { display: block; margin-bottom: 14px; }
+.visit-col p { color: var(--cream-dim); font-size: 17px; line-height: 1.8; }
+.visit-col .visit-note {
+    font-family: var(--font-label);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--cream-faint);
+    margin-top: 6px;
+}
+.visit-col a { color: var(--cream); transition: color 0.25s; }
+.visit-col a:hover { color: var(--amber-soft); }
+
+/* Illustrated map in the dining-room palette. To use a live map, replace the
+   <svg> with a Google Maps <iframe>; the iframe rule below tints it to match. */
+.visit-map {
+    position: relative;
+    margin-top: 64px;
+    aspect-ratio: 16 / 6;
+    min-height: 260px;
+    overflow: hidden;
+    border: 1px solid rgba(217,154,78,0.28);
+    border-radius: 2px;
+    background: #1b1611;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.35);
+}
+.visit-map svg, .visit-map iframe {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    border: 0;
+    display: block;
+}
+.visit-map iframe { filter: grayscale(1) invert(0.92) sepia(0.35) brightness(0.85) contrast(0.95); }
+.visit-map::after {
+    content: '';
+    position: absolute; inset: 10px;
+    border: 1px solid rgba(217,154,78,0.12);
+    pointer-events: none;
+}
+.map-directions {
+    position: absolute;
+    right: 28px; bottom: 26px;
+    z-index: 2;
+    background: rgba(21,17,13,0.72);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 
 @media (max-width: 900px) {
     .story-grid { grid-template-columns: 1fr; gap: 40px; }
-    .contact-grid { grid-template-columns: 1fr; gap: 44px; }
 }
 @media (max-width: 560px) {
-    .press-link { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .addr-sep { display: none; }
+    .visit-address span.addr-line { display: block; }
+    .visit-details { grid-template-columns: 1fr; gap: 28px; }
+    .visit-rule { width: 64px; height: 1px; margin: 0 auto; background: linear-gradient(to right, transparent, var(--amber), transparent); }
+    .visit-map { aspect-ratio: 4 / 5; margin-top: 52px; }
+    .map-directions { left: 50%; right: auto; transform: translateX(-50%); white-space: nowrap; }
 }
 </style>
 </head>
@@ -204,68 +220,76 @@
             <p>The dining room was designed the same way the menu was written — slowly, and with restraint. Dark beige walls, wine-red details, fine wood floors, and just enough amber light to make you forget what time it is.</p>
             <p>We've kept the room small on purpose. Every table gets the same attention a chef gives a sauce that's almost ready — patient, and a little obsessive.</p>
             <span class="story-signature">— The Kitchen</span>
+            <a class="reviews-link" href="#" target="_blank" rel="noopener">Read Our Reviews <span>&rarr;</span></a>
         </div>
     </div>
 </section>
 
-<section class="contact-band">
+<section class="visit" id="visit">
     <div class="container">
-        <div class="contact-grid reveal">
-            <div class="contact-card">
-                <span class="eyebrow">Visit</span>
-                <h3>Location</h3>
-                <p>123 Placeholder Street<br>City, State 00000</p>
-            </div>
-            <div class="contact-card">
+        <div class="divider"></div>
+        <address class="visit-address reveal">
+            <span class="addr-line">123 Placeholder Street</span><span class="addr-sep">&middot;</span><span class="addr-line">City, State 00000</span>
+        </address>
+
+        <div class="visit-details reveal">
+            <div class="visit-col">
                 <span class="eyebrow">Hours</span>
-                <h3>Open Tuesday–Sunday</h3>
-                <p>5:30 PM &ndash; 10:30 PM<br>Closed Mondays</p>
+                <p>Tuesday &ndash; Sunday<br>5:30 PM &ndash; 10:30 PM</p>
+                <p class="visit-note">Closed Mondays</p>
             </div>
-            <div class="contact-card">
+            <div class="visit-rule"></div>
+            <div class="visit-col">
                 <span class="eyebrow">Contact</span>
-                <h3>Get in Touch</h3>
                 <p><a href="tel:+10000000000">(000) 000-0000</a><br><a href="mailto:hello@restaurant.com">hello@restaurant.com</a></p>
             </div>
         </div>
-        <div class="map-placeholder reveal">Map embed here</div>
-    </div>
-</section>
 
-<section class="press-section">
-    <div class="container">
-        <div class="section-head reveal">
-            <span class="eyebrow">In the Press</span>
-            <h2>Reviews &amp; Recognition</h2>
-        </div>
-        <div class="press-list reveal">
-            <a class="press-link" href="#" target="_blank" rel="noopener">
-                <span>
-                    <span class="press-link-pub">The Local Critic</span>
-                    <span class="press-link-quote">"A masterclass in restraint."</span>
-                </span>
-                <span class="press-link-arrow">Read Review &rarr;</span>
-            </a>
-            <a class="press-link" href="#" target="_blank" rel="noopener">
-                <span>
-                    <span class="press-link-pub">City Dining Guide</span>
-                    <span class="press-link-quote">Named one of this year's best new dining rooms.</span>
-                </span>
-                <span class="press-link-arrow">Read Review &rarr;</span>
-            </a>
-            <a class="press-link" href="#" target="_blank" rel="noopener">
-                <span>
-                    <span class="press-link-pub">Regional Food &amp; Wine</span>
-                    <span class="press-link-quote">Editor's Choice, Fine Dining.</span>
-                </span>
-                <span class="press-link-arrow">Read Review &rarr;</span>
-            </a>
-            <a class="press-link" href="#" target="_blank" rel="noopener">
-                <span>
-                    <span class="press-link-pub">Guest Reviews</span>
-                    <span class="press-link-quote">See what our guests are saying.</span>
-                </span>
-                <span class="press-link-arrow">View All &rarr;</span>
-            </a>
+        <div class="visit-map reveal">
+            <svg viewBox="0 0 1200 450" preserveAspectRatio="xMidYMid slice" aria-label="Map showing the restaurant's location" role="img">
+                <defs>
+                    <radialGradient id="mapVignette" cx="50%" cy="50%" r="70%">
+                        <stop offset="55%" stop-color="#15110d" stop-opacity="0"/>
+                        <stop offset="100%" stop-color="#15110d" stop-opacity="0.85"/>
+                    </radialGradient>
+                    <radialGradient id="pinGlow" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#d99a4e" stop-opacity="0.45"/>
+                        <stop offset="100%" stop-color="#d99a4e" stop-opacity="0"/>
+                    </radialGradient>
+                </defs>
+                <rect width="1200" height="450" fill="#1b1611"/>
+                <g transform="rotate(-9 600 225)">
+                    <!-- park and river -->
+                    <rect x="770" y="40" width="220" height="150" rx="6" fill="#2a2117"/>
+                    <path d="M-100 360 C 200 330, 380 420, 640 380 S 1050 300, 1350 350 L 1350 420 C 1050 370, 860 460, 640 450 S 200 400, -100 430 Z" fill="#221c17"/>
+                    <!-- minor streets -->
+                    <g stroke="#f2e8d8" stroke-opacity="0.06" stroke-width="5">
+                        <path d="M-100 70H1300M-100 140H1300M-100 290H1300M-100 330H1300"/>
+                        <path d="M120 -100V600M250 -100V600M380 -100V600M720 -100V600M850 -100V600M1000 -100V600M1120 -100V600"/>
+                    </g>
+                    <!-- main avenues -->
+                    <g stroke="#f2e8d8" stroke-opacity="0.13" stroke-width="13">
+                        <path d="M-100 215H1300"/>
+                        <path d="M560 -100V600"/>
+                    </g>
+                    <path d="M-100 520 L 1300 -60" stroke="#f2e8d8" stroke-opacity="0.08" stroke-width="9"/>
+                    <!-- building blocks -->
+                    <g fill="#f2e8d8" fill-opacity="0.025">
+                        <rect x="135" y="80" width="100" height="50"/><rect x="265" y="80" width="100" height="50"/>
+                        <rect x="395" y="150" width="150" height="55"/><rect x="575" y="80" width="130" height="50"/>
+                        <rect x="575" y="230" width="130" height="50"/><rect x="865" y="230" width="120" height="50"/>
+                        <rect x="135" y="230" width="100" height="50"/><rect x="1015" y="150" width="90" height="55"/>
+                    </g>
+                </g>
+                <rect width="1200" height="450" fill="url(#mapVignette)"/>
+                <!-- pin -->
+                <circle cx="600" cy="214" r="90" fill="url(#pinGlow)"/>
+                <circle cx="600" cy="214" r="34" fill="none" stroke="#d99a4e" stroke-opacity="0.35"/>
+                <path d="M600 236c-14-18-22-29-22-41a22 22 0 0 1 44 0c0 12-8 23-22 41z" fill="#6b1f24" stroke="#e8b877" stroke-width="2"/>
+                <circle cx="600" cy="195" r="7" fill="#e8b877"/>
+                <text x="600" y="282" text-anchor="middle" fill="#f2e8d8" font-family="'Pinyon Script', cursive" font-size="30">Restaurant Name</text>
+            </svg>
+            <a class="btn btn-outline map-directions" href="https://www.google.com/maps/search/?api=1&amp;query=123+Placeholder+Street" target="_blank" rel="noopener">Get Directions &rarr;</a>
         </div>
     </div>
 </section>
