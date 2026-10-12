@@ -53,6 +53,9 @@
     scrollbar-width: none;
 }
 .gallery-thumbs::-webkit-scrollbar { display: none; }
+/* auto margins center the row but still let it scroll from the first photo when it overflows */
+.thumb:first-child { margin-left: auto; }
+.thumb:last-child { margin-right: auto; }
 .thumb {
     position: relative;
     flex: 0 0 168px;
@@ -89,7 +92,7 @@
 }
 .p-title { font-size: clamp(30px, 4vw, 44px); margin-top: 14px; }
 .p-address { color: var(--ink-soft); font-size: 17px; margin-top: 8px; }
-.p-price { font-family: var(--font-display); font-size: 40px; font-weight: 700; color: var(--sky-deep); margin-top: 18px; }
+.p-price { font-family: var(--font-display); font-size: 44px; font-weight: 700; color: var(--sky-deep); margin-top: 18px; }
 
 .p-specs {
     display: grid;
@@ -178,6 +181,8 @@
     .gallery-main { aspect-ratio: 16 / 10; max-height: none; min-height: 0; }
     .gallery-thumbs { gap: 10px; }
     .thumb { flex-basis: calc((100% - 30px) / 4); border-radius: 10px; }
+    .p-head { text-align: center; }
+    .p-price { font-size: 46px; }
     .p-specs { grid-template-columns: 1fr 1fr; }
     .p-features { grid-template-columns: 1fr; }
 }
@@ -215,10 +220,12 @@
 
     <div class="property-layout">
         <div>
-            <span class="p-status" id="pStatus"></span>
-            <h1 class="p-title" id="pTitle"></h1>
-            <p class="p-address" id="pAddress"></p>
-            <div class="p-price" id="pPrice"></div>
+            <div class="p-head">
+                <span class="p-status" id="pStatus"></span>
+                <h1 class="p-title" id="pTitle"></h1>
+                <p class="p-address" id="pAddress"></p>
+                <div class="p-price" id="pPrice"></div>
+            </div>
 
             <div class="p-specs">
                 <div class="p-spec"><strong id="pBeds"></strong><span>Bedrooms</span></div>
