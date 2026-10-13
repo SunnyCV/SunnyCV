@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Artwork — Ashwood Museum</title>
+<meta name="description" content="A work from the Ashwood collection, and where to find it in the museum.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 44'%3E%3Cpath d='M2 43V17C2 9 9 3 17 1c8 2 15 8 15 16v26z' fill='%2313261D' stroke='%23E2BF62' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Grenze+Gotisch:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Grenze:wght@400;500;600&text=IN&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.art-page { padding-top: calc(var(--header-h) + 34px); }
+.art-back {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: var(--font-label); font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--aegean);
+}
+.art-back span {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    border: 1px solid rgba(30,78,121,0.3);
+    font-family: var(--font-body); font-size: 17px; letter-spacing: 0;
+    transition: background-color 0.2s, color 0.2s;
+}
+.art-back:hover span { background: var(--aegean); color: var(--marble); }
+
+.art-layout { display: grid; grid-template-columns: 1.15fr 1fr; gap: 70px; margin-top: 26px; align-items: start; }
+.art-stage { position: sticky; top: calc(var(--header-h) + 24px); }
+.art-stage .art-media {
+    aspect-ratio: 4 / 5;
+    max-height: calc(100svh - var(--header-h) - 70px);
+    margin: 0 auto;
+    cursor: zoom-in;
+    box-shadow: var(--shadow);
+}
+.art-zoom {
+    position: absolute;
+    right: 16px; bottom: 16px;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 14px;
+    border: 0;
+    border-radius: 2px;
+    background: rgba(13,27,20,0.78);
+    color: var(--marble);
+    font-family: var(--font-label); font-size: 11px; font-weight: 600; letter-spacing: 1.6px; text-transform: uppercase;
+    cursor: pointer;
+}
+.art-zoom:hover { background: var(--forest-night); }
+
+.art-info h1 { font-size: clamp(40px, 4.4vw, 60px); margin-top: 10px; }
+.art-who { margin-top: 14px; font-size: 20px; }
+.art-who strong { font-weight: 500; color: var(--ink); }
+.art-who span { color: var(--ink-soft); }
+.art-date { font-family: var(--font-display); font-weight: 600; font-size: 22px; color: var(--ink-soft); margin-top: 2px; }
+.art-desc { margin-top: 24px; font-size: 19px; line-height: 1.8; color: var(--ink-soft); }
+
+.find-card {
+    margin-top: 34px;
+    background: var(--forest);
+    color: var(--marble);
+    border-radius: 2px;
+    padding: 26px 26px 22px;
+}
+.find-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+.find-card h2 { color: var(--marble); font-size: 40px; margin-top: 4px; }
+.find-card .wing { color: rgba(247,243,234,0.8); font-size: 17px; }
+.find-card .map { margin-top: 18px; background: var(--marble); border-radius: 2px; padding: 8px; }
+.find-card .map svg { display: block; width: 100%; height: auto; }
+.find-card .text-link { display: inline-block; margin-top: 16px; }
+.find-ex {
+    display: flex; flex-direction: column; gap: 2px;
+    margin-top: 16px;
+    padding: 16px 18px;
+    border: 1px solid var(--gold);
+    border-radius: 2px;
+    background: rgba(226,191,98,0.08);
+}
+.find-ex a { font-family: var(--font-display); font-size: 22px; color: var(--forest-deep); }
+.find-ex a:hover { color: var(--aegean); }
+.find-ex span:last-child { color: var(--ink-soft); font-size: 15.5px; }
+
+.art-details { margin-top: 40px; }
+.art-details h3 { font-size: 30px; }
+.art-details dl { display: grid; grid-template-columns: 150px 1fr; margin: 16px 0 0; border-top: 1px solid var(--line); }
+.art-details dt, .art-details dd { padding: 12px 0; border-bottom: 1px solid var(--line); margin: 0; }
+.art-details dt { font-family: var(--font-label); font-size: 11px; font-weight: 600; letter-spacing: 1.6px; text-transform: uppercase; color: var(--ink-faint); padding-top: 15px; }
+.art-details dd { font-size: 17px; }
+
+.lightbox {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(13,27,20,0.96);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 70px 24px 30px;
+}
+.lightbox-art { position: relative; width: min(90vw, calc((100svh - 160px) * 0.8)); aspect-ratio: 4 / 5; background: var(--stone); }
+.lightbox-cap { margin-top: 18px; color: rgba(247,243,234,0.8); text-align: center; font-family: var(--font-display); font-size: 20px; }
+.lightbox-close {
+    position: absolute; top: 18px; right: 18px;
+    width: 48px; height: 48px; border-radius: 50%;
+    border: 1px solid rgba(247,243,234,0.4); background: transparent; color: var(--marble);
+    font-size: 26px; line-height: 1; cursor: pointer;
+}
+.lightbox-close:hover { background: var(--marble); color: var(--forest-deep); }
+
+@media (max-width: 900px) {
+    .art-layout { grid-template-columns: 1fr; gap: 40px; }
+    .art-stage { position: relative; top: auto; }
+    .art-stage .art-media { max-height: none; }
+}
+@media (max-width: 640px) {
+    .art-page { padding-top: calc(var(--header-h) + 20px); }
+    .art-who { font-size: 18px; }
+    .art-desc { font-size: 18px; }
+    .find-card { padding: 22px 18px 18px; }
+    .find-card h2 { font-size: 34px; }
+    .art-details dl { grid-template-columns: 1fr; }
+    .art-details dt { border-bottom: 0; padding-bottom: 0; }
+    .art-details dd { padding-top: 4px; }
+}
+</style>
+</head>
+<body data-page="collection">
+
+<header id="siteHeader"></header>
+
+<main class="art-page" id="artRoot">
+    <div class="container">
+        <a href="collection.html" class="art-back" id="artBack"><span>&larr;</span> Back to the Collection</a>
+
+        <div class="art-layout">
+            <div class="art-stage">
+                <div class="art-media" id="artMedia" role="button" tabindex="-1" aria-label="View larger"></div>
+                <button type="button" class="art-zoom" id="artZoom">&#x2922; View Larger</button>
+            </div>
+
+            <div class="art-info">
+                <span class="eyebrow" id="artCulture"></span>
+                <h1 id="artTitle"></h1>
+                <p class="art-who" id="artWho"></p>
+                <p class="art-date" id="artDate"></p>
+
+                <div class="find-card on-dark">
+                    <div class="find-top">
+                        <div>
+                            <span class="eyebrow">Where to Find It</span>
+                            <h2 id="artGallery"></h2>
+                            <p class="wing" id="artWing"></p>
+                        </div>
+                    </div>
+                    <div class="map" id="artMap"></div>
+                    <a href="collection.html" class="text-link" id="artMapLink"></a>
+                </div>
+                <div class="find-ex" id="artExhibition" hidden></div>
+
+                <p class="art-desc" id="artDesc"></p>
+
+                <div class="art-details">
+                    <h3>Object Details</h3>
+                    <dl id="artDetails"></dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <span class="eyebrow">Nearby in the Museum</span>
+                    <h2>You May Also Like</h2>
+                </div>
+                <a href="collection.html" class="text-link">Browse the Collection &rarr;</a>
+            </div>
+            <div class="art-grid" id="artRelated"></div>
+        </div>
+    </section>
+</main>
+
+<div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Artwork viewer">
+    <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Close viewer">&times;</button>
+    <div class="lightbox-art art-media" id="lightboxArt"></div>
+    <p class="lightbox-cap" id="lightboxCap"></p>
+</div>
+
+<footer id="siteFooter"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/art.js"></script>
+<script src="js/script.js"></script>
+</body>
+</html>

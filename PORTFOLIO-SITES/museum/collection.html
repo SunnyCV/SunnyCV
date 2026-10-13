@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Collection — Ashwood Museum</title>
+<meta name="description" content="Search and browse the Ashwood collection by era, culture and object type, and find each work in the museum.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 44'%3E%3Cpath d='M2 43V17C2 9 9 3 17 1c8 2 15 8 15 16v26z' fill='%2313261D' stroke='%23E2BF62' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Grenze+Gotisch:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Grenze:wght@400;500;600&text=IN&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.col-search {
+    display: flex;
+    max-width: 680px;
+    margin: 36px auto 0;
+    background: var(--marble);
+    border-radius: 2px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    overflow: hidden;
+}
+.col-search input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    padding: 20px 22px;
+    font-family: var(--font-body);
+    font-size: 19px;
+    color: var(--ink);
+}
+.col-search input:focus { outline: none; }
+.col-search .btn { border-radius: 0; }
+
+.filter-bar {
+    position: sticky;
+    top: var(--header-h);
+    z-index: 20;
+    background: rgba(247,243,234,0.96);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+}
+.filters {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr) auto;
+    gap: 14px;
+    padding: 18px 0;
+    align-items: end;
+}
+.filters .field label { font-size: 10.5px; }
+.filters .field select { padding: 11px 36px 11px 13px; font-size: 16px; }
+.filter-toggle { display: none; }
+
+.col-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 34px 0 30px;
+}
+.col-count { font-family: var(--font-display); font-size: 24px; color: var(--ink-soft); }
+.col-count strong { font-family: var(--font-gothic); font-weight: 500; font-size: 34px; color: var(--forest-deep); }
+.col-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-body); font-size: 15.5px;
+    padding: 6px 12px 6px 14px;
+    border: 1px solid var(--aegean);
+    border-radius: 999px;
+    background: var(--aegean-soft);
+    color: var(--aegean);
+    cursor: pointer;
+}
+.chip span[aria-hidden] { font-size: 18px; line-height: 1; }
+.chip:hover { background: var(--aegean); color: var(--marble); }
+.chip-clear { border: 0; background: none; font-family: var(--font-label); font-size: 11.5px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-soft); cursor: pointer; text-decoration: underline; }
+
+.col-empty { text-align: center; padding: 60px 0 40px; }
+.col-empty h3 { font-size: 40px; }
+.col-empty p { color: var(--ink-soft); margin-top: 10px; }
+.col-empty .btn { margin-top: 24px; }
+.col-more { display: flex; justify-content: center; margin-top: 60px; }
+.col-results { padding-bottom: 120px; scroll-margin-top: calc(var(--header-h) + 90px); }
+
+.type-strip { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 26px; }
+.type-strip a {
+    font-family: var(--font-label); font-size: 11.5px; font-weight: 600; letter-spacing: 1.4px; text-transform: uppercase;
+    color: rgba(247,243,234,0.85);
+    padding: 9px 15px;
+    border: 1px solid rgba(247,243,234,0.3);
+    border-radius: 999px;
+    transition: background-color 0.2s, color 0.2s;
+}
+.type-strip a:hover { background: var(--marble); color: var(--forest-deep); }
+
+@media (max-width: 900px) {
+    .filters { grid-template-columns: 1fr 1fr; }
+    .filters .field-sort { grid-column: span 2; }
+}
+@media (max-width: 640px) {
+    .col-search input { padding: 16px; font-size: 17px; }
+    .col-search .btn { padding: 0 18px; }
+    .filter-toggle {
+        display: flex; width: 100%; justify-content: space-between; align-items: center;
+        padding: 15px 0; border: 0; background: none; cursor: pointer;
+        font-family: var(--font-label); font-size: 12.5px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--forest);
+    }
+    .filter-toggle .caret { transition: transform 0.2s; }
+    .filter-bar.open .filter-toggle .caret { transform: rotate(180deg); }
+    .filters { display: none; padding-top: 0; grid-template-columns: 1fr; }
+    .filters .field-sort { grid-column: auto; }
+    .filter-bar.open .filters { display: grid; }
+    .type-strip { display: none; }
+}
+</style>
+</head>
+<body data-page="collection">
+
+<header id="siteHeader"></header>
+
+<main>
+    <section class="page-hero">
+        <div class="container">
+            <span class="eyebrow light">Five Thousand Years</span>
+            <h1>The Collection</h1>
+            <p>Search paintings, sculpture, armor, pottery, carpets and more. Every work shows exactly where to find it in the museum.</p>
+            <form class="col-search" id="colSearchForm" role="search">
+                <input type="search" id="fSearch" placeholder="Title, artist, culture or gallery" aria-label="Search the collection">
+                <button type="submit" class="btn btn-gold">Search</button>
+            </form>
+            <div class="type-strip">
+                <a href="#" data-type-link="Paintings">Paintings</a>
+                <a href="#" data-type-link="Sculpture">Sculpture</a>
+                <a href="#" data-type-link="Arms &amp; Armor">Arms &amp; Armor</a>
+                <a href="#" data-type-link="Pottery &amp; Ceramics">Pottery</a>
+                <a href="#" data-type-link="Textiles &amp; Carpets">Carpets</a>
+                <a href="#" data-type-link="Architecture">Architecture</a>
+            </div>
+        </div>
+        <div data-treeline></div>
+    </section>
+
+    <div class="filter-bar" id="filterBar">
+        <div class="container">
+            <button type="button" class="filter-toggle" id="filterToggle" aria-expanded="false" aria-controls="filters">Filter &amp; Sort <span class="caret">&#9662;</span></button>
+            <div class="filters" id="filters">
+                <div class="field"><label for="fEra">Era</label><select id="fEra"></select></div>
+                <div class="field"><label for="fCulture">Culture</label><select id="fCulture"></select></div>
+                <div class="field"><label for="fType">Object Type</label><select id="fType"></select></div>
+                <div class="field"><label for="fWing">Gallery</label><select id="fWing"></select></div>
+                <div class="field field-sort"><label for="fSort">Sort</label>
+                    <select id="fSort">
+                        <option value="featured">Featured</option>
+                        <option value="title">Title A–Z</option>
+                        <option value="oldest">Oldest first</option>
+                        <option value="newest">Newest first</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container col-results" id="colResults">
+        <div class="col-head">
+            <p class="col-count" id="colCount" aria-live="polite"></p>
+            <div class="col-chips" id="colChips"></div>
+        </div>
+        <div class="art-grid" id="colGrid"></div>
+        <div class="col-empty" id="colEmpty" hidden>
+            <h3>Nothing Found</h3>
+            <p>No works match those filters. Try a broader search.</p>
+            <button type="button" class="btn btn-forest" data-clear="all">Clear All Filters</button>
+        </div>
+        <div class="col-more"><button type="button" class="btn btn-line" id="colMore" hidden>Show More Works</button></div>
+    </div>
+</main>
+
+<footer id="siteFooter"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/art.js"></script>
+<script src="js/script.js"></script>
+<script>
+(function () {
+    var bar = document.getElementById('filterBar'), t = document.getElementById('filterToggle');
+    t.addEventListener('click', function () {
+        var open = bar.classList.toggle('open');
+        t.setAttribute('aria-expanded', open);
+    });
+})();
+</script>
+</body>
+</html>

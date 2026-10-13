@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About — Ashwood Museum</title>
+<meta name="description" content="The story of the Ashwood Museum of Art & History, its building and the forest beside it.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 44'%3E%3Cpath d='M2 43V17C2 9 9 3 17 1c8 2 15 8 15 16v26z' fill='%2313261D' stroke='%23E2BF62' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Grenze+Gotisch:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Grenze:wght@400;500;600&text=IN&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
+.manifesto { text-align: center; }
+.manifesto .big {
+    font-family: var(--font-gothic);
+    font-size: clamp(34px, 4.4vw, 56px);
+    line-height: 1.2;
+    color: var(--forest-deep);
+    max-width: 1000px;
+    margin: 14px auto 0;
+}
+.manifesto .big em { font-style: normal; color: var(--aegean); }
+.manifesto .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; text-align: left; max-width: 980px; margin: 50px auto 0; }
+.manifesto .cols p { font-size: 19px; line-height: 1.8; color: var(--ink-soft); }
+
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; text-align: center; }
+.stat strong { display: block; font-family: var(--font-gothic); font-weight: 500; font-size: clamp(48px, 5vw, 70px); color: var(--gold-bright); line-height: 1; }
+.stat span { display: block; margin-top: 10px; font-family: var(--font-label); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: rgba(247,243,234,0.8); }
+
+.building { display: grid; grid-template-columns: 1.1fr 1fr; gap: 70px; align-items: center; }
+.building-art { aspect-ratio: 4 / 5; box-shadow: var(--shadow-lg); }
+.building h2 { font-size: clamp(40px, 5vw, 60px); margin-top: 8px; }
+.building p { font-size: 19px; line-height: 1.8; color: var(--ink-soft); margin-top: 18px; }
+
+.timeline { position: relative; max-width: 900px; margin: 0 auto; }
+.timeline::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: linear-gradient(var(--gold), var(--moss)); }
+.t-item { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 70px; padding: 26px 0; }
+.t-item::before {
+    content: ''; position: absolute; left: 50%; top: 36px; width: 13px; height: 13px;
+    border: 2px solid var(--gold); background: var(--marble-2); transform: translateX(-50%) rotate(45deg);
+}
+.t-year { font-family: var(--font-gothic); font-size: 52px; color: var(--forest); line-height: 1; text-align: right; }
+.t-item:nth-child(even) .t-year { order: 2; text-align: left; }
+.t-text h3 { font-family: var(--font-display); font-weight: 600; font-size: 25px; color: var(--ink); }
+.t-text p { color: var(--ink-soft); font-size: 17px; margin-top: 6px; }
+.t-item:nth-child(even) .t-text { text-align: right; }
+
+.leaders { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
+.leader { text-align: center; }
+.leader .portrait {
+    width: 170px; height: 210px; margin: 0 auto;
+    background: radial-gradient(circle at 50% 38%, #D9C7AE 0 26%, transparent 27%), radial-gradient(ellipse at 50% 108%, var(--forest) 0 46%, transparent 47%), linear-gradient(180deg, var(--stone), var(--marble-2));
+}
+.leader h3 { font-family: var(--font-display); font-weight: 600; font-size: 25px; color: var(--ink); margin-top: 18px; }
+.leader p { color: var(--ink-soft); font-size: 16px; }
+
+.contact-wrap { display: grid; grid-template-columns: 1fr 1.2fr; gap: 70px; align-items: start; }
+.contact-wrap h2 { font-size: clamp(40px, 5vw, 58px); margin-top: 8px; }
+.contact-list { list-style: none; margin: 26px 0 0; padding: 0; display: flex; flex-direction: column; gap: 16px; font-size: 18px; }
+.contact-list .k { display: block; font-family: var(--font-label); font-size: 11.5px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--gold-deep); }
+.contact-card { background: #FFFDF8; border: 1px solid var(--line); border-top: 6px solid var(--gold); padding: 36px; }
+.c-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.c-form .full { grid-column: 1 / -1; }
+.c-form .btn { grid-column: 1 / -1; }
+
+@media (max-width: 900px) {
+    .manifesto .cols, .building, .contact-wrap { grid-template-columns: 1fr; gap: 40px; }
+    .building-art { max-width: 480px; }
+    .stats { grid-template-columns: 1fr 1fr; row-gap: 40px; }
+    .leaders { grid-template-columns: 1fr; gap: 40px; }
+}
+@media (max-width: 640px) {
+    .timeline::before { left: 7px; }
+    .t-item { grid-template-columns: 1fr; gap: 6px; padding: 18px 0 18px 34px; }
+    .t-item::before { left: 7px; top: 30px; }
+    .t-year, .t-item:nth-child(even) .t-year { order: 0; text-align: left; font-size: 42px; }
+    .t-item:nth-child(even) .t-text { text-align: left; }
+    .contact-card { padding: 26px 18px; }
+    .c-form { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body data-page="about">
+
+<header id="siteHeader"></header>
+
+<main>
+    <section class="page-hero">
+        <div class="container">
+            <span class="eyebrow light">About Ashwood</span>
+            <h1>A Sanctuary of Culture</h1>
+            <p>Founded beside the forest in 1874, Ashwood has spent a century and a half gathering the world’s art and history under one roof.</p>
+        </div>
+        <div data-treeline></div>
+    </section>
+
+    <section class="section manifesto">
+        <div class="container">
+            <span class="eyebrow">Our Mission</span>
+            <div data-ornament></div>
+            <p class="big reveal">A museum is more than a place that houses art. It is a <em>tour through time</em> that lasts as long as you want it to.</p>
+            <div class="cols reveal">
+                <p>Ashwood exists so that anyone can stand in front of something made thousands of years ago, by someone they will never meet, and feel understood. We collect, care for and share the art of every culture and every era, from Egyptian gold and Greek marble to Gothic glass and modern canvas.</p>
+                <p>People arrive with their own eyes and their own ideas: scholars and students, skeptics and dreamers, the professional and the anti-establishment. Here, they observe, think and feel, one exhibit at a time. That is what a museum is for.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section tight dark on-dark">
+        <div class="container stats">
+            <div class="stat reveal"><strong>1874</strong><span>Year Founded</span></div>
+            <div class="stat reveal"><strong>1.5</strong><span>Million Works in the Collection</span></div>
+            <div class="stat reveal"><strong>5,000</strong><span>Years of History</span></div>
+            <div class="stat reveal"><strong>10</strong><span>Wings on Two Floors</span></div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container building">
+            <div class="art-media arch cover building-art reveal" id="buildingArt"></div>
+            <div class="reveal">
+                <span class="eyebrow">The Building &amp; the Forest</span>
+                <h2>Gothic Nature</h2>
+                <p>Ashwood’s grand Beaux-Arts halls rise at the edge of a forest more than eight hundred acres wide. The architects planned it that way: tall north windows open onto the trees, the Sculpture Court sits beneath a glass roof crossed by branches, and forest paths lead straight to the museum’s doors.</p>
+                <p>Inside, the bold scale of a nineteenth-century mansion meets the calm of the woods: soaring arches, quiet green galleries and light that shifts with the leaves. It is a place built for wandering, with a clear head and no hurry at all.</p>
+                <a href="visit.html#directions" class="btn btn-forest" style="margin-top:28px">Getting Here</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section alt">
+        <div class="container">
+            <div class="section-head center">
+                <span class="eyebrow">Our History</span>
+                <h2>150 Years of Ashwood</h2>
+            </div>
+            <div class="timeline">
+                <div class="t-item reveal"><div class="t-year">1874</div><div class="t-text"><h3>A museum for everyone</h3><p>A group of citizens, artists and collectors charters the Ashwood Museum with a promise to bring art to all people.</p></div></div>
+                <div class="t-item reveal"><div class="t-year">1880</div><div class="t-text"><h3>Into the forest</h3><p>The first building opens on the east edge of Ashwood Forest, with three galleries and a single marble statue.</p></div></div>
+                <div class="t-item reveal"><div class="t-year">1902</div><div class="t-text"><h3>The Great Hall</h3><p>The grand Ashwood Avenue facade and Great Hall are completed, giving the museum its famous columns and steps.</p></div></div>
+                <div class="t-item reveal"><div class="t-year">1926</div><div class="t-text"><h3>Treasures of the ancient world</h3><p>Ashwood’s excavations bring Egyptian and Greek collections home, and the Temple of Artemis facade is raised inside.</p></div></div>
+                <div class="t-item reveal"><div class="t-year">1987</div><div class="t-text"><h3>The Sculpture Court</h3><p>A glass-roofed court opens on the forest side, letting trees and sky into the galleries.</p></div></div>
+                <div class="t-item reveal"><div class="t-year">2024</div><div class="t-text"><h3>The next chapter</h3><p>A 150th-anniversary renewal reopens the Medieval and Arms &amp; Armor wings and makes every gallery step-free.</p></div></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head center">
+                <span class="eyebrow">Leadership</span>
+                <h2>The People Behind Ashwood</h2>
+            </div>
+            <div class="leaders">
+                <div class="leader reveal"><div class="portrait arch"></div><h3>[Director Name]</h3><p>Director &amp; Chief Executive</p></div>
+                <div class="leader reveal"><div class="portrait arch"></div><h3>[Curator Name]</h3><p>Chief Curator</p></div>
+                <div class="leader reveal"><div class="portrait arch"></div><h3>[Chair Name]</h3><p>Chair, Board of Trustees</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section alt" id="contact">
+        <div class="container contact-wrap">
+            <div>
+                <span class="eyebrow">Get in Touch</span>
+                <h2>Contact Us</h2>
+                <ul class="contact-list">
+                    <li><span class="k">Address</span>1000 Ashwood Avenue, City, State ZIP</li>
+                    <li><span class="k">Phone</span>(000) 000-0000</li>
+                    <li><span class="k">General</span>info@ashwoodmuseum.org</li>
+                    <li><span class="k">Press</span>press@ashwoodmuseum.org</li>
+                </ul>
+            </div>
+            <div class="contact-card">
+                <form class="c-form" id="contactForm" novalidate>
+                    <div class="field"><label for="cName">Name</label><input type="text" id="cName" autocomplete="name"><span class="err">Please enter your name.</span></div>
+                    <div class="field"><label for="cEmail">Email</label><input type="email" id="cEmail" autocomplete="email"><span class="err">Please enter a valid email.</span></div>
+                    <div class="field full"><label for="cTopic">Topic</label>
+                        <select id="cTopic"><option>General question</option><option>Visiting &amp; accessibility</option><option>Membership</option><option>Groups &amp; schools</option><option>Press</option></select>
+                    </div>
+                    <div class="field full"><label for="cMsg">Message</label><textarea id="cMsg"></textarea><span class="err">Please write a short message.</span></div>
+                    <button type="submit" class="btn btn-forest">Send Message</button>
+                </form>
+                <div class="form-success" id="contactDone">
+                    <span class="eyebrow">Thank You</span>
+                    <h3>Message Sent</h3>
+                    <p>We’ll reply within two working days.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer id="siteFooter" class="after-alt"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/art.js"></script>
+<script src="js/script.js"></script>
+<script>document.getElementById('buildingArt').innerHTML = facadeSVG();</script>
+</body>
+</html>

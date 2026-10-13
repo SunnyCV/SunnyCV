@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exhibitions — Ashwood Museum</title>
+<meta name="description" content="Current, upcoming and past exhibitions at the Ashwood Museum of Art & History.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 44'%3E%3Cpath d='M2 43V17C2 9 9 3 17 1c8 2 15 8 15 16v26z' fill='%2313261D' stroke='%23E2BF62' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Grenze+Gotisch:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Grenze:wght@400;500;600&text=IN&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.ex-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: -32px auto 0;
+    position: relative;
+    z-index: 2;
+    background: var(--marble);
+    width: fit-content;
+    padding: 6px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    box-shadow: var(--shadow);
+}
+.ex-tab {
+    font-family: var(--font-label);
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    padding: 13px 26px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+.ex-tab:hover { color: var(--forest); }
+.ex-tab.active { background: var(--forest); color: var(--marble); }
+
+.ex-list { display: flex; flex-direction: column; gap: 110px; padding: 90px 0 130px; }
+.ex-feature {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 80px;
+    align-items: center;
+}
+.ex-feature .art-media { aspect-ratio: 4 / 5; max-height: 640px; display: block; }
+.ex-feature .art-media > svg, .ex-feature .art-media > img { transition: transform 0.7s ease; }
+.ex-feature .art-media:hover > svg, .ex-feature .art-media:hover > img { transform: scale(1.04); }
+.ex-feature.flip .art-media { order: 2; }
+.ex-feature h2 { font-size: clamp(44px, 5.4vw, 72px); margin-top: 10px; }
+.ex-feature h2 a:hover { color: var(--aegean); }
+.ex-sub { font-family: var(--font-display); font-style: italic; font-size: 26px; color: var(--ink-soft); margin-top: 6px; }
+.ex-feature-text > p:not(.ex-sub):not(.ex-dates) { margin-top: 22px; font-size: 19px; color: var(--ink-soft); }
+.ex-dates { margin-top: 22px; font-family: var(--font-display); font-weight: 600; font-size: 21px; color: var(--ink); }
+.ex-feature .loc { margin-top: 8px; }
+.ex-actions { margin-top: 32px; }
+.ex-empty { text-align: center; color: var(--ink-soft); font-size: 20px; padding: 40px 0; }
+
+@media (max-width: 900px) {
+    .ex-feature { grid-template-columns: 1fr; gap: 34px; }
+    .ex-feature.flip .art-media { order: 0; }
+    .ex-feature .art-media { aspect-ratio: 5 / 4; }
+}
+@media (max-width: 640px) {
+    .ex-tabs { width: auto; margin: -28px 20px 0; }
+    .ex-tab { flex: 1; padding: 12px 6px; font-size: 11px; letter-spacing: 1px; }
+    .ex-list { gap: 80px; padding: 64px 0 100px; }
+    .ex-sub { font-size: 22px; }
+    .ex-actions .btn { width: 100%; }
+}
+</style>
+</head>
+<body data-page="exhibitions">
+
+<header id="siteHeader"></header>
+
+<main>
+    <section class="page-hero">
+        <div class="container">
+            <span class="eyebrow light">On View at Ashwood</span>
+            <h1>Exhibitions</h1>
+            <p>From the forests of medieval Europe to the shores of the Aegean: stories told one gallery at a time.</p>
+        </div>
+        <div data-treeline></div>
+    </section>
+
+    <div class="ex-tabs" role="tablist" aria-label="Exhibitions by date">
+        <button type="button" class="ex-tab" role="tab" data-show="current">Now On View</button>
+        <button type="button" class="ex-tab" role="tab" data-show="upcoming">Upcoming</button>
+        <button type="button" class="ex-tab" role="tab" data-show="past">Past</button>
+    </div>
+
+    <div class="container">
+        <div class="ex-list" id="exList"></div>
+    </div>
+</main>
+
+<footer id="siteFooter"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/art.js"></script>
+<script src="js/script.js"></script>
+</body>
+</html>

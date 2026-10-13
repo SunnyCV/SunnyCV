@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plan Your Visit — Ashwood Museum</title>
+<meta name="description" content="Hours, admission, directions, floor guide and accessibility at the Ashwood Museum of Art & History.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 44'%3E%3Cpath d='M2 43V17C2 9 9 3 17 1c8 2 15 8 15 16v26z' fill='%2313261D' stroke='%23E2BF62' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Grenze+Gotisch:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Grenze:wght@400;500;600&text=IN&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
+
+.visit-quick { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; }
+.v-card { background: #FFFDF8; border: 1px solid var(--line); border-radius: 2px; padding: 40px; }
+.v-card h2 { font-size: 46px; margin: 6px 0 22px; }
+.hours-table { width: 100%; border-collapse: collapse; font-size: 18px; }
+.hours-table th, .hours-table td { padding: 12px 0; border-bottom: 1px solid var(--line); text-align: left; font-weight: 400; }
+.hours-table td { text-align: right; color: var(--ink-soft); }
+.hours-table tr.today th, .hours-table tr.today td { color: var(--forest-deep); font-weight: 500; }
+.hours-table tr.today th span {
+    font-family: var(--font-label); font-size: 9.5px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase;
+    background: var(--gold); color: var(--forest-night); padding: 3px 8px; border-radius: 999px; margin-left: 8px; vertical-align: 2px;
+}
+.v-note { margin-top: 18px; font-size: 16px; color: var(--ink-soft); }
+.admission { list-style: none; margin: 0; padding: 0; }
+.admission li { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 13px 0; border-bottom: 1px solid var(--line); }
+.admission strong { font-weight: 500; font-size: 18px; }
+.admission em { display: block; font-style: normal; font-size: 15px; color: var(--ink-faint); }
+.admission b { font-family: var(--font-display); font-weight: 600; font-size: 24px; color: var(--forest-deep); }
+.v-card .btn { margin-top: 26px; }
+
+.getting { display: grid; grid-template-columns: 1fr 1.2fr; gap: 70px; align-items: center; }
+.getting h2 { font-size: clamp(40px, 5vw, 58px); margin-top: 8px; }
+.address { font-family: var(--font-display); font-size: 28px; font-weight: 600; color: var(--marble); margin-top: 18px; line-height: 1.3; }
+.ways { list-style: none; margin: 28px 0 0; padding: 0; display: flex; flex-direction: column; gap: 18px; }
+.ways li { display: grid; grid-template-columns: 110px 1fr; gap: 16px; font-size: 17.5px; }
+.ways .k { font-family: var(--font-label); font-size: 11.5px; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase; color: var(--gold-bright); padding-top: 4px; }
+.loc-map { border: 1px solid rgba(201,162,74,0.35); border-radius: 2px; overflow: hidden; box-shadow: var(--shadow-lg); }
+.loc-map svg { display: block; width: 100%; height: auto; }
+.getting .btn { margin-top: 30px; }
+
+.floors-wrap { display: grid; grid-template-columns: 1.5fr 1fr; gap: 50px; align-items: start; }
+.floor-tabs { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 5px; background: var(--marble); margin-bottom: 22px; }
+.floor-tab {
+    border: 0; background: transparent; cursor: pointer;
+    font-family: var(--font-label); font-size: 12px; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase;
+    padding: 11px 22px; border-radius: 999px; color: var(--ink-soft);
+}
+.floor-tab.active { background: var(--forest); color: var(--marble); }
+.floor-map { background: #FFFDF8; border: 1px solid var(--line); padding: 14px; border-radius: 2px; }
+.floor-map svg { display: block; width: 100%; height: auto; }
+.floor-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.floor-list a { display: flex; flex-direction: column; padding: 15px 0; border-bottom: 1px solid var(--line); }
+.floor-list a[href]:hover strong { color: var(--aegean); }
+.floor-list strong { font-family: var(--font-display); font-weight: 600; font-size: 22px; transition: color 0.2s; }
+.floor-list span { font-size: 15.5px; color: var(--ink-soft); }
+
+.access-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; }
+.access-item { border-top: 2px solid var(--gold); padding-top: 20px; }
+.access-item h3 { font-family: var(--font-display); font-weight: 600; font-size: 24px; color: var(--ink); }
+.access-item p { color: var(--ink-soft); font-size: 16.5px; margin-top: 8px; }
+
+.amen-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+.amen { position: relative; padding: 44px; border-radius: 2px; color: var(--marble); overflow: hidden; min-height: 280px; display: flex; flex-direction: column; justify-content: flex-end; }
+.amen.cafe { background: linear-gradient(160deg, var(--walnut), var(--bark)); }
+.amen.shop { background: linear-gradient(160deg, var(--aegean), #12324F); }
+.amen h3 { color: var(--marble); font-size: 42px; margin-top: 6px; }
+.amen p { color: rgba(247,243,234,0.85); margin-top: 10px; max-width: 420px; }
+.amen .hrs { font-family: var(--font-label); font-size: 11.5px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--gold-bright); margin-top: 16px; }
+
+.faq { max-width: 860px; margin: 0 auto; }
+.faq details { border-bottom: 1px solid var(--line); }
+.faq summary {
+    list-style: none; cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center; gap: 20px;
+    padding: 22px 0;
+    font-family: var(--font-display); font-weight: 600; font-size: 23px;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: '+'; font-family: var(--font-body); font-size: 28px; color: var(--gold-deep); transition: transform 0.2s; }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq details p { padding: 0 0 22px; color: var(--ink-soft); font-size: 18px; max-width: 760px; }
+
+@media (max-width: 1000px) {
+    .access-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 900px) {
+    .visit-quick, .getting, .floors-wrap, .amen-grid { grid-template-columns: 1fr; }
+    .getting { gap: 44px; }
+}
+@media (max-width: 640px) {
+    .v-card { padding: 28px 22px; }
+    .v-card h2 { font-size: 38px; }
+    .v-card .btn { width: 100%; }
+    .ways li { grid-template-columns: 1fr; gap: 2px; }
+    .access-grid { grid-template-columns: 1fr; }
+    .amen { padding: 30px 24px; min-height: 230px; }
+    .amen h3 { font-size: 36px; }
+    .faq summary { font-size: 20px; }
+}
+</style>
+</head>
+<body data-page="visit">
+
+<header id="siteHeader"></header>
+
+<main>
+    <section class="page-hero">
+        <div class="container">
+            <span class="eyebrow light">Plan Your Visit</span>
+            <h1>Visit Ashwood</h1>
+            <p>Everything you need for a day among the galleries, from hours and tickets to the quickest way to the armor.</p>
+        </div>
+        <div data-treeline></div>
+    </section>
+
+    <section class="section" id="hours">
+        <div class="container visit-quick">
+            <div class="v-card reveal">
+                <span class="eyebrow">Opening Hours</span>
+                <h2>Hours</h2>
+                <table class="hours-table" id="hoursTable"></table>
+                <p class="v-note">Galleries begin closing 15 minutes before closing time. Open late on Friday and Saturday evenings.</p>
+            </div>
+            <div class="v-card reveal">
+                <span class="eyebrow">Tickets</span>
+                <h2>Admission</h2>
+                <ul class="admission" id="admissionList"></ul>
+                <p class="v-note">Admission includes all exhibitions and same-day re-entry. Timed entry is recommended on weekends.</p>
+                <a href="tickets.html" class="btn btn-gold">Buy Tickets Online</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section dark on-dark" id="directions">
+        <div class="container getting">
+            <div class="reveal">
+                <span class="eyebrow">Getting Here</span>
+                <h2>Beside the Forest</h2>
+                <p class="address">1000 Ashwood Avenue<br>City, State ZIP</p>
+                <ul class="ways">
+                    <li><span class="k">On Foot</span><span>The museum stands on the east edge of Ashwood Forest. Forest paths from the Lantern Gate and the Pond lead straight to the north doors.</span></li>
+                    <li><span class="k">Transit</span><span>Ashwood Avenue station, two blocks south. Buses stop at the main steps.</span></li>
+                    <li><span class="k">Parking</span><span>Garage entrance on Ashwood Avenue at the south wing. Accessible spaces on level one.</span></li>
+                    <li><span class="k">Bicycles</span><span>Racks at the main steps and the forest entrance.</span></li>
+                </ul>
+                <a href="https://www.google.com/maps/search/?api=1&amp;query=Ashwood+Museum" target="_blank" rel="noopener" class="btn btn-gold">Get Directions</a>
+            </div>
+            <div class="loc-map reveal">
+                <svg viewBox="0 0 640 480" role="img" aria-label="Map: the museum on the east edge of Ashwood Forest">
+                    <rect width="640" height="480" fill="#E9E2D0"/>
+                    <g stroke="#FFFDF8" stroke-width="10"><path d="M0 70H640M0 190H640M0 330H640M0 440H640"/></g>
+                    <rect x="20" y="20" width="400" height="440" rx="10" fill="#8FB574"/>
+                    <path d="M250 140 C 300 120, 360 150, 350 210 C 340 260, 270 270, 240 230 C 215 195, 215 155, 250 140Z" fill="#7FC8C2"/>
+                    <g fill="#4E7A4A">
+                        <circle cx="70" cy="70" r="26"/><circle cx="110" cy="110" r="22"/><circle cx="60" cy="160" r="28"/><circle cx="130" cy="200" r="24"/>
+                        <circle cx="80" cy="260" r="30"/><circle cx="150" cy="300" r="22"/><circle cx="70" cy="360" r="26"/><circle cx="140" cy="400" r="28"/>
+                        <circle cx="210" cy="360" r="24"/><circle cx="260" cy="410" r="22"/><circle cx="200" cy="60" r="22"/><circle cx="290" cy="60" r="26"/>
+                        <circle cx="380" cy="90" r="20"/><circle cx="210" cy="280" r="18"/><circle cx="330" cy="330" r="24"/><circle cx="380" cy="420" r="20"/>
+                    </g>
+                    <path d="M40 440 C 120 380, 160 300, 230 250 S 330 230, 410 250" stroke="#EFE8DA" stroke-width="5" fill="none" stroke-dasharray="2 0"/>
+                    <path d="M60 40 C 140 120, 190 140, 245 150" stroke="#EFE8DA" stroke-width="4" fill="none"/>
+                    <rect x="432" y="0" width="22" height="480" fill="#FFFDF8"/>
+                    <text x="443" y="470" transform="rotate(-90 443 470)" font-family="Cinzel, Georgia, serif" font-size="11" letter-spacing="2" fill="#4F5A53">ASHWOOD AVENUE</text>
+                    <rect x="350" y="200" width="78" height="120" rx="3" fill="#F7F3EA" stroke="#8F6E22" stroke-width="2"/>
+                    <rect x="358" y="210" width="62" height="100" fill="#E2BF62"/>
+                    <text x="389" y="250" text-anchor="middle" font-family="Grenze Gotisch, Georgia, serif" font-size="18" fill="#13261D">Ash-</text>
+                    <text x="389" y="270" text-anchor="middle" font-family="Grenze Gotisch, Georgia, serif" font-size="18" fill="#13261D">wood</text>
+                    <path d="M428 260 h20" stroke="#1E4E79" stroke-width="3"/><path d="M440 252 l8 8 -8 8" stroke="#1E4E79" stroke-width="3" fill="none"/>
+                    <rect x="44" y="300" width="196" height="46" rx="3" fill="#F7F3EA" opacity="0.92"/><text x="142" y="331" text-anchor="middle" font-family="Grenze Gotisch, Georgia, serif" font-size="27" fill="#1F3A2E">Ashwood Forest</text>
+                    <text x="290" y="196" text-anchor="middle" font-family="Cinzel, Georgia, serif" font-size="10" letter-spacing="1.5" fill="#1E4E79">THE POND</text>
+                    <circle cx="520" cy="430" r="12" fill="#1E4E79"/><text x="520" y="434" text-anchor="middle" font-family="Cinzel, Georgia, serif" font-size="11" font-weight="700" fill="#fff">T</text>
+                    <text x="540" y="434" font-family="Cinzel, Georgia, serif" font-size="10" letter-spacing="1" fill="#1E4E79">STATION</text>
+                    <rect x="470" y="280" width="60" height="40" rx="3" fill="#D8D0BE"/><text x="500" y="304" text-anchor="middle" font-family="Cinzel, Georgia, serif" font-size="12" font-weight="700" fill="#4F5A53">P</text>
+                    <rect x="470" y="90" width="150" height="80" fill="#DCD3BF"/><rect x="470" y="210" width="150" height="50" fill="#DCD3BF"/><rect x="550" y="280" width="70" height="40" fill="#DCD3BF"/>
+                    <rect x="470" y="350" width="150" height="70" fill="#DCD3BF"/><rect x="470" y="10" width="150" height="50" fill="#DCD3BF"/>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="floors">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <span class="eyebrow">Find Your Way</span>
+                    <h2>Floor Guide</h2>
+                    <p>The galleries span two floors around the Great Hall. Tap a gallery to see what’s on view there.</p>
+                </div>
+            </div>
+            <div class="floors-wrap">
+                <div>
+                    <div class="floor-tabs" role="tablist" aria-label="Floors">
+                        <button type="button" class="floor-tab" role="tab" data-floor="1">Floor 1</button>
+                        <button type="button" class="floor-tab" role="tab" data-floor="2">Floor 2</button>
+                    </div>
+                    <div class="floor-map" id="floorMap"></div>
+                </div>
+                <ul class="floor-list" id="floorList"></ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="section alt" id="accessibility">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <span class="eyebrow">Welcome, Everyone</span>
+                    <h2>Accessibility</h2>
+                </div>
+            </div>
+            <div class="access-grid">
+                <div class="access-item"><h3>Step-Free Entry</h3><p>Ramped entrance at the Ashwood Avenue doors and the forest entrance. Elevators serve every floor.</p></div>
+                <div class="access-item"><h3>Wheelchairs</h3><p>Wheelchairs and folding stools are free to borrow at every coat check.</p></div>
+                <div class="access-item"><h3>Audio &amp; Verbal Tours</h3><p>Audio guides with described tours, plus verbal-description tours on the first Sunday of each month.</p></div>
+                <div class="access-item"><h3>Quiet Hours</h3><p>Sensory-friendly mornings on Sundays from 10 to 11 AM, with lowered lights and sound.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container amen-grid">
+            <div class="amen cafe reveal">
+                <span class="eyebrow light">Dining</span>
+                <h3>The Forest Café</h3>
+                <p>Lunch, pastries and coffee on a terrace that looks out into the trees.</p>
+                <span class="hrs">Daily 10 AM – 4:30 PM · Fri &amp; Sat until 8 PM</span>
+            </div>
+            <div class="amen shop reveal">
+                <span class="eyebrow light">Shopping</span>
+                <h3>The Ashwood Shop</h3>
+                <p>Books, prints, jewelry inspired by the collection, and gifts for every age.</p>
+                <span class="hrs">Open during museum hours · Floor 1</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="section alt">
+        <div class="container">
+            <div class="section-head center">
+                <span class="eyebrow">Good to Know</span>
+                <h2>Questions</h2>
+            </div>
+            <div class="faq">
+                <details><summary>How long should I plan to spend?</summary><p>Most visitors spend two to three hours. If it’s your first visit, start in the Great Hall and choose two or three galleries. The museum is far too large to see in one day.</p></details>
+                <details><summary>Can I take photographs?</summary><p>Yes. Photography for personal use is welcome in the permanent collection, without flash or tripods. Some exhibitions don’t allow photography; look for signs at the entrance.</p></details>
+                <details><summary>Are bags allowed in the galleries?</summary><p>Small bags are welcome. Backpacks and bags larger than 11 × 15 inches must be checked at a coat check, free of charge.</p></details>
+                <details><summary>Do my tickets include exhibitions?</summary><p>Yes. General admission includes every exhibition on view, plus same-day re-entry.</p></details>
+                <details><summary>Can I walk to the museum through the forest?</summary><p>Yes. Ashwood Forest is open from dawn until dusk, and the forest paths lead directly to the museum’s north entrance.</p></details>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer id="siteFooter" class="after-alt"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/art.js"></script>
+<script src="js/script.js"></script>
+</body>
+</html>

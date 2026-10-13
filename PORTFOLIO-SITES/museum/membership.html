@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Membership — Ashwood Museum</title>
+<meta name="description" content="Become a member of the Ashwood Museum: free admission all year, previews, tours and more.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 44'%3E%3Cpath d='M2 43V17C2 9 9 3 17 1c8 2 15 8 15 16v26z' fill='%2313261D' stroke='%23E2BF62' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Grenze+Gotisch:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Grenze:wght@400;500;600&text=IN&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
+.perks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; text-align: center; }
+.perk .num { font-family: var(--font-gothic); font-size: 64px; color: var(--forest); line-height: 1; }
+.perk h3 { font-family: var(--font-display); font-weight: 600; font-size: 23px; color: var(--ink); margin-top: 10px; }
+.perk p { color: var(--ink-soft); font-size: 16.5px; margin-top: 6px; }
+
+.tier-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; align-items: stretch; }
+.tier {
+    position: relative;
+    display: flex; flex-direction: column;
+    background: #FFFDF8;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 36px 28px 30px;
+    transition: transform 0.25s, box-shadow 0.25s;
+}
+.tier:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+.tier.featured { background: var(--forest); color: var(--marble); border-color: var(--forest); }
+.tier.featured h3 { color: var(--marble); }
+.tier-flag {
+    position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+    font-family: var(--font-label); font-size: 10.5px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    background: var(--gold); color: var(--forest-night); padding: 6px 14px; border-radius: 999px; white-space: nowrap;
+}
+.tier h3 { font-size: 40px; }
+.tier-price { margin-top: 6px; font-size: 17px; color: var(--ink-soft); }
+.tier.featured .tier-price { color: rgba(247,243,234,0.75); }
+.tier-price strong { font-family: var(--font-display); font-size: 40px; font-weight: 600; color: var(--forest-deep); }
+.tier.featured .tier-price strong { color: var(--gold-bright); }
+.tier ul { list-style: none; margin: 22px 0 28px; padding: 0; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+.tier li { position: relative; padding-left: 24px; font-size: 16.5px; line-height: 1.5; }
+.tier li::before { content: ''; position: absolute; left: 2px; top: 8px; width: 9px; height: 9px; border: 1.5px solid var(--gold); transform: rotate(45deg); }
+.tier.featured .btn-gold { width: 100%; }
+.tier .btn { width: 100%; white-space: normal; padding-left: 14px; padding-right: 14px; }
+.tier.featured .btn-line { border-color: var(--marble); color: var(--marble); }
+
+.join-wrap { display: grid; grid-template-columns: 1fr 1.3fr; gap: 70px; align-items: start; }
+.join-wrap h2 { font-size: clamp(40px, 5vw, 58px); margin-top: 8px; }
+.join-wrap .lead { margin-top: 18px; }
+.join-card { background: #FFFDF8; border: 1px solid var(--line); border-top: 6px solid var(--gold); padding: 36px; border-radius: 2px; }
+.m-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.m-form .full { grid-column: 1 / -1; }
+.m-total { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: baseline; padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.m-total span { font-family: var(--font-label); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-soft); }
+.m-total strong { font-family: var(--font-gothic); font-weight: 500; font-size: 40px; color: var(--forest-deep); }
+.demo-note { grid-column: 1 / -1; font-size: 14.5px; color: var(--ink-faint); background: var(--marble-2); padding: 10px 14px; border-radius: 2px; }
+.m-form .btn { grid-column: 1 / -1; padding: 18px; }
+
+@media (max-width: 1100px) {
+    .tier-grid { grid-template-columns: 1fr 1fr; row-gap: 34px; }
+}
+@media (max-width: 900px) {
+    .perks { grid-template-columns: 1fr 1fr; row-gap: 40px; }
+    .join-wrap { grid-template-columns: 1fr; gap: 40px; }
+}
+@media (max-width: 640px) {
+    .tier-grid { grid-template-columns: 1fr; }
+    .perk .num { font-size: 52px; }
+    .join-card { padding: 26px 18px; }
+}
+</style>
+</head>
+<body data-page="membership">
+
+<header id="siteHeader"></header>
+
+<main>
+    <section class="page-hero">
+        <div class="container">
+            <span class="eyebrow light">Membership</span>
+            <h1>Belong to Ashwood</h1>
+            <p>Come back as often as you like. Members keep the galleries thriving and see every exhibition first.</p>
+        </div>
+        <div data-treeline></div>
+    </section>
+
+    <section class="section tight">
+        <div class="container perks">
+            <div class="perk reveal"><div class="num">∞</div><h3>Unlimited Visits</h3><p>Free admission, every day we’re open, all year.</p></div>
+            <div class="perk reveal"><div class="num">1st</div><h3>First to See</h3><p>Members-only previews before every exhibition opens.</p></div>
+            <div class="perk reveal"><div class="num">9</div><h3>Early Mornings</h3><p>Tours at 9 AM, an hour before the doors open.</p></div>
+            <div class="perk reveal"><div class="num">10%</div><h3>Shop &amp; Café</h3><p>Savings on books, gifts and lunch by the forest.</p></div>
+        </div>
+    </section>
+
+    <section class="section alt" id="tiers">
+        <div class="container">
+            <div class="section-head center">
+                <span class="eyebrow">Choose a Level</span>
+                <h2>Membership Levels</h2>
+                <p>All levels are valid for twelve months from the day you join.</p>
+            </div>
+            <div class="tier-grid" id="tierGrid"></div>
+        </div>
+    </section>
+
+    <section class="section" id="join">
+        <div class="container join-wrap">
+            <div>
+                <span class="eyebrow">Join Today</span>
+                <h2>Your Membership Starts Now</h2>
+                <p class="lead">Your digital card arrives by email straight away, so you can visit today. Your printed card and the first issue of Ashwood Magazine follow within two weeks.</p>
+                <div data-ornament class="left"></div>
+                <p style="color:var(--ink-soft)">Questions about membership? Call <strong>(000) 000-0000</strong> or email <strong>members@ashwoodmuseum.org</strong>.</p>
+            </div>
+            <div class="join-card">
+                <form class="m-form" id="mForm" novalidate>
+                    <div class="field full"><label for="mTier">Membership Level</label><select id="mTier"></select></div>
+                    <div class="field"><label for="mName">Full Name</label><input type="text" id="mName" autocomplete="name"><span class="err">Please enter your name.</span></div>
+                    <div class="field"><label for="mEmail">Email</label><input type="email" id="mEmail" autocomplete="email"><span class="err">Please enter a valid email.</span></div>
+                    <div class="field full"><label for="mCard">Card Number</label><input type="text" id="mCard" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456"><span class="err">Please check the card number.</span></div>
+                    <div class="field"><label for="mExp">Expiry</label><input type="text" id="mExp" inputmode="numeric" autocomplete="cc-exp" placeholder="MM / YY"><span class="err">Invalid date.</span></div>
+                    <div class="field"><label for="mCvc">CVC</label><input type="text" id="mCvc" inputmode="numeric" autocomplete="cc-csc" placeholder="123"><span class="err">3–4 digits.</span></div>
+                    <div class="field full"><label for="mZip">Billing ZIP</label><input type="text" id="mZip" autocomplete="postal-code"><span class="err">Required.</span></div>
+                    <div class="m-total"><span>Total today</span><strong id="mTotal"></strong></div>
+                    <p class="demo-note">Portfolio demo: no payment is taken. Try the test card 4242 4242 4242 4242 with any future expiry.</p>
+                    <button type="submit" class="btn btn-gold" id="mSubmit">Join</button>
+                </form>
+                <div class="form-success" id="mDone">
+                    <span class="eyebrow">Welcome</span>
+                    <h3>Welcome to Ashwood, <span id="mDoneName"></span></h3>
+                    <p>Your <strong id="mDoneTier"></strong> membership is active. Your digital card is on its way to <strong id="mDoneEmail"></strong>.</p>
+                    <a href="exhibitions.html" class="btn btn-forest" style="margin-top:24px">See What’s On</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer id="siteFooter"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/art.js"></script>
+<script src="js/script.js"></script>
+</body>
+</html>
