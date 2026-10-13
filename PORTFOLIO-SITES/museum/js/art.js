@@ -330,12 +330,15 @@ function facadeSVG() {
             '<radialGradient id="fcGlow" cx="0.5" cy="0.8" r="0.8"><stop offset="0" stop-color="#F6C27D"/><stop offset="1" stop-color="#F6C27D" stop-opacity="0"/></radialGradient>' +
             '<radialGradient id="fcSun" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#FFF4C8"/><stop offset="1" stop-color="#FFF4C8" stop-opacity="0"/></radialGradient>' +
         '</defs>' +
-        '<rect width="1600" height="900" fill="url(#fcSky)"/>' +
-        '<circle cx="1260" cy="190" r="220" fill="url(#fcSun)"/>' +
-        '<ellipse cx="380" cy="170" rx="200" ry="34" fill="#fff" opacity="0.45"/><ellipse cx="520" cy="140" rx="120" ry="22" fill="#fff" opacity="0.35"/>' +
-        '<path d="M0 560 C 200 470, 380 500, 540 470 L 1060 470 C 1220 490, 1400 460, 1600 520 V900 H0Z" fill="#2F5A38"/>' +
-        trees +
+        /* layers are grouped so the Home page can move them at different speeds */
+        '<g class="px" data-depth="0.5"><rect x="-200" y="-500" width="2000" height="1400" fill="url(#fcSky)"/>' +
+        '<circle cx="1260" cy="190" r="220" fill="url(#fcSun)"/></g>' +
+        '<g class="px" data-depth="0.42"><g class="clouds"><ellipse cx="380" cy="170" rx="200" ry="34" fill="#fff" opacity="0.45"/><ellipse cx="520" cy="140" rx="120" ry="22" fill="#fff" opacity="0.35"/>' +
+        '<ellipse cx="1050" cy="110" rx="150" ry="24" fill="#fff" opacity="0.3"/></g></g>' +
+        '<g class="px" data-depth="0.3"><path d="M-200 560 C 200 470, 380 500, 540 470 L 1060 470 C 1220 490, 1400 460, 1800 520 V1000 H-200Z" fill="#2F5A38"/>' +
+        trees + '</g>' +
         /* the building */
+        '<g class="px" data-depth="0.18">' +
         '<rect x="500" y="300" width="600" height="340" fill="#EDE6D6"/>' +
         '<rect x="380" y="380" width="140" height="260" fill="#E6DECC"/><rect x="1080" y="380" width="140" height="260" fill="#E6DECC"/>' +
         '<path d="M400 640 V470 C 400 440, 440 440, 440 470 V640Z M460 640 V470 C 460 440, 500 440, 500 470 V640Z M1100 640 V470 C 1100 440, 1140 440, 1140 470 V640Z M1160 640 V470 C 1160 440, 1200 440, 1200 470 V640Z" fill="#2B4250"/>' +
@@ -345,8 +348,8 @@ function facadeSVG() {
         '<text x="800" y="270" text-anchor="middle" font-family="Cinzel, Georgia, serif" font-size="22" letter-spacing="10" fill="#8F6E22">ASHWOOD MUSEUM</text>' +
         wins + cols + banners +
         '<rect x="460" y="636" width="680" height="18" fill="#F2ECDF"/><rect x="430" y="654" width="740" height="18" fill="#E6DECC"/><rect x="400" y="672" width="800" height="20" fill="#D8D0BE"/>' +
-        '<path d="M0 692 H1600 V900 H0Z" fill="#3E6B4A"/>' +
-        '<path d="M0 760 C 300 720, 600 760, 800 740 S 1300 720, 1600 760 V900 H0Z" fill="#1F3D28"/>' +
+        '<path d="M-200 692 H1800 V1100 H-200Z" fill="#3E6B4A"/></g>' +
+        '<g class="px" data-depth="0.06"><path d="M-200 760 C 300 720, 600 760, 800 740 S 1300 720, 1800 760 V1100 H-200Z" fill="#1F3D28"/></g>' +
         '</svg>';
 }
 
