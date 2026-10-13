@@ -609,8 +609,9 @@ function eventDateBlock(e) {
         $('tkStep2').classList.toggle('locked', !state.date);
         $('tkStep3').classList.toggle('locked', !state.time);
         $('tkStep4').classList.toggle('locked', !ready);
-        $('tkPayFields').hidden = t.sum === 0;
-        $('tkPay').textContent = t.sum === 0 ? 'Reserve Free Tickets' : 'Pay ' + money(t.sum);
+        var free = t.count > 0 && t.sum === 0;
+        $('tkPayFields').hidden = free;
+        $('tkPay').textContent = free ? 'Reserve Free Tickets' : t.sum ? 'Pay ' + money(t.sum) : 'Pay';
         $('tkPay').disabled = !ready;
         $('tkSumNote').textContent = ready ? '' : !state.date ? 'Pick a date to begin.' : !state.time ? 'Pick an entry time.' : 'Add at least one ticket.';
     }
