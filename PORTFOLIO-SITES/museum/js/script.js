@@ -69,7 +69,7 @@ function esc(s) {
     var footer = $('siteFooter');
     if (footer) {
         footer.classList.add('site-footer');
-        footer.innerHTML = treelineSVG() +
+        footer.innerHTML = arcadeHTML() +
             '<div class="container"><div class="footer-grid">' +
                 '<div>' + logo + '<p class="footer-address">' + MUSEUM.street + '<br>' + MUSEUM.city + '<br>Beside Ashwood Forest</p></div>' +
                 '<div><h4>Visit</h4><ul><li><a href="visit.html">Plan Your Visit</a></li><li><a href="tickets.html">Tickets</a></li><li><a href="visit.html#hours">Hours</a></li><li><a href="visit.html#accessibility">Accessibility</a></li></ul></div>' +
@@ -95,8 +95,8 @@ function esc(s) {
         el.classList.add('ornament');
         el.innerHTML = ICON.laurel;
     });
-    document.querySelectorAll('[data-treeline]').forEach(function (el) {
-        el.outerHTML = treelineSVG();
+    document.querySelectorAll('[data-arcade]').forEach(function (el) {
+        el.outerHTML = arcadeHTML();
     });
 })();
 

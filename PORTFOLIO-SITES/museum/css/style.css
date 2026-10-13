@@ -279,16 +279,16 @@ body.nav-open { overflow: hidden; }
 }
 .page-hero h1 { color: var(--marble); font-size: clamp(48px, 7vw, 86px); margin-top: 12px; }
 .page-hero p { max-width: 640px; margin: 18px auto 0; color: rgba(247,243,234,0.78); font-size: 19.5px; }
-.treeline {
+.arcade {
     position: absolute;
     left: 0; right: 0; bottom: -1px;
-    height: 70px;
-    width: 100%;
-    color: var(--marble);
+    height: 64px;
+    background: var(--marble);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 64'%3E%3Cpath d='M0 64V58H5V40C5 24 18 10 30 2C42 10 55 24 55 40V58H60V64Z'/%3E%3C/svg%3E") center bottom / 60px 64px repeat-x;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 64'%3E%3Cpath d='M0 64V58H5V40C5 24 18 10 30 2C42 10 55 24 55 40V58H60V64Z'/%3E%3C/svg%3E") center bottom / 60px 64px repeat-x;
     pointer-events: none;
 }
 .page-hero > .container { position: relative; z-index: 1; }
-.section.alt + .site-footer .treeline, .site-footer.after-alt .treeline { color: var(--marble-2); }
 
 /* screen-reader only */
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -479,20 +479,12 @@ body.nav-open { overflow: hidden; }
     position: relative;
     background: var(--forest-night);
     color: rgba(247,243,234,0.74);
-    padding: 120px 0 40px;
+    padding: 96px 0 40px;
     margin-top: 0;
-    overflow: hidden;
 }
-.site-footer .treeline {
-    position: absolute;
-    left: 0; right: 0; top: -1px;
-    width: 100%;
-    height: 70px;
-    color: var(--marble);
-    transform: scaleY(-1);
-}
-.site-footer.after-alt .treeline { color: var(--marble-2); }
-.site-footer.after-dark .treeline { display: none; }
+/* the footer's arcade rises out of it into the section above */
+.site-footer .arcade { top: -63px; bottom: auto; background: var(--forest-night); }
+.site-footer.after-dark .arcade { display: none; }
 .site-footer.after-dark { padding-top: 90px; border-top: 1px solid rgba(201,162,74,0.18); }
 .footer-grid {
     display: grid;
@@ -592,5 +584,6 @@ body.nav-open { overflow: hidden; }
     .footer-grid > :first-child, .footer-news { grid-column: span 2; }
     .footer-bottom { flex-direction: column; text-align: center; }
     .btn { padding: 15px 24px; }
-    .treeline { width: 260%; height: 56px; }
+    .arcade { height: 48px; -webkit-mask-size: 45px 48px; mask-size: 45px 48px; }
+    .site-footer .arcade { top: -47px; }
 }

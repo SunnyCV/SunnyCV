@@ -412,6 +412,7 @@ var ICON = {
     arrow: '&rarr;'
 };
 
-function treelineSVG() {
-    return '<svg class="treeline" viewBox="0 0 1406 70" preserveAspectRatio="none" aria-hidden="true"><path fill="currentColor" d="M0 70V52c20-4 30-22 46-24 12 2 14 16 30 18 14-2 18-26 36-30 16 6 16 24 34 26 18-2 20-18 38-20 14 2 18 20 34 22 20-4 24-32 44-36 18 6 20 30 40 32 16-2 20-14 36-14 16 2 18 16 34 16 18-4 22-26 42-28 18 4 22 22 40 24 16-2 20-16 36-16 18 2 20 18 38 18 20-6 22-34 44-38 20 6 22 32 42 34 16-2 18-12 34-12 16 2 20 14 36 14 18-4 22-24 40-26 18 4 20 20 38 22 18-2 22-18 40-18 16 2 18 14 34 14 20-6 26-32 46-34 18 6 20 28 40 30 16-2 20-14 36-14s18 12 34 12c18-4 22-22 40-24 18 4 20 18 38 20 18-2 22-16 40-16 14 2 18 12 32 12 20-6 24-30 44-32 18 6 22 26 40 28 16-2 20-12 36-12 16 2 20 12 36 12 16-4 20-20 38-22 16 4 18 16 34 18 16-2 20-12 36-12V70z"/></svg>';
+/* row of pointed Gothic arches that closes dark headers and opens the footer */
+function arcadeHTML() {
+    return '<div class="arcade" aria-hidden="true"></div>';
 }
