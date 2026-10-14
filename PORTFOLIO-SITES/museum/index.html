@@ -360,6 +360,129 @@ body[data-page="home"] .member-band .btn { padding: 13px 24px; font-size: 11.5px
     .member-band { padding: 56px 0; }
     .ev-row h3 { font-size: 18.5px; }
 }
+
+/* ══════════════════════════════════════
+   HOME: four full-screen panels
+══════════════════════════════════════ */
+.panel { position: relative; }
+
+/* 1 · Welcome */
+.panel-hero .hero-content { padding-bottom: 150px; }
+.panel-hero .today-bar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; background: rgba(13,27,20,0.88); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.scroll-cue { border: 0; background: none; cursor: pointer; bottom: 92px; padding: 0; }
+.scroll-cue:hover { color: var(--marble); }
+
+/* 2 · Exhibitions & dates */
+.panel-ex { background: var(--marble); padding-bottom: 70px; }
+.panel-ex .marquee { margin-bottom: 44px; }
+.ex-layout { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr); gap: 50px; align-items: start; }
+.ex-dates { border-left: 1px solid var(--line); padding-left: 40px; }
+.ex-dates .section-head { flex-direction: column; align-items: flex-start; gap: 6px; margin-bottom: 18px; }
+.ex-dates .ev-row:first-child { padding-top: 4px; }
+.ex-dates .ev-row { grid-template-columns: auto 1fr; }
+.ex-dates .ev-arrow { display: none; }
+.ex-dates .ev-row h3 { font-size: 18px; }
+
+/* 3 · Quote & collection */
+.panel-col .mission {
+    padding: 54px 0 46px; text-align: center; color: var(--marble);
+    background: radial-gradient(ellipse at 15% 0%, rgba(127,200,194,0.10), transparent 50%), linear-gradient(180deg, var(--forest-deep), var(--forest-night));
+}
+.panel-col .mission p { color: rgba(247,243,234,0.78); margin-top: 16px; }
+.panel-col .mission .text-link { margin: 0 0 0 10px; display: inline; }
+.col-area { background: var(--marble-2); padding: 46px 0 56px; }
+
+/* 4 · Hours, tickets, membership + footer */
+.panel-visit { background: var(--marble); padding-top: 70px; }
+.visit-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-bottom: 120px; align-items: stretch; }
+.member-card { position: relative; overflow: hidden; border-radius: 2px; padding: 34px; text-align: left; display: flex; flex-direction: column; justify-content: center; }
+.member-card .member-inner { position: relative; z-index: 1; }
+.member-card h2 { margin-top: 6px; }
+.member-card p { margin: 12px 0 24px; max-width: none; }
+.member-card .btns { justify-content: flex-start; }
+
+/* section dots (only in full-page mode) */
+.fp-dots { display: none; }
+
+/* ── Full-page mode ── */
+html.fp-on, html.fp-on body { height: 100%; overflow: hidden; }
+.fp-on .fp { position: fixed; inset: 0; overflow: hidden; }
+.fp-on .fp-track { height: 100%; transition: transform 1.05s cubic-bezier(.77,0,.18,1); will-change: transform; }
+.fp-on .panel { height: 100%; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; scrollbar-width: none; display: flex; flex-direction: column; }
+.fp-on .panel::-webkit-scrollbar { display: none; }
+.fp-on .panel > * { flex-shrink: 0; }
+.fp-on .panel-hero { min-height: 0; justify-content: flex-end; }
+.fp-on .panel-ex, .fp-on .panel-col, .fp-on .panel-visit { padding-top: var(--header-h); }
+.fp-on .panel-ex { padding-bottom: 40px; }
+.fp-on .panel-inner { margin-top: auto; margin-bottom: auto; }
+.fp-on .col-area { flex: 1 0 auto; display: flex; flex-direction: column; justify-content: center; }
+.fp-on .visit-layout { margin-top: auto; }
+.fp-on .panel-visit .site-footer { margin-top: auto; }
+.fp-on .visit-layout { margin-bottom: 80px; }
+
+/* tighter fit so each panel fills one screen */
+.fp-on .panel-col .mission { padding: 30px 0 28px; }
+.fp-on .panel-col .mission blockquote { font-size: clamp(24px, 2.7vw, 36px); }
+.fp-on .panel-col .ornament { margin: 8px 0; }
+.fp-on .col-area { padding: 28px 0 30px; }
+.fp-on .col-area .section-head { margin-bottom: 20px; }
+.fp-on .hl-track { grid-auto-columns: 180px; gap: 22px; }
+.fp-on .hl-track .art-media { aspect-ratio: 1 / 1; }
+.fp-on .col-area .section-head p { display: none; }
+.fp-on .col-area .section-head { align-items: flex-end; }
+.fp-on .panel-col .mission p { margin-top: 10px; }
+.fp-on .browse-types { margin-top: 22px; }
+.fp-on .plan-card { padding: 26px 28px; }
+.fp-on .plan-card h2, .fp-on .member-card h2 { font-size: 30px; }
+.fp-on .plan-card dl { margin: 14px 0 18px; font-size: 15px; }
+.fp-on .member-card { padding: 26px 30px; }
+.fp-on .member-card p { font-size: 16px; margin: 10px 0 20px; }
+.fp-on .panel-visit .site-footer { padding: 44px 0 20px; }
+.fp-on .panel-visit { padding-top: calc(var(--header-h) + 24px); }
+.fp-on .panel-visit .footer-bottom { margin-top: 26px; padding-top: 16px; }
+.fp-on .panel-visit .footer-address { margin-top: 14px; }
+body[data-page="home"] .ex-card .dates { letter-spacing: 1.4px; font-size: 10.5px; }
+
+.fp-on .reveal { opacity: 1; transform: none; }
+.fp-on .fp-item { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.9s cubic-bezier(.2,.7,.2,1); transition-delay: calc(var(--d, 0) * 0.13s + 0.1s); }
+.fp-on .panel.shown .fp-item { opacity: 1; transform: none; }
+.fp-on .panel.resetting, .fp-on .panel.resetting * { transition: none !important; }
+
+.fp-on .fp-dots {
+    display: flex; flex-direction: column; gap: 6px;
+    position: fixed; right: 22px; top: 50%; transform: translateY(-50%); z-index: 90;
+    padding: 10px 8px; border-radius: 999px; background: rgba(13,27,20,0.55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.fp-dot { position: relative; width: 22px; height: 22px; border: 0; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.fp-dot::before { content: ''; width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid rgba(247,243,234,0.75); transition: background-color 0.3s, transform 0.3s, border-color 0.3s; }
+.fp-dot:hover::before { border-color: var(--gold-bright); }
+.fp-dot.active::before { background: var(--gold-bright); border-color: var(--gold-bright); transform: scale(1.25); }
+.fp-dot span {
+    position: absolute; right: 32px; white-space: nowrap; pointer-events: none;
+    font-family: var(--font-label); font-size: 10.5px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--marble); background: rgba(13,27,20,0.85); padding: 6px 10px; border-radius: 2px;
+    opacity: 0; transform: translateX(6px); transition: opacity 0.2s, transform 0.2s;
+}
+.fp-dot:hover span, .fp-dot:focus-visible span { opacity: 1; transform: none; }
+
+@media (max-width: 1000px) {
+    .ex-layout, .visit-layout { grid-template-columns: 1fr; gap: 34px; }
+    .ex-dates { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); padding-top: 26px; }
+}
+@media (max-width: 640px) {
+    .panel-hero .hero-content { padding-bottom: 120px; }
+    .panel-hero .today-inner { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding-top: 12px; padding-bottom: 12px; font-size: 14px; }
+    .panel-hero .today-inner > span:nth-child(2), .panel-hero .today-inner > span:nth-child(3) { display: none; }
+    .panel-ex .marquee { margin-bottom: 28px; }
+    .panel-col .mission { padding: 40px 0 34px; }
+    .col-area { padding: 36px 0 40px; }
+    .member-card { padding: 28px 22px; }
+    .visit-layout { margin-bottom: 90px; }
+    .fp-on .fp-dots { right: 4px; padding: 4px 1px; gap: 0; background: none; backdrop-filter: none; -webkit-backdrop-filter: none; top: auto; bottom: 18px; transform: none; }
+    .fp-dot { width: 18px; height: 18px; }
+    .fp-dot::before { width: 6px; height: 6px; box-shadow: 0 0 0 1px rgba(13,27,20,0.35); }
+    .fp-dot span { display: none; }
+}
 </style>
 </head>
 <body data-page="home" data-hero>
@@ -367,8 +490,11 @@ body[data-page="home"] .member-band .btn { padding: 13px 24px; font-size: 11.5px
 <div class="progress" id="progress"></div>
 <header id="siteHeader"></header>
 
-<main>
-    <section class="hero">
+<main class="fp" id="fp">
+<div class="fp-track" id="fpTrack">
+
+    <!-- ── 1 · Welcome ── -->
+    <section class="panel panel-hero hero" id="welcome" data-label="Welcome">
         <div class="hero-art" id="heroArt"></div>
         <div class="hero-shade"></div>
         <div class="container hero-content">
@@ -380,77 +506,90 @@ body[data-page="home"] .member-band .btn { padding: 13px 24px; font-size: 11.5px
                 <a href="collection.html" class="btn btn-light">Explore the Collection</a>
             </div>
         </div>
-        <div class="scroll-cue" aria-hidden="true">Scroll<span></span></div>
-    </section>
-
-    <div class="today-bar">
-        <div class="container today-inner">
-            <span id="todayHours"></span>
-            <span>1000 Ashwood Avenue <span class="dot">·</span> Beside Ashwood Forest</span>
-            <span>Adults $30 <span class="dot">·</span> Members &amp; children free</span>
-            <a href="visit.html" class="text-link" style="color:var(--sea-glass);border-color:rgba(127,200,194,0.4)">Plan Your Visit</a>
-        </div>
-    </div>
-
-    <div class="marquee" aria-label="Now on view">
-        <div class="marquee-track" id="marqueeTrack"></div>
-    </div>
-
-    <section class="section">
-        <div class="container">
-            <div class="section-head reveal">
-                <div>
-                    <span class="eyebrow">On View</span>
-                    <h2>Current Exhibitions</h2>
-                </div>
-                <a href="exhibitions.html" class="text-link">All Exhibitions &rarr;</a>
-            </div>
-            <div class="ex-grid reveal" id="homeExhibitions"></div>
-        </div>
-    </section>
-
-    <section class="section dark mission on-dark">
-        <div class="container reveal">
-            <span class="eyebrow">A Sanctuary of Culture</span>
-            <div data-ornament></div>
-            <blockquote>You don’t just learn when you roam. You <em>observe</em>, you <em>think</em>, you <em>feel</em>.</blockquote>
-            <p>Ashwood is a gathering place for every kind of curious mind. Scholars and schoolchildren, skeptics and dreamers meet here to understand what the world has made, one gallery at a time.</p>
-            <a href="about.html" class="text-link">Our Story &rarr;</a>
-        </div>
-    </section>
-
-    <section class="section alt">
-        <div class="container">
-            <div class="section-head reveal">
-                <div>
-                    <span class="eyebrow">From the Collection</span>
-                    <h2>Highlights to Find</h2>
-                    <p>Every work shows the gallery where you’ll find it.</p>
-                </div>
-                <div class="hl-arrows">
-                    <button type="button" class="round-btn" data-scroll="-1" aria-label="Scroll left">&larr;</button>
-                    <button type="button" class="round-btn" data-scroll="1" aria-label="Scroll right">&rarr;</button>
-                </div>
-            </div>
-            <div class="hl-track reveal" id="homeHighlights"></div>
-            <div class="browse-types reveal">
-                <span class="eyebrow label">Browse</span>
-                <a href="collection.html?type=Paintings">Paintings</a>
-                <a href="collection.html?type=Sculpture">Sculpture</a>
-                <a href="collection.html?type=Arms%20%26%20Armor">Arms &amp; Armor</a>
-                <a href="collection.html?type=Pottery%20%26%20Ceramics">Pottery</a>
-                <a href="collection.html?type=Textiles%20%26%20Carpets">Carpets &amp; Textiles</a>
-                <a href="collection.html?type=Architecture">Architecture</a>
-                <a href="collection.html" class="all">Full Collection &rarr;</a>
+        <button type="button" class="scroll-cue" data-goto="1" aria-label="Go to exhibitions">Scroll<span></span></button>
+        <div class="today-bar">
+            <div class="container today-inner">
+                <span id="todayHours"></span>
+                <span>1000 Ashwood Avenue <span class="dot">·</span> Beside Ashwood Forest</span>
+                <span>Adults $30 <span class="dot">·</span> Members &amp; children free</span>
+                <a href="visit.html" class="text-link" style="color:var(--sea-glass);border-color:rgba(127,200,194,0.4)">Plan Your Visit</a>
             </div>
         </div>
     </section>
 
-    <section class="section">
-        <div class="container plan-grid">
-            <div class="plan-card reveal">
+    <!-- ── 2 · Exhibitions & dates ── -->
+    <section class="panel panel-ex" id="exhibitions" data-label="Exhibitions">
+        <div class="marquee fp-item" style="--d:0" aria-label="Now on view">
+            <div class="marquee-track" id="marqueeTrack"></div>
+        </div>
+        <div class="panel-inner container ex-layout">
+            <div class="ex-main">
+                <div class="section-head reveal fp-item" style="--d:1">
+                    <div>
+                        <span class="eyebrow">On View</span>
+                        <h2>Current Exhibitions</h2>
+                    </div>
+                    <a href="exhibitions.html" class="text-link">All Exhibitions &rarr;</a>
+                </div>
+                <div class="ex-grid reveal fp-item" style="--d:2" id="homeExhibitions"></div>
+            </div>
+            <aside class="ex-dates reveal fp-item" style="--d:3">
+                <div class="section-head">
+                    <div>
+                        <span class="eyebrow">Mark Your Calendar</span>
+                        <h2>Coming Up</h2>
+                    </div>
+                    <a href="events.html" class="text-link">All Events &rarr;</a>
+                </div>
+                <div id="homeEvents"></div>
+            </aside>
+        </div>
+    </section>
+
+    <!-- ── 3 · Quote & collection ── -->
+    <section class="panel panel-col" id="collection" data-label="Collection">
+        <div class="mission on-dark">
+            <div class="container reveal fp-item" style="--d:0">
+                <span class="eyebrow">A Sanctuary of Culture</span>
+                <div data-ornament></div>
+                <blockquote>You don’t just learn when you roam. You <em>observe</em>, you <em>think</em>, you <em>feel</em>.</blockquote>
+                <p>Ashwood is a gathering place for every kind of curious mind, one gallery at a time. <a href="about.html" class="text-link">Our Story &rarr;</a></p>
+            </div>
+        </div>
+        <div class="col-area">
+            <div class="container">
+                <div class="section-head reveal fp-item" style="--d:1">
+                    <div>
+                        <span class="eyebrow">From the Collection</span>
+                        <h2>Highlights to Find</h2>
+                        <p>Every work shows the gallery where you’ll find it.</p>
+                    </div>
+                    <div class="hl-arrows">
+                        <button type="button" class="round-btn" data-scroll="-1" aria-label="Scroll left">&larr;</button>
+                        <button type="button" class="round-btn" data-scroll="1" aria-label="Scroll right">&rarr;</button>
+                    </div>
+                </div>
+                <div class="hl-track reveal fp-item" style="--d:2" id="homeHighlights"></div>
+                <div class="browse-types reveal fp-item" style="--d:3">
+                    <span class="eyebrow label">Browse</span>
+                    <a href="collection.html?type=Paintings">Paintings</a>
+                    <a href="collection.html?type=Sculpture">Sculpture</a>
+                    <a href="collection.html?type=Arms%20%26%20Armor">Arms &amp; Armor</a>
+                    <a href="collection.html?type=Pottery%20%26%20Ceramics">Pottery</a>
+                    <a href="collection.html?type=Textiles%20%26%20Carpets">Carpets &amp; Textiles</a>
+                    <a href="collection.html?type=Architecture">Architecture</a>
+                    <a href="collection.html" class="all">Full Collection &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── 4 · Hours, tickets, membership & footer ── -->
+    <section class="panel panel-visit" id="visit" data-label="Visit">
+        <div class="panel-inner container visit-layout">
+            <div class="plan-card reveal fp-item" style="--d:0">
                 <span class="eyebrow light">Plan Your Visit</span>
-                <h2>Come Wander</h2>
+                <h2>Hours &amp; Tickets</h2>
                 <dl>
                     <dt>Hours</dt><dd>Sun–Tue &amp; Thu 10 AM – 5 PM<br>Fri &amp; Sat 10 AM – 9 PM<br>Closed Wednesdays</dd>
                     <dt>Where</dt><dd>1000 Ashwood Avenue<br>On the east edge of Ashwood Forest</dd>
@@ -461,34 +600,26 @@ body[data-page="home"] .member-band .btn { padding: 13px 24px; font-size: 11.5px
                     <a href="visit.html" class="btn btn-light">Visitor Guide</a>
                 </div>
             </div>
-            <div class="reveal">
-                <div class="section-head" style="margin-bottom:30px">
-                    <div>
-                        <span class="eyebrow">Coming Up</span>
-                        <h2>Events &amp; Programs</h2>
+            <div class="member-band member-card reveal fp-item" style="--d:1">
+                <div class="orb o1"></div><div class="orb o2"></div>
+                <div class="member-inner">
+                    <span class="eyebrow light">Membership</span>
+                    <h2>Make Ashwood Yours</h2>
+                    <p>Free admission all year, early previews of every exhibition, and morning tours before the doors open. From $110 a year.</p>
+                    <div class="btns">
+                        <a href="membership.html" class="btn btn-gold">Become a Member</a>
+                        <a href="membership.html#tiers" class="btn btn-light">Compare Levels</a>
                     </div>
-                    <a href="events.html" class="text-link">All Events &rarr;</a>
                 </div>
-                <div id="homeEvents"></div>
             </div>
         </div>
+        <footer id="siteFooter"></footer>
     </section>
 
-    <section class="member-band">
-        <div class="orb o1"></div><div class="orb o2"></div>
-        <div class="container reveal">
-            <span class="eyebrow light">Membership</span>
-            <h2>Make Ashwood Yours</h2>
-            <p>Free admission all year, early previews of every exhibition, and morning tours before the doors open. From $110 a year.</p>
-            <div class="btns">
-                <a href="membership.html" class="btn btn-gold">Become a Member</a>
-                <a href="membership.html#tiers" class="btn btn-light">Compare Levels</a>
-            </div>
-        </div>
-    </section>
+</div>
 </main>
 
-<footer id="siteFooter" class="after-dark"></footer>
+<nav class="fp-dots" id="fpDots" aria-label="Home sections"></nav>
 
 <script src="js/data.js"></script>
 <script src="js/art.js"></script>
