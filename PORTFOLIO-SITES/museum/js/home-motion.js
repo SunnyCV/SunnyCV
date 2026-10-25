@@ -286,9 +286,14 @@
         var i = panels.indexOf(pnl);
         if (i !== current && i >= 0) {
             current = i; place(false); syncChrome(); showPanel(pnl);
-            pnl.parentNode.parentNode.scrollTop = 0;
         }
     });
+
+    /* the browser's own jump-to-anchor scroll must never move the panel frame; only the slide does */
+    var frameEl = document.getElementById('fp');
+    function pin() { if (frameEl.scrollTop || frameEl.scrollLeft) { frameEl.scrollTop = 0; frameEl.scrollLeft = 0; } if (window.scrollY) window.scrollTo(0, 0); }
+    frameEl.addEventListener('scroll', pin);
+    window.addEventListener('scroll', pin);
 
     window.addEventListener('resize', function () { place(false); });
     window.addEventListener('hashchange', function () {
