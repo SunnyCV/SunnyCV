@@ -58,6 +58,11 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
 .floor-list a[href]:hover strong { color: var(--aegean); }
 .floor-list strong { font-family: var(--font-display); font-weight: 600; font-size: 21px; transition: color 0.2s; }
 .floor-list span { font-size: 15px; color: var(--ink-soft); }
+.floor-list em { font-style: normal; font-family: var(--font-label); font-size: 10.5px; font-weight: 600; letter-spacing: 1.4px; text-transform: uppercase; color: var(--gold-deep); margin: 2px 0 8px; }
+.floor-list em:last-child { margin-bottom: 0; }
+.floor-list li.wide { flex-basis: calc(50% - 15px); }
+.floor-list a > * { max-width: 100%; }
+.floor-list li { min-width: 0; }
 
 .access-group {
     font-family: var(--font-label); font-weight: 600; font-size: 13px; letter-spacing: 3px; text-transform: uppercase;
@@ -69,13 +74,6 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
 .access-item h3 { font-family: var(--font-display); font-weight: 600; font-size: 24px; color: var(--ink); }
 .access-item p { color: var(--ink-soft); font-size: 16.5px; margin-top: 8px; }
 
-.amen-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-.amen { position: relative; padding: 44px; border-radius: 2px; color: var(--marble); overflow: hidden; min-height: 280px; display: flex; flex-direction: column; justify-content: flex-end; }
-.amen.cafe { background: linear-gradient(160deg, var(--walnut), var(--bark)); }
-.amen.shop { background: linear-gradient(160deg, var(--aegean), #12324F); }
-.amen h3 { color: var(--marble); font-size: 42px; margin-top: 6px; }
-.amen p { color: rgba(247,243,234,0.85); margin-top: 10px; max-width: 420px; }
-.amen .hrs { font-family: var(--font-label); font-size: 11.5px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--gold-bright); margin-top: 16px; }
 
 .faq { max-width: 860px; margin: 0 auto; }
 .faq details { border-bottom: 1px solid var(--line); }
@@ -94,7 +92,7 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
     .access-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 900px) {
-    .visit-quick, .amen-grid { grid-template-columns: 1fr; }
+    .visit-quick { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
     .v-card { padding: 28px 22px; }
@@ -104,10 +102,9 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
     .floor-map { padding: 8px; }
     .floor-list { gap: 0 14px; }
     .floor-list li { flex-basis: calc(50% - 7px); }
+    .floor-list li.wide { flex-basis: 100%; }
     .floor-list strong { font-size: 18px; }
     .access-grid { grid-template-columns: 1fr; }
-    .amen { padding: 30px 24px; min-height: 230px; }
-    .amen h3 { font-size: 36px; }
     .faq summary { font-size: 20px; }
 }
 </style>
@@ -223,23 +220,6 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
                 <div class="access-item"><h3>Wheelchairs</h3><p>Wheelchairs and folding stools are free to borrow at every coat check.</p></div>
                 <div class="access-item"><h3>Audio &amp; Verbal Tours</h3><p>Audio guides with described tours, plus verbal-description tours on the first Sunday of each month.</p></div>
                 <div class="access-item"><h3>Quiet Hours</h3><p>Sensory-friendly mornings on Sundays from 10 to 11 AM, with lowered lights and sound.</p></div>
-            </div>
-        </div>
-    </section>
-
-    <section class="section">
-        <div class="container amen-grid">
-            <div class="amen cafe reveal">
-                <span class="eyebrow light">Dining</span>
-                <h3>The Forest Café</h3>
-                <p>Lunch, pastries and coffee on a terrace that looks out into the trees.</p>
-                <span class="hrs">Daily 10 AM – 4:30 PM · Fri &amp; Sat until 8 PM</span>
-            </div>
-            <div class="amen shop reveal">
-                <span class="eyebrow light">Shopping</span>
-                <h3>The Ashwood Shop</h3>
-                <p>Books, prints, jewelry inspired by the collection, and gifts for every age.</p>
-                <span class="hrs">Open during museum hours · Floor 1</span>
             </div>
         </div>
     </section>

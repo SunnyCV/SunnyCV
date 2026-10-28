@@ -517,7 +517,12 @@ function eventDateBlock(e) {
         $('floorList').innerHTML = MAP_LAYOUT[f].map(function (r) {
             var w = WINGS[r[0]];
             var link = (r[0] === 'greathall' || r[0] === 'shop') ? '' : ' href="collection.html?wing=' + r[0] + '"';
-            return '<li><a' + link + '><strong>' + w.name + '</strong><span>' + (w.galleries ? (w.galleries.indexOf('–') > 0 ? 'Galleries ' : 'Gallery ') + w.galleries : (r[0] === 'greathall' ? 'Main entrance, information & tickets' : 'Gifts, books, coffee & lunch')) + '</span></a></li>';
+            var detail = w.galleries ? (w.galleries.indexOf('–') > 0 ? 'Galleries ' : 'Gallery ') + w.galleries
+                : r[0] === 'greathall' ? 'Main entrance, information & tickets'
+                : 'The Forest Café: lunch, pastries & coffee on the forest terrace</span>' +
+                  '<em>Café daily 10 AM – 4:30 PM · Fri & Sat until 8 PM</em>' +
+                  '<span>The Ashwood Shop: books, prints & gifts</span><em>Shop open during museum hours';
+            return '<li' + (r[0] === 'shop' ? ' class="wide"' : '') + '><a' + link + '><strong>' + w.name + '</strong><span>' + detail + '</span></a></li>';
         }).join('');
     }
     floorTabs.forEach(function (t) {
