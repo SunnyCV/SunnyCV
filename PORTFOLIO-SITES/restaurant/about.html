@@ -82,21 +82,12 @@
 }
 
 /* ── Reviews link ── */
-.reviews-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 30px;
-    padding-bottom: 6px;
-    font-family: var(--font-label);
-    font-size: 12px;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    color: var(--amber-soft);
-    border-bottom: 1px solid rgba(217,154,78,0.35);
-    transition: color 0.25s, border-color 0.25s, gap 0.25s;
-}
-.reviews-link:hover { color: var(--cream); border-color: var(--amber); gap: 14px; }
+/* ── Acclaim (no outside links; the restaurant is fictional) ── */
+.acclaim { margin-top: 30px; padding-top: 24px; border-top: 1px solid rgba(217,154,78,0.2); }
+.acclaim-stars { display: block; color: var(--amber); font-size: 15px; letter-spacing: 5px; }
+.acclaim-score { margin: 10px 0 0 !important; font-family: var(--font-label); font-size: 12px !important; letter-spacing: 2px; text-transform: uppercase; color: var(--cream-dim); }
+.acclaim-score strong { font-family: var(--font-display); font-size: 26px; font-weight: 500; letter-spacing: 0; color: var(--amber-soft); margin-right: 6px; text-transform: none; }
+.acclaim-note { margin-top: 10px !important; font-style: italic; color: var(--cream-faint) !important; font-size: 15.5px !important; max-width: 440px; }
 
 /* ── Visit: address, hours, contact, map ── */
 .visit { padding: 0 0 130px; text-align: center; }
@@ -220,7 +211,11 @@
             <p>The dining room was designed the same way the menu was written — slowly, and with restraint. Dark beige walls, wine-red details, fine wood floors, and just enough amber light to make you forget what time it is.</p>
             <p>We've kept the room small on purpose. Every table gets the same attention a chef gives a sauce that's almost ready — patient, and a little obsessive.</p>
             <span class="story-signature">— The Kitchen</span>
-            <a class="reviews-link" href="#" target="_blank" rel="noopener">Read Our Reviews <span>&rarr;</span></a>
+            <div class="acclaim">
+                <span class="acclaim-stars" aria-hidden="true">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                <p class="acclaim-score"><strong>4.9</strong> average from more than 1,200 guests</p>
+                <p class="acclaim-note">Praised by critics for its quiet dining room, patient service and a menu where Italy and France share the same table.</p>
+            </div>
         </div>
     </div>
 </section>
