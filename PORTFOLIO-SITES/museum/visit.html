@@ -32,32 +32,38 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
 .admission b { font-family: var(--font-display); font-weight: 600; font-size: 24px; color: var(--forest-deep); }
 .v-card .btn { margin-top: 26px; }
 
-.getting { display: grid; grid-template-columns: 1fr 1.2fr; gap: 70px; align-items: center; }
+.getting { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 44px; }
 .getting h2 { font-size: clamp(40px, 5vw, 58px); margin-top: 8px; }
-.address { font-family: var(--font-display); font-size: 28px; font-weight: 600; color: var(--marble); margin-top: 18px; line-height: 1.3; }
-.ways { list-style: none; margin: 28px 0 0; padding: 0; display: flex; flex-direction: column; gap: 18px; }
-.ways li { display: grid; grid-template-columns: 110px 1fr; gap: 16px; font-size: 17.5px; }
-.ways .k { font-family: var(--font-label); font-size: 11.5px; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase; color: var(--gold-bright); padding-top: 4px; }
-.loc-map { border: 1px solid rgba(201,162,74,0.35); border-radius: 2px; overflow: hidden; box-shadow: var(--shadow-lg); }
+.address { font-family: var(--font-display); font-size: 26px; font-weight: 600; color: var(--marble); margin-top: 12px; line-height: 1.3; }
+.getting .btn { margin-top: 24px; }
+.loc-map { width: 100%; max-width: 980px; border: 1px solid rgba(201,162,74,0.35); border-radius: 2px; overflow: hidden; box-shadow: var(--shadow-lg); }
 .loc-map svg { display: block; width: 100%; height: auto; }
-.getting .btn { margin-top: 30px; }
 
-.floors-wrap { display: grid; grid-template-columns: 1.5fr 1fr; gap: 50px; align-items: start; }
-.floor-tabs { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 5px; background: var(--marble); margin-bottom: 22px; }
+.floors-wrap { display: flex; flex-direction: column; align-items: center; }
+.floor-tabs { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 5px; background: var(--marble); margin-bottom: 24px; }
 .floor-tab {
     border: 0; background: transparent; cursor: pointer;
     font-family: var(--font-label); font-size: 12px; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase;
     padding: 11px 22px; border-radius: 999px; color: var(--ink-soft);
 }
 .floor-tab.active { background: var(--forest); color: var(--marble); }
-.floor-map { background: #FFFDF8; border: 1px solid var(--line); padding: 14px; border-radius: 2px; }
+.floor-map { width: 100%; max-width: 1060px; background: #FFFDF8; border: 1px solid var(--line); padding: 18px; border-radius: 2px; box-shadow: var(--shadow); }
 .floor-map svg { display: block; width: 100%; height: auto; }
-.floor-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
-.floor-list a { display: flex; flex-direction: column; padding: 15px 0; border-bottom: 1px solid var(--line); }
+.floor-list {
+    list-style: none; margin: 34px 0 0; padding: 0; width: 100%; max-width: 1060px;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 0 30px;
+}
+.floor-list li { flex: 0 1 calc(25% - 23px); border-bottom: 1px solid var(--line); }
+.floor-list a { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 18px 8px; height: 100%; }
 .floor-list a[href]:hover strong { color: var(--aegean); }
-.floor-list strong { font-family: var(--font-display); font-weight: 600; font-size: 22px; transition: color 0.2s; }
-.floor-list span { font-size: 15.5px; color: var(--ink-soft); }
+.floor-list strong { font-family: var(--font-display); font-weight: 600; font-size: 21px; transition: color 0.2s; }
+.floor-list span { font-size: 15px; color: var(--ink-soft); }
 
+.access-group {
+    font-family: var(--font-label); font-weight: 600; font-size: 13px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--gold-deep); text-align: center; margin: 10px 0 24px;
+}
+.access-grid + .access-group { margin-top: 54px; }
 .access-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; }
 .access-item { border-top: 2px solid var(--gold); padding-top: 20px; }
 .access-item h3 { font-family: var(--font-display); font-weight: 600; font-size: 24px; color: var(--ink); }
@@ -88,14 +94,17 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
     .access-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 900px) {
-    .visit-quick, .getting, .floors-wrap, .amen-grid { grid-template-columns: 1fr; }
-    .getting { gap: 44px; }
+    .visit-quick, .amen-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
     .v-card { padding: 28px 22px; }
     .v-card h2 { font-size: 38px; }
     .v-card .btn { width: 100%; }
-    .ways li { grid-template-columns: 1fr; gap: 2px; }
+    .address { font-size: 21px; }
+    .floor-map { padding: 8px; }
+    .floor-list { gap: 0 14px; }
+    .floor-list li { flex-basis: calc(50% - 7px); }
+    .floor-list strong { font-size: 18px; }
     .access-grid { grid-template-columns: 1fr; }
     .amen { padding: 30px 24px; min-height: 230px; }
     .amen h3 { font-size: 36px; }
@@ -137,16 +146,10 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
 
     <section class="section dark on-dark" id="directions">
         <div class="container getting">
-            <div class="reveal">
+            <div class="getting-head reveal">
                 <span class="eyebrow">Getting Here</span>
                 <h2>Beside the Forest</h2>
-                <p class="address">1000 Ashwood Avenue<br>City, State ZIP</p>
-                <ul class="ways">
-                    <li><span class="k">On Foot</span><span>The museum stands on the east edge of Ashwood Forest. Forest paths from the Lantern Gate and the Pond lead straight to the north doors.</span></li>
-                    <li><span class="k">Transit</span><span>Ashwood Avenue station, two blocks south. Buses stop at the main steps.</span></li>
-                    <li><span class="k">Parking</span><span>Garage entrance on Ashwood Avenue at the south wing. Accessible spaces on level one.</span></li>
-                    <li><span class="k">Bicycles</span><span>Racks at the main steps and the forest entrance.</span></li>
-                </ul>
+                <p class="address">1000 Ashwood Avenue, City, State ZIP</p>
                 <a href="https://www.google.com/maps/search/?api=1&amp;query=Ashwood+Museum" target="_blank" rel="noopener" class="btn btn-gold">Get Directions</a>
             </div>
             <div class="loc-map reveal">
@@ -170,7 +173,7 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
                     <text x="389" y="250" text-anchor="middle" font-family="Bodoni Moda, Georgia, serif" font-weight="700" font-size="18" fill="#13261D">Ash-</text>
                     <text x="389" y="270" text-anchor="middle" font-family="Bodoni Moda, Georgia, serif" font-weight="700" font-size="18" fill="#13261D">wood</text>
                     <path d="M428 260 h20" stroke="#1E4E79" stroke-width="3"/><path d="M440 252 l8 8 -8 8" stroke="#1E4E79" stroke-width="3" fill="none"/>
-                    <rect x="44" y="300" width="196" height="46" rx="3" fill="#F7F3EA" opacity="0.92"/><text x="142" y="331" text-anchor="middle" font-family="Bodoni Moda, Georgia, serif" font-weight="700" font-size="27" fill="#1F3A2E">Ashwood Forest</text>
+                    <rect x="40" y="300" width="232" height="44" rx="3" fill="#F7F3EA" opacity="0.92"/><text x="156" y="329" text-anchor="middle" font-family="Bodoni Moda, Georgia, serif" font-weight="700" font-size="22" fill="#1F3A2E">Ashwood Forest</text>
                     <text x="290" y="196" text-anchor="middle" font-family="Cinzel, Georgia, serif" font-size="10" letter-spacing="1.5" fill="#1E4E79">THE POND</text>
                     <circle cx="520" cy="430" r="12" fill="#1E4E79"/><text x="520" y="434" text-anchor="middle" font-family="Cinzel, Georgia, serif" font-size="11" font-weight="700" fill="#fff">T</text>
                     <text x="540" y="434" font-family="Cinzel, Georgia, serif" font-size="10" letter-spacing="1" fill="#1E4E79">STATION</text>
@@ -184,21 +187,17 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
 
     <section class="section" id="floors">
         <div class="container">
-            <div class="section-head">
-                <div>
-                    <span class="eyebrow">Find Your Way</span>
-                    <h2>Floor Guide</h2>
-                    <p>The galleries span two floors around the Great Hall. Tap a gallery to see what’s on view there.</p>
-                </div>
+            <div class="section-head center">
+                <span class="eyebrow">Find Your Way</span>
+                <h2>Floor Guide</h2>
+                <p>The galleries span two floors around the Great Hall. Choose a floor, then pick a gallery to see what’s on view.</p>
             </div>
             <div class="floors-wrap">
-                <div>
-                    <div class="floor-tabs" role="tablist" aria-label="Floors">
-                        <button type="button" class="floor-tab" role="tab" data-floor="1">Floor 1</button>
-                        <button type="button" class="floor-tab" role="tab" data-floor="2">Floor 2</button>
-                    </div>
-                    <div class="floor-map" id="floorMap"></div>
+                <div class="floor-tabs" role="tablist" aria-label="Floors">
+                    <button type="button" class="floor-tab" role="tab" data-floor="1">Floor 1</button>
+                    <button type="button" class="floor-tab" role="tab" data-floor="2">Floor 2</button>
                 </div>
+                <div class="floor-map" id="floorMap"></div>
                 <ul class="floor-list" id="floorList"></ul>
             </div>
         </div>
@@ -206,12 +205,19 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
 
     <section class="section alt" id="accessibility">
         <div class="container">
-            <div class="section-head">
-                <div>
-                    <span class="eyebrow">Welcome, Everyone</span>
-                    <h2>Accessibility</h2>
-                </div>
+            <div class="section-head center">
+                <span class="eyebrow">Welcome, Everyone</span>
+                <h2>Access &amp; Getting Around</h2>
+                <p>How to reach the museum, and everything we offer to make your visit comfortable.</p>
             </div>
+            <h3 class="access-group">Travel &amp; Parking</h3>
+            <div class="access-grid">
+                <div class="access-item"><h3>On Foot</h3><p>The museum stands on the east edge of Ashwood Forest. Forest paths from the Lantern Gate and the Pond lead straight to the north doors.</p></div>
+                <div class="access-item"><h3>Transit</h3><p>Ashwood Avenue station is two blocks south. Buses stop at the main steps.</p></div>
+                <div class="access-item"><h3>Parking</h3><p>Garage entrance on Ashwood Avenue at the south wing. Accessible spaces on level one.</p></div>
+                <div class="access-item"><h3>Bicycles</h3><p>Racks at the main steps and the forest entrance.</p></div>
+            </div>
+            <h3 class="access-group">Accessibility</h3>
             <div class="access-grid">
                 <div class="access-item"><h3>Step-Free Entry</h3><p>Ramped entrance at the Ashwood Avenue doors and the forest entrance. Elevators serve every floor.</p></div>
                 <div class="access-item"><h3>Wheelchairs</h3><p>Wheelchairs and folding stools are free to borrow at every coat check.</p></div>
