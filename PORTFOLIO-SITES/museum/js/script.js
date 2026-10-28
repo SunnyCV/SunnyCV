@@ -519,10 +519,15 @@ function eventDateBlock(e) {
             var link = (r[0] === 'greathall' || r[0] === 'shop') ? '' : ' href="collection.html?wing=' + r[0] + '"';
             var detail = w.galleries ? (w.galleries.indexOf('–') > 0 ? 'Galleries ' : 'Gallery ') + w.galleries
                 : r[0] === 'greathall' ? 'Main entrance, information & tickets'
-                : 'The Forest Café: lunch, pastries & coffee on the forest terrace</span>' +
-                  '<em>Café daily 10 AM – 4:30 PM · Fri & Sat until 8 PM</em>' +
-                  '<span>The Ashwood Shop: books, prints & gifts</span><em>Shop open during museum hours';
-            return '<li' + (r[0] === 'shop' ? ' class="wide"' : '') + '><a' + link + '><strong>' + w.name + '</strong><span>' + detail + '</span></a></li>';
+                : '';
+            if (r[0] === 'shop') {
+                /* the café and shop sit on their own centered row beneath the galleries */
+                return '<li class="amenities"><strong>Shop &amp; Café</strong><div class="amen-pair">' +
+                    '<div><b>The Forest Café</b><span>Lunch, pastries &amp; coffee on the forest terrace</span><em>Daily 10 AM – 4:30 PM · Fri &amp; Sat until 8 PM</em></div>' +
+                    '<div><b>The Ashwood Shop</b><span>Books, prints &amp; gifts inspired by the collection</span><em>Open during museum hours</em></div>' +
+                    '</div></li>';
+            }
+            return '<li><a' + link + '><strong>' + w.name + '</strong><span>' + detail + '</span></a></li>';
         }).join('');
     }
     floorTabs.forEach(function (t) {

@@ -58,9 +58,16 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
 .floor-list a[href]:hover strong { color: var(--aegean); }
 .floor-list strong { font-family: var(--font-display); font-weight: 600; font-size: 21px; transition: color 0.2s; }
 .floor-list span { font-size: 15px; color: var(--ink-soft); }
-.floor-list em { font-style: normal; font-family: var(--font-label); font-size: 10.5px; font-weight: 600; letter-spacing: 1.4px; text-transform: uppercase; color: var(--gold-deep); margin: 2px 0 8px; }
-.floor-list em:last-child { margin-bottom: 0; }
-.floor-list li.wide { flex-basis: calc(50% - 15px); }
+.floor-list li.amenities {
+    flex-basis: 100%; border-bottom: 0; margin-top: 34px; padding: 26px 0 0;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+.floor-list li.amenities > strong { font-family: var(--font-label); font-size: 12.5px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--gold-deep); }
+.amen-pair { display: flex; justify-content: center; gap: 0; margin-top: 18px; width: 100%; max-width: 720px; }
+.amen-pair > div { flex: 1 1 0; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 28px; }
+.amen-pair > div + div { border-left: 1px solid var(--line); }
+.amen-pair b { font-family: var(--font-display); font-weight: 600; font-size: 22px; color: var(--ink); }
+.amen-pair em { font-style: normal; font-family: var(--font-label); font-size: 10.5px; font-weight: 600; letter-spacing: 1.4px; text-transform: uppercase; color: var(--gold-deep); margin-top: 4px; }
 .floor-list a > * { max-width: 100%; }
 .floor-list li { min-width: 0; }
 
@@ -102,7 +109,9 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
     .floor-map { padding: 8px; }
     .floor-list { gap: 0 14px; }
     .floor-list li { flex-basis: calc(50% - 7px); }
-    .floor-list li.wide { flex-basis: 100%; }
+    .amen-pair { flex-direction: column; gap: 22px; }
+    .amen-pair > div { padding: 0; }
+    .amen-pair > div + div { border-left: 0; border-top: 1px solid var(--line); padding-top: 22px; }
     .floor-list strong { font-size: 18px; }
     .access-grid { grid-template-columns: 1fr; }
     .faq summary { font-size: 20px; }
