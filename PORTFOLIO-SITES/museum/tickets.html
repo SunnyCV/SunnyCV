@@ -12,33 +12,33 @@
 <link rel="stylesheet" href="css/style.css">
 <style>
 .page-hero { padding-bottom: 110px; }
-.tk-wrap { display: grid; grid-template-columns: 1.6fr 1fr; gap: 50px; align-items: start; padding: 70px 0 120px; }
+.tk-wrap { max-width: 920px; margin: 0 auto; padding: 70px 0 120px; }
 
-.tk-step { background: #FFFDF8; border: 1px solid var(--line); border-radius: 2px; padding: 34px; transition: opacity 0.3s; }
-.tk-step + .tk-step { margin-top: 22px; }
+.tk-step { background: #FFFDF8; border: 1px solid var(--line); border-radius: 2px; padding: 48px 56px; text-align: center; transition: opacity 0.3s; box-shadow: 0 10px 30px rgba(19,38,29,0.05); }
+.tk-step + .tk-step, .tk-summary { margin-top: 26px; }
 .tk-step.locked { opacity: 0.45; pointer-events: none; }
-.tk-step-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 22px; }
-.tk-num { font-family: var(--font-label); font-weight: 700; font-size: 26px; line-height: 1; color: var(--gold-deep); }
-.tk-step h2 { font-size: 34px; }
-.tk-hint { color: var(--ink-faint); font-size: 16.5px; grid-column: 1 / -1; }
+.tk-step-head { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 30px; }
+.tk-num { font-family: var(--font-label); font-weight: 700; font-size: 15px; letter-spacing: 3px; line-height: 1; color: var(--gold-deep); }
+.tk-step h2 { font-size: 42px; }
+.tk-hint { color: var(--ink-faint); font-size: 17.5px; width: 100%; }
 
-.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.cal-head strong { font-family: var(--font-display); font-weight: 600; font-size: 24px; }
+.cal-head { display: flex; align-items: center; justify-content: center; gap: 34px; margin-bottom: 18px; }
+.cal-head strong { font-family: var(--font-display); font-weight: 600; font-size: 28px; min-width: 220px; }
 .cal-nav {
-    width: 42px; height: 42px; border-radius: 50%;
-    border: 1px solid var(--line); background: transparent; cursor: pointer; font-size: 18px; color: var(--forest);
+    width: 48px; height: 48px; border-radius: 50%;
+    border: 1px solid var(--line); background: transparent; cursor: pointer; font-size: 20px; color: var(--forest);
 }
 .cal-nav:hover:not(:disabled) { background: var(--forest); color: var(--marble); }
 .cal-nav:disabled { opacity: 0.3; cursor: default; }
-.calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-.cal-dow { text-align: center; font-family: var(--font-label); font-size: 11px; font-weight: 600; letter-spacing: 1px; color: var(--ink-faint); padding-bottom: 6px; }
+.calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; max-width: 700px; margin: 0 auto; }
+.cal-dow { text-align: center; font-family: var(--font-label); font-size: 12px; font-weight: 600; letter-spacing: 1px; color: var(--ink-faint); padding-bottom: 8px; }
 .cal-day {
-    height: 54px;
+    height: 68px;
     border: 1px solid var(--line);
     border-radius: 2px;
     background: var(--marble);
     font-family: var(--font-body);
-    font-size: 17px;
+    font-size: 19px;
     cursor: pointer;
     transition: background-color 0.15s, border-color 0.15s, color 0.15s;
 }
@@ -47,54 +47,61 @@
 .cal-day.closed:disabled { text-decoration: line-through; }
 .cal-day.today { border-color: var(--gold); }
 .cal-day.selected { background: var(--forest); border-color: var(--forest); color: var(--marble); }
-.cal-key { display: flex; gap: 20px; margin-top: 14px; font-size: 14.5px; color: var(--ink-faint); flex-wrap: wrap; }
+.cal-key { display: flex; justify-content: center; gap: 24px; margin-top: 18px; font-size: 15px; color: var(--ink-faint); flex-wrap: wrap; }
 
-.slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; }
+.slots { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
 .slot {
-    padding: 12px 6px;
+    flex: 0 0 128px;
+    padding: 16px 8px;
     border: 1px solid var(--line);
     border-radius: 2px;
     background: var(--marble);
     font-family: var(--font-body);
-    font-size: 16.5px;
+    font-size: 18px;
     cursor: pointer;
 }
 .slot:hover { border-color: var(--forest); }
 .slot.selected { background: var(--forest); border-color: var(--forest); color: var(--marble); }
 
-.tk-type { display: grid; grid-template-columns: 1fr auto auto; gap: 24px; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--line); }
+#tkTypes { max-width: 640px; margin: 0 auto; }
+.tk-type { display: grid; grid-template-columns: 1fr 90px auto; gap: 24px; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--line); text-align: left; }
 .tk-type:first-child { padding-top: 0; }
-.tk-type strong { font-weight: 500; font-size: 19px; display: block; }
-.tk-type span { font-size: 15px; color: var(--ink-faint); }
-.tk-type b { font-family: var(--font-display); font-weight: 600; font-size: 22px; color: var(--forest-deep); min-width: 56px; text-align: right; }
+.tk-type strong { font-weight: 500; font-size: 21px; display: block; }
+.tk-type span { font-size: 15.5px; color: var(--ink-faint); }
+.tk-type b { font-family: var(--font-display); font-weight: 600; font-size: 24px; color: var(--forest-deep); text-align: right; }
 .stepper { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; }
 .stepper button {
-    width: 40px; height: 40px; border: 0; background: transparent; cursor: pointer; font-size: 20px; color: var(--forest); border-radius: 50%;
+    width: 46px; height: 46px; border: 0; background: transparent; cursor: pointer; font-size: 22px; color: var(--forest); border-radius: 50%;
 }
 .stepper button:hover:not(:disabled) { background: var(--moss-soft); }
 .stepper button:disabled { color: #C2C7C2; cursor: default; }
-.stepper output { min-width: 28px; text-align: center; font-size: 18px; }
+.stepper output { min-width: 32px; text-align: center; font-size: 19px; }
 
-.tk-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.tk-form .full { grid-column: 1 / -1; }
-.pay-fields { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 16px; grid-column: 1 / -1; margin-top: 6px; padding-top: 22px; border-top: 1px solid var(--line); }
-.pay-fields .pay-title { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.tk-form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 700px; margin: 0 auto; }
+.tk-form .field { align-items: center; }
+.tk-form .field input { text-align: center; font-size: 18px; padding: 16px; }
+.pay-fields { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 20px; grid-column: 1 / -1; margin-top: 10px; padding-top: 28px; border-top: 1px solid var(--line); }
+.pay-fields .pay-title { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .pay-fields .pay-title span { font-size: 14.5px; color: var(--ink-faint); }
-.demo-note { grid-column: 1 / -1; font-size: 14.5px; color: var(--ink-faint); background: var(--marble-2); padding: 10px 14px; border-radius: 2px; }
-.tk-form .btn[type=submit] { grid-column: 1 / -1; margin-top: 8px; padding: 18px; font-size: 14px; }
+.demo-note { grid-column: 1 / -1; font-size: 14.5px; color: var(--ink-faint); background: var(--marble-2); padding: 12px 14px; border-radius: 2px; }
 
-.tk-summary { position: sticky; top: calc(var(--header-h) + 24px); background: var(--forest); color: var(--marble); border-radius: 2px; padding: 32px; }
-.tk-summary h3 { color: var(--marble); font-size: 34px; margin-top: 4px; }
-.sum-row { display: flex; justify-content: space-between; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line-light); font-size: 17px; }
-.sum-row span:first-child { font-family: var(--font-label); font-size: 11px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--gold-bright); padding-top: 4px; }
-.sum-lines { list-style: none; margin: 14px 0 0; padding: 0; }
-.sum-lines li { display: flex; justify-content: space-between; padding: 6px 0; font-size: 17px; }
-.sum-lines li.muted { color: rgba(247,243,234,0.55); }
-.sum-total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(201,162,74,0.5); }
-.sum-total span { font-family: var(--font-label); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; }
-.sum-total strong { font-family: var(--font-heading); font-variation-settings: 'opsz' 14; font-weight: 700; font-size: 44px; color: var(--gold-bright); }
-.sum-note { margin-top: 12px; font-size: 15px; color: var(--sea-glass); min-height: 22px; }
-.sum-incl { margin-top: 18px; font-size: 15px; color: rgba(247,243,234,0.7); }
+/* subtotal: the last step, after the form */
+.tk-summary { background: var(--forest); color: var(--marble); border-radius: 2px; padding: 48px 56px; text-align: center; }
+.tk-summary h3 { color: var(--marble); font-size: 42px; margin-top: 6px; }
+.tk-summary .sum-row, .tk-summary .sum-lines, .tk-summary .sum-total { max-width: 520px; margin-left: auto; margin-right: auto; }
+.sum-row { display: flex; justify-content: space-between; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line-light); font-size: 18px; }
+.tk-summary .sum-row:first-of-type { margin-top: 22px; }
+.sum-row span:first-child { font-family: var(--font-label); font-size: 11.5px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--gold-bright); padding-top: 4px; }
+.sum-lines { list-style: none; margin-top: 14px; padding: 0; }
+.sum-lines li { display: flex; justify-content: space-between; padding: 6px 0; font-size: 18px; }
+.sum-lines li.muted { color: rgba(247,243,234,0.55); justify-content: center; }
+.sum-total { display: flex; justify-content: space-between; align-items: baseline; margin-top: 16px; padding-top: 18px; border-top: 1px solid rgba(201,162,74,0.5); }
+.sum-total span { font-family: var(--font-label); font-size: 13px; letter-spacing: 2px; text-transform: uppercase; }
+.sum-total strong { font-family: var(--font-heading); font-variation-settings: 'opsz' 14; font-weight: 700; font-size: 52px; color: var(--gold-bright); }
+.sum-note { margin-top: 14px; font-size: 16px; color: var(--sea-glass); min-height: 22px; }
+.tk-pay { width: 100%; max-width: 520px; margin-top: 18px; padding: 20px; font-size: 14.5px; }
+.tk-pay:disabled { opacity: 0.4; }
+.sum-incl { margin: 18px auto 0; max-width: 520px; font-size: 15px; color: rgba(247,243,234,0.7); }
 
 /* ── Confirmation ── */
 .tk-confirm { max-width: 720px; margin: 70px auto 130px; background: #FFFDF8; border: 1px solid var(--line); border-top: 6px solid var(--gold); padding: 50px; text-align: center; box-shadow: var(--shadow); }
@@ -111,24 +118,21 @@
 .tk-confirm .sent { margin-top: 26px; color: var(--ink-soft); }
 .tk-confirm .btns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 26px; }
 
-@media (max-width: 1000px) {
-    .tk-wrap { grid-template-columns: 1fr; }
-    .tk-summary { position: static; }
-}
 @media (max-width: 640px) {
-    .tk-wrap { padding: 40px 0 90px; gap: 26px; }
-    .tk-step { padding: 24px 16px; }
-    .tk-step h2 { font-size: 28px; }
-    .tk-num { font-size: 21px; }
-    .cal-day { height: 44px; }
+    .tk-wrap { padding: 40px 0 90px; }
+    .tk-step, .tk-summary { padding: 30px 18px; }
+    .tk-step h2, .tk-summary h3 { font-size: 32px; }
+    .cal-head { gap: 14px; }
+    .cal-head strong { font-size: 22px; min-width: 0; }
     .calendar { gap: 4px; }
-    .cal-day { font-size: 15px; }
+    .cal-day { height: 46px; font-size: 16px; }
+    .slot { flex-basis: calc(33.333% - 8px); font-size: 16px; padding: 14px 4px; }
     .tk-type { grid-template-columns: 1fr auto; gap: 6px 14px; }
-    .tk-type b { grid-row: 2; text-align: left; font-size: 19px; }
+    .tk-type b { grid-row: 2; text-align: left; font-size: 20px; }
     .tk-type .stepper { grid-row: 1 / 3; grid-column: 2; }
     .tk-form, .pay-fields { grid-template-columns: 1fr 1fr; }
-    .tk-form .field-name, .tk-form .field-email, .pay-fields .field-card { grid-column: 1 / -1; }
-    .tk-summary { padding: 24px 20px; }
+    .tk-form .field-name, .tk-form .field-email, .pay-fields .field-card, .pay-fields .field-zip { grid-column: 1 / -1; }
+    .sum-total strong { font-size: 42px; }
     .tk-confirm { padding: 34px 20px; margin: 40px 0 90px; }
     .tk-confirm h2 { font-size: 42px; }
     .conf-body { grid-template-columns: 1fr; justify-items: center; }
@@ -184,24 +188,23 @@
                             <div class="field field-card"><label for="tkCard">Card Number</label><input type="text" id="tkCard" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456"><span class="err">Please check the card number.</span></div>
                             <div class="field"><label for="tkExp">Expiry</label><input type="text" id="tkExp" inputmode="numeric" autocomplete="cc-exp" placeholder="MM / YY"><span class="err">Invalid date.</span></div>
                             <div class="field"><label for="tkCvc">CVC</label><input type="text" id="tkCvc" inputmode="numeric" autocomplete="cc-csc" placeholder="123"><span class="err">3–4 digits.</span></div>
-                            <div class="field"><label for="tkZip">ZIP</label><input type="text" id="tkZip" autocomplete="postal-code"><span class="err">Required.</span></div>
+                            <div class="field field-zip"><label for="tkZip">ZIP</label><input type="text" id="tkZip" autocomplete="postal-code"><span class="err">Required.</span></div>
                             <p class="demo-note">Portfolio demo: no payment is taken. Try the test card 4242 4242 4242 4242 with any future expiry.</p>
                         </div>
-                        <button type="submit" class="btn btn-gold" id="tkPay" disabled>Pay</button>
                     </div>
                 </div>
+                <div class="tk-summary on-dark" aria-live="polite">
+                    <span class="eyebrow">Review Your Visit</span>
+                    <h3>Subtotal</h3>
+                    <div class="sum-row"><span>Date</span><span id="tkSumDate"></span></div>
+                    <div class="sum-row"><span>Entry</span><span id="tkSumTime"></span></div>
+                    <ul class="sum-lines" id="tkSumLines"></ul>
+                    <div class="sum-total"><span>Total</span><strong id="tkSumTotal">$0</strong></div>
+                    <p class="sum-note" id="tkSumNote"></p>
+                    <button type="submit" class="btn btn-gold tk-pay" id="tkPay" disabled>Pay</button>
+                    <p class="sum-incl">Includes all exhibitions and same-day re-entry. Members enter free; just bring your card.</p>
+                </div>
             </form>
-
-            <aside class="tk-summary on-dark" aria-live="polite">
-                <span class="eyebrow">Your Visit</span>
-                <h3>Summary</h3>
-                <div class="sum-row"><span>Date</span><span id="tkSumDate"></span></div>
-                <div class="sum-row"><span>Entry</span><span id="tkSumTime"></span></div>
-                <ul class="sum-lines" id="tkSumLines"></ul>
-                <div class="sum-total"><span>Total</span><strong id="tkSumTotal">$0</strong></div>
-                <p class="sum-note" id="tkSumNote"></p>
-                <p class="sum-incl">Includes all exhibitions and same-day re-entry. Members enter free; just bring your card.</p>
-            </aside>
         </div>
 
         <div class="tk-confirm" id="tkConfirm" hidden>
