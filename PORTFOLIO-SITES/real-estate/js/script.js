@@ -417,7 +417,7 @@ function fillCitySelect(select) {
         }
     });
 
-    document.title = l.title + ' — [Agency Name]';
+    document.title = l.title + ' — Brightlane Homes';
 
     var main   = document.getElementById('galleryMain');
     var thumbs = document.getElementById('galleryThumbs');
