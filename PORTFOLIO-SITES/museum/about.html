@@ -30,10 +30,30 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
 .stat strong { display: block; font-family: var(--font-heading); font-variation-settings: 'opsz' 14; font-weight: 700; font-size: clamp(48px, 5vw, 70px); color: var(--gold-bright); line-height: 1; }
 .stat span { display: block; margin-top: 10px; font-family: var(--font-label); font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: rgba(247,243,234,0.8); }
 
-.building { display: grid; grid-template-columns: 1.1fr 1fr; gap: 70px; align-items: center; }
-.building-art { aspect-ratio: 4 / 5; box-shadow: var(--shadow-lg); }
-.building h2 { font-size: clamp(40px, 5vw, 60px); margin-top: 8px; }
-.building p { font-size: 19px; line-height: 1.8; color: var(--ink-soft); margin-top: 18px; }
+/* the museum itself, presented big beneath the intro */
+.about-hero { padding-bottom: 150px; }
+.showcase { margin: 56px auto 0; max-width: 1180px; }
+.showcase-frame {
+    position: relative; aspect-ratio: 16 / 8; overflow: hidden;
+    border: 1px solid rgba(226,191,98,0.55); outline: 1px solid rgba(226,191,98,0.25); outline-offset: 10px;
+    box-shadow: 0 40px 90px rgba(0,0,0,0.45);
+}
+.showcase-frame svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.showcase figcaption { margin-top: 26px; font-family: var(--font-label); font-size: 11.5px; letter-spacing: 2.4px; text-transform: uppercase; color: rgba(247,243,234,0.65); }
+
+.building { text-align: center; }
+.building h2 { font-size: clamp(40px, 5vw, 58px); margin-top: 8px; }
+.building-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; max-width: 980px; margin: 30px auto 0; text-align: left; }
+.building-cols p { font-size: 19px; line-height: 1.8; color: var(--ink-soft); }
+
+.wing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.wing-tile { display: block; background: #FFFDF8; border: 1px solid var(--line); transition: transform 0.3s, box-shadow 0.3s; }
+.wing-tile:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
+.wing-tile .art-media { aspect-ratio: 1 / 1; }
+.wing-label { padding: 16px 18px 18px; text-align: center; }
+.wing-label strong { display: block; font-family: var(--font-display); font-weight: 600; font-size: 21px; color: var(--ink); }
+.wing-label span { font-size: 14.5px; color: var(--ink-soft); }
+.wing-cta { text-align: center; margin-top: 40px; }
 
 .timeline { position: relative; max-width: 900px; margin: 0 auto; }
 .timeline::before { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: linear-gradient(var(--gold), var(--moss)); }
@@ -48,29 +68,24 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
 .t-text p { color: var(--ink-soft); font-size: 17px; margin-top: 6px; }
 .t-item:nth-child(even) .t-text { text-align: right; }
 
-.leaders { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
-.leader { text-align: center; }
-.leader .portrait {
-    width: 170px; height: 210px; margin: 0 auto;
-    background: radial-gradient(circle at 50% 38%, #D9C7AE 0 26%, transparent 27%), radial-gradient(ellipse at 50% 108%, var(--forest) 0 46%, transparent 47%), linear-gradient(180deg, var(--stone), var(--marble-2));
-}
-.leader h3 { font-family: var(--font-display); font-weight: 600; font-size: 25px; color: var(--ink); margin-top: 18px; }
-.leader p { color: var(--ink-soft); font-size: 16px; }
-
-.contact-wrap { display: grid; grid-template-columns: 1fr 1.2fr; gap: 70px; align-items: start; }
-.contact-wrap h2 { font-size: clamp(40px, 5vw, 58px); margin-top: 8px; }
-.contact-list { list-style: none; margin: 26px 0 0; padding: 0; display: flex; flex-direction: column; gap: 16px; font-size: 18px; }
-.contact-list .k { display: block; font-family: var(--font-label); font-size: 11.5px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--gold-deep); }
-.contact-card { background: #FFFDF8; border: 1px solid var(--line); border-top: 6px solid var(--gold); padding: 36px; }
-.c-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.reach { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 980px; margin: 0 auto; }
+.reach-item { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; padding: 26px 18px; background: #FFFDF8; border: 1px solid var(--line); border-top: 3px solid var(--gold); transition: box-shadow 0.25s; }
+a.reach-item:hover { box-shadow: var(--shadow); }
+a.reach-item:hover strong { color: var(--aegean); }
+.reach-item .k { font-family: var(--font-label); font-size: 11.5px; font-weight: 600; letter-spacing: 2.4px; text-transform: uppercase; color: var(--gold-deep); }
+.reach-item strong { font-family: var(--font-display); font-weight: 600; font-size: 23px; color: var(--ink); transition: color 0.2s; overflow-wrap: anywhere; }
+.reach-item em { font-style: normal; font-size: 15px; color: var(--ink-soft); }
+.contact-card { max-width: 980px; margin: 24px auto 0; background: #FFFDF8; border: 1px solid var(--line); border-top: 6px solid var(--gold); padding: 40px; }
+.c-form { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 .c-form .full { grid-column: 1 / -1; }
-.c-form .btn { grid-column: 1 / -1; }
+.c-form .btn { grid-column: 1 / -1; justify-self: center; min-width: 260px; }
+.c-form .opt { text-transform: none; letter-spacing: 0.5px; color: var(--ink-faint); font-weight: 400; }
 
 @media (max-width: 900px) {
-    .manifesto .cols, .building, .contact-wrap { grid-template-columns: 1fr; gap: 40px; }
-    .building-art { max-width: 480px; }
+    .manifesto .cols, .building-cols { grid-template-columns: 1fr; gap: 24px; }
+    .wing-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
+    .reach { grid-template-columns: 1fr; }
     .stats { grid-template-columns: 1fr 1fr; row-gap: 40px; }
-    .leaders { grid-template-columns: 1fr; gap: 40px; }
 }
 @media (max-width: 640px) {
     .timeline::before { left: 7px; }
@@ -79,6 +94,13 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
     .t-year, .t-item:nth-child(even) .t-year { order: 0; text-align: left; font-size: 42px; }
     .t-item:nth-child(even) .t-text { text-align: left; }
     .contact-card { padding: 26px 18px; }
+    .about-hero { padding-bottom: 110px; }
+    .showcase { margin-top: 36px; }
+    .showcase-frame { aspect-ratio: 4 / 3; outline-offset: 6px; }
+    .showcase figcaption { font-size: 10px; letter-spacing: 1.6px; }
+    .wing-label strong { font-size: 17px; }
+    .wing-label span { font-size: 12.5px; }
+    .wing-label { padding: 12px 8px 14px; }
     .c-form { grid-template-columns: 1fr; }
 }
 </style>
@@ -88,11 +110,15 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
 <header id="siteHeader"></header>
 
 <main>
-    <section class="page-hero">
+    <section class="page-hero about-hero">
         <div class="container">
             <span class="eyebrow light">About Ashwood</span>
             <h1>A Sanctuary of Culture</h1>
             <p>Founded beside the forest in 1874, Ashwood has spent a century and a half gathering the world’s art and history under one roof.</p>
+            <figure class="showcase reveal">
+                <div class="showcase-frame" id="buildingArt"></div>
+                <figcaption>The Ashwood Avenue facade and Great Hall, completed in 1902</figcaption>
+            </figure>
         </div>
         <div data-arcade></div>
     </section>
@@ -119,19 +145,29 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
     </section>
 
     <section class="section">
-        <div class="container building">
-            <div class="art-media arch cover building-art reveal" id="buildingArt"></div>
-            <div class="reveal">
-                <span class="eyebrow">The Building &amp; the Forest</span>
-                <h2>Gothic Nature</h2>
+        <div class="container building reveal">
+            <span class="eyebrow">The Building &amp; the Forest</span>
+            <h2>A Palace Beside the Woods</h2>
+            <div class="building-cols">
                 <p>Ashwood’s grand Beaux-Arts halls rise at the edge of a forest more than eight hundred acres wide. The architects planned it that way: tall north windows open onto the trees, the Sculpture Court sits beneath a glass roof crossed by branches, and forest paths lead straight to the museum’s doors.</p>
                 <p>Inside, the bold scale of a nineteenth-century mansion meets the calm of the woods: soaring arches, quiet green galleries and light that shifts with the leaves. It is a place built for wandering, with a clear head and no hurry at all.</p>
-                <a href="visit.html#directions" class="btn btn-forest" style="margin-top:28px">Getting Here</a>
             </div>
         </div>
     </section>
 
     <section class="section alt">
+        <div class="container">
+            <div class="section-head center">
+                <span class="eyebrow">What You’ll Find</span>
+                <h2>The Collection</h2>
+                <p>Ten wings span five thousand years. Here is a taste of each; every work shows the gallery where you’ll find it.</p>
+            </div>
+            <div class="wing-grid" id="wingGrid"></div>
+            <div class="wing-cta"><a href="collection.html" class="btn btn-forest">Explore the Full Collection</a></div>
+        </div>
+    </section>
+
+    <section class="section">
         <div class="container">
             <div class="section-head center">
                 <span class="eyebrow">Our History</span>
@@ -148,41 +184,28 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
         </div>
     </section>
 
-    <section class="section">
+    <section class="section alt" id="contact">
         <div class="container">
             <div class="section-head center">
-                <span class="eyebrow">Leadership</span>
-                <h2>The People Behind Ashwood</h2>
-            </div>
-            <div class="leaders">
-                <div class="leader reveal"><div class="portrait arch"></div><h3>[Director Name]</h3><p>Director &amp; Chief Executive</p></div>
-                <div class="leader reveal"><div class="portrait arch"></div><h3>[Curator Name]</h3><p>Chief Curator</p></div>
-                <div class="leader reveal"><div class="portrait arch"></div><h3>[Chair Name]</h3><p>Chair, Board of Trustees</p></div>
-            </div>
-        </div>
-    </section>
-
-    <section class="section alt" id="contact">
-        <div class="container contact-wrap">
-            <div>
                 <span class="eyebrow">Get in Touch</span>
                 <h2>Contact Us</h2>
-                <ul class="contact-list">
-                    <li><span class="k">Address</span>1000 Ashwood Avenue, City, State ZIP</li>
-                    <li><span class="k">Phone</span>(000) 000-0000</li>
-                    <li><span class="k">General</span>info@ashwoodmuseum.org</li>
-                    <li><span class="k">Press</span>press@ashwoodmuseum.org</li>
-                </ul>
+                <p>Questions about a visit, membership, groups or the collection? Call, email or send us a message below.</p>
+            </div>
+            <div class="reach">
+                <a class="reach-item" href="tel:+10000000000"><span class="k">Call</span><strong>(000) 000-0000</strong><em>Daily, 9 AM – 5 PM</em></a>
+                <a class="reach-item" href="mailto:info@ashwoodmuseum.org"><span class="k">Email</span><strong>info@ashwoodmuseum.org</strong><em>We reply within two working days</em></a>
+                <div class="reach-item"><span class="k">Visit</span><strong>1000 Ashwood Avenue</strong><em>City, State ZIP</em></div>
             </div>
             <div class="contact-card">
                 <form class="c-form" id="contactForm" novalidate>
                     <div class="field"><label for="cName">Name</label><input type="text" id="cName" autocomplete="name"><span class="err">Please enter your name.</span></div>
                     <div class="field"><label for="cEmail">Email</label><input type="email" id="cEmail" autocomplete="email"><span class="err">Please enter a valid email.</span></div>
-                    <div class="field full"><label for="cTopic">Topic</label>
+                    <div class="field"><label for="cPhone">Phone <span class="opt">(optional)</span></label><input type="tel" id="cPhone" autocomplete="tel"></div>
+                    <div class="field"><label for="cTopic">Topic</label>
                         <select id="cTopic"><option>General question</option><option>Visiting &amp; accessibility</option><option>Membership</option><option>Groups &amp; schools</option><option>Press</option></select>
                     </div>
                     <div class="field full"><label for="cMsg">Message</label><textarea id="cMsg"></textarea><span class="err">Please write a short message.</span></div>
-                    <button type="submit" class="btn btn-forest">Send Message</button>
+                    <button type="submit" class="btn btn-gold">Send Message</button>
                 </form>
                 <div class="form-success" id="contactDone">
                     <span class="eyebrow">Thank You</span>
@@ -199,6 +222,18 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 20px); }
 <script src="js/data.js"></script>
 <script src="js/art.js"></script>
 <script src="js/script.js"></script>
-<script>document.getElementById('buildingArt').innerHTML = facadeSVG();</script>
+<script>
+document.getElementById('buildingArt').innerHTML = facadeSVG();
+/* one work from each wing, linking to that wing in the collection */
+(function () {
+    var picks = [['european', 'cypresses-above-the-bay'], ['greek', 'amphora-with-meander-band'], ['egypt', 'funerary-mask-of-a-noble'], ['arms', 'close-helmet'],
+                 ['islamic', 'medallion-carpet'], ['medieval', 'lancet-window-tree-of-life'], ['asian', 'vase-with-peony-scrolls'], ['modern', 'composition-in-aegean-blue']];
+    document.getElementById('wingGrid').innerHTML = picks.map(function (p) {
+        var w = WINGS[p[0]], o = findArt(p[1]);
+        return '<a class="wing-tile reveal" href="collection.html?wing=' + p[0] + '"><div class="art-media">' + artHTML(o) + '</div>' +
+            '<div class="wing-label"><strong>' + w.name + '</strong><span>Floor ' + w.floor + ' · Galleries ' + w.galleries + '</span></div></a>';
+    }).join('');
+})();
+</script>
 </body>
 </html>
