@@ -8,8 +8,8 @@ var MUSEUM = {
     name: 'Ashwood',
     full: 'Ashwood Museum of Art & History',
     street: '1000 Ashwood Avenue',
-    city: 'City, State ZIP',
-    phone: '(000) 000-0000',
+    city: 'Ashford, NY 10955',
+    phone: '(212) 555-0174',
     email: 'info@ashwoodmuseum.org'
 };
 
