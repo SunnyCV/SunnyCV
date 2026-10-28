@@ -90,6 +90,28 @@
 @media (max-width: 560px) { .acclaim-score { font-size: 10px !important; letter-spacing: 1.6px; } }
 .acclaim-note { margin: 4px 0 0 !important; font-style: italic; color: var(--cream-faint) !important; font-size: 15.5px !important; max-width: 400px; }
 
+/* ── Private dining: same voice as the story, same layout as the visit details ── */
+.celebrate { padding: 0 0 120px; text-align: center; }
+.celebrate .divider { margin: 0 auto 56px; }
+.celebrate .eyebrow { display: block; }
+.celebrate-title {
+    font-size: clamp(28px, 4vw, 40px);
+    font-style: italic;
+    line-height: 1.25;
+    margin-top: 16px;
+}
+.celebrate-lead { color: var(--cream-dim); font-size: 16.5px; line-height: 1.8; max-width: 560px; margin: 20px auto 0; }
+.celebrate-occasions {
+    margin-top: 22px;
+    font-family: var(--font-display); font-style: italic; font-size: 19px;
+    color: var(--amber-soft);
+}
+.celebrate-occasions span { color: var(--amber); font-style: normal; margin: 0 10px; }
+.celebrate-occasions .m-only { display: none; }
+.celebrate .visit-details { margin-top: 44px; }
+.visit-col .visit-note a { color: var(--amber-soft); border-bottom: 1px solid rgba(217,154,78,0.35); }
+.visit-col .visit-note a:hover { color: var(--cream); }
+
 /* ── Visit: address, hours, contact, map ── */
 .visit { padding: 0 0 130px; text-align: center; }
 .visit .divider { margin: 0 auto 56px; }
@@ -165,6 +187,11 @@
     .addr-sep { display: none; }
     .visit-address span.addr-line { display: block; }
     .visit-details { grid-template-columns: 1fr; gap: 28px; }
+    .celebrate { padding-bottom: 90px; }
+    .celebrate-occasions { font-size: 17px; line-height: 1.7; }
+    .celebrate-occasions span { margin: 0 6px; }
+    .celebrate-occasions .m-only { display: inline; }
+    .celebrate-occasions .sep-break { display: none; }
     .visit-rule { width: 64px; height: 1px; margin: 0 auto; background: linear-gradient(to right, transparent, var(--amber), transparent); }
     .visit-map { aspect-ratio: 4 / 5; margin-top: 52px; }
     .map-directions { left: 50%; right: auto; transform: translateX(-50%); white-space: nowrap; }
@@ -222,6 +249,30 @@
     </div>
 </section>
 
+<section class="celebrate" id="events">
+    <div class="container">
+        <div class="divider"></div>
+        <span class="eyebrow reveal">Private Dining &amp; Celebrations</span>
+        <h2 class="celebrate-title reveal">An evening worth remembering.</h2>
+        <p class="celebrate-lead reveal">From wedding dinners and proposals to anniversaries and private parties, we shape the menu, the wine and the room around your occasion. Parties of up to forty may reserve the full dining room.</p>
+        <p class="celebrate-occasions reveal">Wedding Dinners <span>&middot;</span> Proposals <span class="sep-break">&middot;</span><br class="m-only"> Anniversaries <span>&middot;</span> Private Parties</p>
+
+        <div class="visit-details reveal">
+            <div class="visit-col">
+                <span class="eyebrow">Events</span>
+                <p><a href="mailto:events@serenadehudson.com">events@serenadehudson.com</a><br><a href="tel:+15185550147">(518) 555-0147</a></p>
+                <p class="visit-note">Ask for our events coordinator</p>
+            </div>
+            <div class="visit-rule"></div>
+            <div class="visit-col">
+                <span class="eyebrow">Menu &amp; Questions</span>
+                <p><a href="mailto:hello@serenadehudson.com">hello@serenadehudson.com</a></p>
+                <p class="visit-note">Allergies &amp; dietary needs</p>
+            </div>
+        </div>
+    </div>
+</section>
+
 <section class="visit" id="visit">
     <div class="container">
         <div class="divider"></div>
@@ -237,8 +288,9 @@
             </div>
             <div class="visit-rule"></div>
             <div class="visit-col">
-                <span class="eyebrow">Contact</span>
+                <span class="eyebrow">Reservations</span>
                 <p><a href="tel:+15185550147">(518) 555-0147</a><br><a href="mailto:reservations@serenadehudson.com">reservations@serenadehudson.com</a></p>
+                <p class="visit-note">Or <a href="reservations.html">book online</a></p>
             </div>
         </div>
 
