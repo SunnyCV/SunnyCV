@@ -16,6 +16,7 @@ let mybutton = document.getElementById("Btn");
 window.onscroll = function() {scrollFunction()};
 
 function scrollFunction() {
+    if (!mybutton) return;
     if (document.body.scrollTop > 20 ||
     document.documentElement.scrollTop > 20) {
         mybutton.style.display = "block";
@@ -37,15 +38,19 @@ let modalImg = document.getElementById('modalImage');
 let captionText = document.getElementById('caption');
 
 let scrollPosition = 0;
-let imageIndex = 0; 
+let imageIndex = 0;
+let mobileCloseBtn = document.getElementById('mobileModalClose');
+
 function openModal(src, alt) {
   modal.style.display = window.innerWidth <= 768 ? 'flex' : 'block';
   modalImg.src = src;
   captionText.innerHTML = alt;
+  if (mobileCloseBtn) mobileCloseBtn.style.display = window.innerWidth <= 768 ? 'block' : 'none';
 }
 
 function closeModal() {
   modal.style.display = 'none';
+  if (mobileCloseBtn) mobileCloseBtn.style.display = 'none';
 }
 
 // Block modal opens during the initial scroll-snap positioning phase on mobile
@@ -130,6 +135,33 @@ const resetDockItems = () => {
 };
 document.addEventListener('keydown', function(event) {
   if (event.keyCode === 27) {
-    closeModal(); 
+    closeModal();
   }
+});
+
+// ── Modal prev / next navigation ──────────────────────────────────────────
+function modalPrev() {
+  if (!images || images.length === 0) return;
+  imageIndex = (imageIndex - 1 + images.length) % images.length;
+  modalImg.src = images[imageIndex].src;
+  captionText.innerHTML = images[imageIndex].alt;
+}
+
+function modalNext() {
+  if (!images || images.length === 0) return;
+  imageIndex = (imageIndex + 1) % images.length;
+  modalImg.src = images[imageIndex].src;
+  captionText.innerHTML = images[imageIndex].alt;
+}
+
+var prevBtn = document.getElementById('modalPrevBtn');
+var nextBtn = document.getElementById('modalNextBtn');
+if (prevBtn) prevBtn.addEventListener('click', function(e) { e.stopPropagation(); modalPrev(); });
+if (nextBtn) nextBtn.addEventListener('click', function(e) { e.stopPropagation(); modalNext(); });
+
+// Keyboard arrow navigation when modal is open
+document.addEventListener('keydown', function(e) {
+  if (modal.style.display === 'none' || !modal.style.display) return;
+  if (e.key === 'ArrowLeft')  modalPrev();
+  if (e.key === 'ArrowRight') modalNext();
 });

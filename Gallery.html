@@ -4,12 +4,12 @@
  <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" type="text/css" href="Gallery.css">
+    <link rel="stylesheet" href="Cart.css">
 <title>NOISE</title>
 <style>
 /* ── Self-contained mobile nav styles ──
    All structural styles are inlined here so the menu works on GoDaddy
-   even if Gallery.css is not yet uploaded / cached */
-
+   even if Gallery.css is not yet uploaded / cached */h1
 /* Hamburger button */
 .hamburger-btn {
     display: none;
@@ -73,21 +73,23 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(0,0,0,0.45);
+    background: rgba(0,0,0,0.55);
     color: white;
     border: none;
     font-size: 32px;
     padding: 14px 18px;
     cursor: pointer;
-    z-index: 200;
+    z-index: 10;
     font-family: Arial, sans-serif;
     transition: background 0.2s;
     line-height: 1;
     user-select: none;
     -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
     border-radius: 4px;
+    pointer-events: auto;
 }
-.modal-nav-btn:hover { background: rgba(0,0,0,0.75); }
+.modal-nav-btn:hover { background: rgba(0,0,0,0.85); }
 #modalPrevBtn { left: 10px; }
 #modalNextBtn { right: 10px; }
 
@@ -122,22 +124,50 @@
     /* Show hamburger on mobile */
     .hamburger-btn { display: block !important; color: black !important; }
     /* Center footer text on mobile */
-    #galleryFooterText { text-align: center !important; height: auto !important; padding: 16px 20px !important; }
-    /* "The Archives" heading — match THE and Archives to same size */
-    h1.header { font-size: 30px !important; }
-    h1.header::first-line { font-size: 30px !important; }
+    #galleryFooterText { text-align: center !important; height: auto !important; padding: 16px 20px !important; display: flex !important; align-items: center !important; justify-content: center !important; }
+    #galleryFooterText br { display: none !important; }
+    #galleryScrollText { text-align: center !important; height: auto !important; padding: 16px 20px !important; display: flex !important; align-items: center !important; justify-content: center !important; }
+    #galleryScrollText br { display: none !important; }
+    /* "The Archives" heading — bigger on mobile, balanced spacing */
+    h1.header { font-size: 52px !important; margin-top: 18px !important; margin-bottom: 12px !important; }
+    h1.header::first-line { font-size: 52px !important; }
+    /* Paragraph between heading and scroll text — smaller on mobile */
+    p { font-size: 13px !important; margin-top: 0 !important; margin-bottom: 4px !important; }
+    /* Remove the extra <br> spacing above heading on mobile */
+    h1.header + br, nav + br { display: none !important; }
     /* Allow body to scroll */
     body { overflow-y: auto !important; }
+    /* Modal: vertically center image on mobile */
+    .modal {
+        display: none;
+        padding: 52px 8px 12px !important;
+        box-sizing: border-box !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow-y: hidden !important;
+    }
+    /* Hide the inner close button — standalone #mobileModalClose is used instead */
+    .close { display: none !important; visibility: hidden !important; }
 }
 @keyframes audioMarquee {
     0%   { transform: translateX(0%); }
     100% { transform: translateX(-100%); }
 }
+/* ── Cart badge colours (light page) ── */
+.cart-badge { background-color: #000; color: #fff; }
+.mobile-header { background-color: #f2f2f2; border-bottom: 1px solid #ccc; color: #000; }
+.mobile-cart-badge { background-color: #000; color: #fff; }
 </style>
 </head>
 <body id="dark-mode">
+<!-- Mobile Header Bar -->
+<div class="mobile-header" id="mobileHeader">
+    <button class="mobile-header-hamburger" id="mobileHamburger" aria-label="Menu">&#9776;</button>
+    <a href="index.html" style="display:contents;"><img class="mobile-header-logo" src="png-logo.png" alt="NOISE"></a>
+    <button class="mobile-header-cart" id="mobileCartBtn" aria-label="Cart">&#128722;<span class="mobile-cart-badge" id="mobileBadge"></span></button>
+</div>
 <!-- Mobile Nav -->
-<button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">&#9776;</button>
 <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
 <div class="mobile-nav-menu" id="mobileNavMenu">
     <a href="index.html">HOME</a>
@@ -148,12 +178,13 @@
 
 
 <nav>
-<img src="png-logo.png" alt="">
+<a href="index.html" style="display:contents;"><img src="png-logo.png" alt=""></a>
 <ul>
     <li><a href="index.html">Home</a></li>
 	<li><a href="Shop.html">Shop</a></li>
     <li><a class="active" href="Gallery.html">Gallery</a></li>
     <li><a href="About.html">About</a></li>
+    <li><button class="cart-nav-btn" id="cartIconBtn">&#128722;<span class="cart-badge" id="cartBadge"></span></button></li>
 </ul>
 </nav>
 
@@ -162,188 +193,256 @@
 <h1 class="header">The Archives</h1>
 
 <p>Welcome to the Gallery, included below is a collection of photos I've found across the Internet.<br><br>
-	Take your time and enjoy your stay.</p><br>
+	Take your time and enjoy your stay.</p>
+	
+	<p>[This page will have updates constantly, so keep a look out]</p>
 
-<div style="background-color: black; color: white; height: 85px; line-height: -10px; text-align: 
-center; margin-top: 10px; margin-bottom: 0px; font-weight: 900; font-family: 
+<div id="galleryScrollText" style="background-color: black; color: white; height: 85px; line-height: -10px; text-align:
+center; margin-top: 10px; margin-bottom: 0px; font-weight: 900; font-family:
 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><br><br>
 Scroll to browse.</div>
 
 <div class="centered-container">
     <div class="image-container">
       <div class="scrollable-images">
-          <img src="pics/1.jpg" alt="Image 1">
-          <img src="pics/2.jpg" alt="Image 2">
-          <img src="pics/3.jpg" alt="Image 3">
-          <img src="pics/4.jpg" alt="Image 4">
-          <img src="pics/5.jpg" alt="Image 5">
-          <img src="pics/6.jpg" alt="Image 6">
-          <img src="pics/7.jpg" alt="Image 7">
-          <img src="pics/8.jpg" alt="Image 8">
-          <img src="pics/9.jpg" alt="Image 9">
-          <img src="pics/10.jpg" alt="Image 10">
-          <img src="pics/11.jpg" alt="Image 11">
-          <img src="pics/12.jpg" alt="Image 12">
-          <img src="pics/13.jpg" alt="Image 13">
-          <img src="pics/14.jpg" alt="Image 14">
-          <img src="pics/15.jpg" alt="Image 15">
-          <img src="pics/16.jpg" alt="Image 16">
-          <img src="pics/17.jpg" alt="Image 17">
-          <img src="pics/18.jpg" alt="Image 18">
-          <img src="pics/19.jpg" alt="Image 19">
-          <img src="pics/20.jpg" alt="Image 20">
-          <img src="pics/21.jpg" alt="Image 21">
-          <img src="pics/22.jpg" alt="Image 22">
-          <img src="pics/23.jpg" alt="Image 23">
-          <img src="pics/24.jpg" alt="Image 24">
-          <img src="pics/25.jpg" alt="Image 25">
-          <img src="pics/26.jpg" alt="Image 26">
-          <img src="pics/27.jpg" alt="Image 27">
-          <img src="pics/28.jpg" alt="Image 28">
-          <img src="pics/29.jpg" alt="Image 29">
-          <img src="pics/30.jpg" alt="Image 30">
-          <img src="pics/31.jpg" alt="Image 31">
-          <img src="pics/32.jpg" alt="Image 32">
-          <img src="pics/33.jpg" alt="Image 33">
-          <img src="pics/34.jpg" alt="Image 34">
-          <img src="pics/35.jpg" alt="Image 35">
-          <img src="pics/36.jpg" alt="Image 36">
-          <img src="pics/37.jpg" alt="Image 37">
-          <img src="pics/38.jpg" alt="Image 38">
-          <img src="pics/39.jpg" alt="Image 39">
-          <img src="pics/40.jpg" alt="Image 40">
-          <img src="pics/41.jpg" alt="Image 41">
-          <img src="pics/42.jpg" alt="Image 42">
-          <img src="pics/43.jpg" alt="Image 43">
-          <img src="pics/44.jpg" alt="Image 44">
-          <img src="pics/45.jpg" alt="Image 45">
-          <img src="pics/46.jpg" alt="Image 46">
-          <img src="pics/47.jpg" alt="Image 47">
-          <img src="pics/48.jpg" alt="Image 48">
-          <img src="pics/49.jpg" alt="Image 49">
-          <img src="pics/50.jpg" alt="Image 50">
-          <img src="pics/51.jpg" alt="Image 51">
-          <img src="pics/52.jpg" alt="Image 52">
-          <img src="pics/53.jpg" alt="Image 53">
-          <img src="pics/54.jpg" alt="Image 54">
-          <img src="pics/55.jpg" alt="Image 55">
-          <img src="pics/56.jpg" alt="Image 56">
-          <img src="pics/57.jpg" alt="Image 57">
-          <img src="pics/58.jpg" alt="Image 58">
-          <img src="pics/59.jpg" alt="Image 59">
-          <img src="pics/60.jpg" alt="Image 60">
-          <img src="pics/61.jpg" alt="Image 61">
-          <img src="pics/62.jpg" alt="Image 62">
-          <img src="pics/63.jpg" alt="Image 63">
-          <img src="pics/64.jpg" alt="Image 64">
-          <img src="pics/65.jpg" alt="Image 65">
-          <img src="pics/66.jpg" alt="Image 66">
-          <img src="pics/67.jpg" alt="Image 67">
-          <img src="pics/68.jpg" alt="Image 68">
-          <img src="pics/69.jpg" alt="Image 69">
-          <img src="pics/70.jpg" alt="Image 70">
-          <img src="pics/71.jpg" alt="Image 71">
-          <img src="pics/72.jpg" alt="Image 72">
-          <img src="pics/73.jpg" alt="Image 73">
-          <img src="pics/74.jpg" alt="Image 74">
-          <img src="pics/75.jpg" alt="Image 75">
-          <img src="pics/76.jpg" alt="Image 76">
-          <img src="pics/77.jpg" alt="Image 77">
-          <img src="pics/78.jpg" alt="Image 78">
-          <img src="pics/79.jpg" alt="Image 79">
-          <img src="pics/80.jpg" alt="Image 80">
-          <img src="pics/81.jpg" alt="Image 81">
-          <img src="pics/82.jpg" alt="Image 82">
-          <img src="pics/83.jpg" alt="Image 83">
-          <img src="pics/84.jpg" alt="Image 84">
-          <img src="pics/85.jpg" alt="Image 85">
-          <img src="pics/86.jpg" alt="Image 86">
-          <img src="pics/87.jpg" alt="Image 87">
-          <img src="pics/88.jpg" alt="Image 88">
-          <img src="pics/89.jpg" alt="Image 89">
-          <img src="pics/90.jpg" alt="Image 90">
-          <img src="pics/91.jpg" alt="Image 91">
-          <img src="pics/92.jpg" alt="Image 92">
-          <img src="pics/93.jpg" alt="Image 93">
-          <img src="pics/94.jpg" alt="Image 94">
-          <img src="pics/95.jpg" alt="Image 95">
-          <img src="pics/96.jpg" alt="Image 96">
-          <img src="pics/97.jpg" alt="Image 97">
-          <img src="pics/98.jpg" alt="Image 98">
-          <img src="pics/99.jpg" alt="Image 99">
-          <img src="pics/100.jpg" alt="Image 100">
-          <img src="pics/101.jpg" alt="Image 101">
-          <img src="pics/102.jpg" alt="Image 102">
-          <img src="pics/103.jpg" alt="Image 103">
-          <img src="pics/104.jpg" alt="Image 104">
-          <img src="pics/105.jpg" alt="Image 105">
-          <img src="pics/106.jpg" alt="Image 106">
-          <img src="pics/107.jpg" alt="Image 107">
-          <img src="pics/108.jpg" alt="Image 108">
-          <img src="pics/109.jpg" alt="Image 109">
-          <img src="pics/110.jpg" alt="Image 110">
-          <img src="pics/111.jpg" alt="Image 111">
-          <img src="pics/112.jpg" alt="Image 112">
-          <img src="pics/113.jpg" alt="Image 113">
-          <img src="pics/114.jpg" alt="Image 114">
-          <img src="pics/115.jpg" alt="Image 115">
-          <img src="pics/116.jpg" alt="Image 116">
-          <img src="pics/117.jpg" alt="Image 117">
-          <img src="pics/118.jpg" alt="Image 118">
-          <img src="pics/119.jpg" alt="Image 119">
-          <img src="pics/120.jpg" alt="Image 120">
-          <img src="pics/121.jpg" alt="Image 121">
-          <img src="pics/122.jpg" alt="Image 122">
-          <img src="pics/123.jpg" alt="Image 123">
-          <img src="pics/124.jpg" alt="Image 124">
-          <img src="pics/125.jpg" alt="Image 125">
-          <img src="pics/126.jpg" alt="Image 126">
-          <img src="pics/127.jpg" alt="Image 127">
-          <img src="pics/128.jpg" alt="Image 128">
-          <img src="pics/129.jpg" alt="Image 129">
-          <img src="pics/130.jpg" alt="Image 130">
-          <img src="pics/131.jpg" alt="Image 131">
-          <img src="pics/132.jpg" alt="Image 132">
-          <img src="pics/133.jpg" alt="Image 133">
-          <img src="pics/134.jpg" alt="Image 134">
-          <img src="pics/135.jpg" alt="Image 135">
-          <img src="pics/136.jpg" alt="Image 136">
-          <img src="pics/137.jpg" alt="Image 137">
-          <img src="pics/138.jpg" alt="Image 138">
-          <img src="pics/139.jpg" alt="Image 139">
-          <img src="pics/140.jpg" alt="Image 140">
-          <img src="pics/141.jpg" alt="Image 141">
-          <img src="pics/142.jpg" alt="Image 142">
-          <img src="pics/143.jpg" alt="Image 143">
-          <img src="pics/144.jpg" alt="Image 144">
-          <img src="pics/145.jpg" alt="Image 145">
-          <img src="pics/146.jpg" alt="Image 146">
-          <img src="pics/147.jpg" alt="Image 147">
-          <img src="pics/148.jpg" alt="Image 148">
-          <img src="pics/149.jpg" alt="Image 149">
-          <img src="pics/150.jpg" alt="Image 150">
-          <img src="pics/151.jpg" alt="Image 151">
-          <img src="pics/152.jpg" alt="Image 152">
+          <img src="pics/1.jpg" alt="[Portrait of a Lady In a Mask] by Tony Moltisanti, 2021">
+          <img src="pics/2.jpg" alt="Biggie Smalls wearing a BAPE Camo Jacket. Shot by Shawn Mortensen, 1996">
+          <img src="pics/3.jpg" alt="Your Favorite Rapper's Favorite Rapper, Philadelphia in 2000">
+          <img src="pics/4.jpg" alt="Eric Clapton in London by David Gahr, 1969">
+          <img src="pics/5.jpg" alt="Eyes from [Make Yourself Prsentable] by Camila Salinas, 2022">
+          <img src="pics/6.jpg" alt="Richard Hell wearing Shady Spex, Late 1970s">
+          <img src="pics/7.jpg" alt="Magazine Ad for Raf Simons A/W 2002. Model Unknown [DM on IG if you know the name]">
+          <img src="pics/8.jpg" alt="Ian Curtis of Joy Division by Kevin Cummins, 1979">
+          <img src="pics/9.jpg" alt="The Jimi Hendrix Experience, 1967">
+          <img src="pics/10.jpg" alt="Carlos Santana Performing at Woodstock, 1969">
+          <img src="pics/11.jpg" alt="Freddie Mercury, Paul McCartney, and Bono On-Stage at Live Aid, 1985">
+          <img src="pics/12.jpg" alt="[The Sunflower Room] from Van Gogh Alive Exhibition">
+          <img src="pics/13.jpg" alt="Man Sleeps on Motorcycle during Woodstock, 1969">
+          <img src="pics/14.jpg" alt="Britney Spears for Chrome Hearts, 2003">
+          <img src="pics/15.jpg" alt="Sid Vicious Performing with the Sex Pistols at the Longhorn Ballroom, 1978">
+          <img src="pics/16.jpg" alt="Biz Markie, Late 1980s">
+          <img src="pics/17.jpg" alt="Tyler, the Creator and Jay-Z at the Grammys, 2022">
+          <img src="pics/18.jpg" alt="Mach-Hommy during the Video Shoot for [No Blood No Sweat], 2021">
+          <img src="pics/19.jpg" alt="A Model Eating Backstage at the Undercover A/W 1997 Show">
+          <img src="pics/20.jpg" alt="Beastie Boys at the Roseland Ballroom, 1992">
+          <img src="pics/21.jpg" alt="[Two Dragons in Clouds] by Kanō Hōgai, 1885">
+          <img src="pics/22.jpg" alt="Maison Margiela Boutique Located in Ebisu, Tokyo">
+          <img src="pics/23.jpg" alt="Amy Winehouse by Harry Benson, 2006">
+          <img src="pics/24.jpg" alt="Jimi Hendrix and Mick Taylor Backstage at MSG, 1969">
+          <img src="pics/25.jpg" alt="John Lennon by Linda McCartney, 1969">
+          <img src="pics/26.jpg" alt="David Lee Roth of Van Halen">
+          <img src="pics/27.jpg" alt="[Memories and Dreams Are Intermixed in this Mad Universe] by Philomena Famulok">
+          <img src="pics/28.jpg" alt="Lightning Strikes the Empire State Building, 2024">
+          <img src="pics/29.jpg" alt="[Casino] Directed by Martin Scorsese, 1995">
+          <img src="pics/30.jpg" alt="Geena Davis for [Beetlejuice], 1988">
+          <img src="pics/31.jpg" alt="Sade Adu">
+          <img src="pics/32.jpg" alt="Ice Cube, Korn, Rammstein, Limp Bizkit and Orgy for [Family Values Tour], 1998">
+          <img src="pics/33.jpg" alt="Banksy">
+          <img src="pics/34.jpg" alt="[La Ricotta] Directed by Pier Paolo Pasolini, 1963">
+          <img src="pics/35.jpg" alt="Johnny Cash Performing at Folsom State Prison, 1968">
+          <img src="pics/36.jpg" alt="Billie Joe Armstrong holding Ernie, 1994">
+          <img src="pics/37.jpg" alt="Cherie Curie Covered in Blood While Performing, 1976">
+          <img src="pics/38.jpg" alt="Kurt Cobain at Nirvana's Final Photoshoot in Paris, 1994">
+          <img src="pics/39.jpg" alt="Jun Takahashi Backstage at the Undercover A/W Show, 1997">
+          <img src="pics/40.jpg" alt="Sid Vicious and Nancy Spungen, 1977">
+          <img src="pics/41.jpg" alt="The Rolling Stones by Art Kane, 1966">
+          <img src="pics/42.jpg" alt="Backstage at the Undercover A/W Show, 1997">
+          <img src="pics/43.jpg" alt="MTA Subway Rush by Billy Dinh">
+          <img src="pics/44.jpg" alt="David Hasselhoff and KITT from [Knight Rider], 1982">
+		  <img src="pics/45.jpg" alt="Jim Morrison by Joel Brodsky, 1967">
+          <img src="pics/46.jpg" alt="Cherie Curie Covered in Blood While Performing, 1976">
+          <img src="pics/47.jpg" alt="Kid Cudi for [Man On The Moon II], 2010">
+          <img src="pics/48.jpg" alt="Backstage at the Undercover A/W Show, 1997">
+          <img src="pics/49.jpg" alt="Various Mugshots of Iconic Musicians">
+          <img src="pics/50.jpg" alt="The Weeknd Performing for the First Time, 2011">
+          <img src="pics/51.jpg" alt="[The Last Supper] by Andy Warhol, 1986">
+          <img src="pics/52.jpg" alt="Young Boy Fishes for a Shark">
+          <img src="pics/53.jpg" alt="XXXTENTACION in a Street Fight, 2015">
+          <img src="pics/54.jpg" alt="NIGO and Jun Takahashi in Front of NOWHERE in Japan, 1993">
+          <img src="pics/55.jpg" alt="Stanley Kubrick, 1949">
+          <img src="pics/56.jpg" alt="MF DOOM Signing Albums at a Concert">
+          <img src="pics/57.jpg" alt="Elvis Presley Examining an Engine for a Lincoln Continental, 1956">
+          <img src="pics/58.jpg" alt="[Judgement Day] by Michelangelo">
+          <img src="pics/59.jpg" alt="Aerial View of Woodstock, 1969">
+          <img src="pics/60.jpg" alt="Lil Wayne Wearing BAPE, 2006">
+          <img src="pics/61.jpg" alt="Paul Sorvino as Paulie Cicero in [Goodfellas], 1990">
+          <img src="pics/62.jpg" alt="Beastie Boys Backstage with Billy Idol, 1986">
+          <img src="pics/63.jpg" alt="One of the Final Photos Taken of John Lennon Before his Death, 1980">
+          <img src="pics/64.jpg" alt="Sid Vicious with Hellin Killer and Trudie Argulles, 1978">
+          <img src="pics/65.jpg" alt="[Chapels of Souls] in Porto, Portugal">
+          <img src="pics/66.jpg" alt="A Fake Ad for JNCO Jeans, Date Unknown">
+          <img src="pics/67.jpg" alt="Jay-Z Bringing Out Michael Jackson for a Concert, 2001">
+          <img src="pics/68.jpg" alt="The Only Known Photo of Rapper Mr. Fantastik, 2022">
+          <img src="pics/69.jpg" alt="[Kyiv's Rave Scene] by Lesha Berezovskiy, 2023">
+          <img src="pics/70.jpg" alt="John Cena at the 2005 WWE Hall of Fame Ceremony">
+          <img src="pics/71.jpg" alt="Carrie-Anne Moss as Trinity in [The Matrix], 1999">
+          <img src="pics/72.jpg" alt="Cherie Curie Covered in Blood While Performing, 1976">
+          <img src="pics/73.jpg" alt="Ian Curtis On-Stage Performing, 1979">
+          <img src="pics/74.jpg" alt="James Caan as Sonny Corleone in The Godfather, 1972">
+          <img src="pics/75.jpg" alt="Cristiano Ronaldo Suffering a Nose Injury, Date Unknown">
+          <img src="pics/76.jpg" alt="Axl Rose by Kevin Mazur, 1987">
+          <img src="pics/77.jpg" alt="Gucci Mane at Hot 107.9 in Atlanta, 2007">
+          <img src="pics/78.jpg" alt="Sid Vicious Performing Cut Up and Scarred On-Stage, 1978">
+          <img src="pics/79.jpg" alt="[The Birth of Venus] by Sandro Botticelli, 1484-1486">
+          <img src="pics/80.jpg" alt="Harold Hunter by Charlie Samuels, 1989">
+          <img src="pics/81.jpg" alt="[Origins] Collection by Vytoky, a Ukrainian Clothing Brand">
+          <img src="pics/82.jpg" alt="Lana Del Rey, Date Unknown">
+          <img src="pics/83.jpg" alt="Screen Cap from Kanye West's DONDA Livestream, 2021">
+          <img src="pics/84.jpg" alt="Woodstock, 1969">
+          <img src="pics/85.jpg" alt="Daft Punk in Tokyo for [HUGE Magazine], 2007">
+          <img src="pics/86.jpg" alt="Freddie Mercury Performing with Queen at Wembley Stadium, 1986">
+          <img src="pics/87.jpg" alt="Kanye West with Steve Lacy on the DONDA Livestream, 2021">
+          <img src="pics/88.jpg" alt="[The Kiss] by Silvio Allason ,1892">
+          <img src="pics/89.jpg" alt="Lebron James during his NBA Rookie Season, 2003">
+          <img src="pics/90.jpg" alt="Corset Top from Vivienne Westwood's A/W 1991 Collection">
+          <img src="pics/91.jpg" alt="Radiohead, 1995">
+          <img src="pics/92.jpg" alt="David Bowie, 1969">
+          <img src="pics/93.jpg" alt="David Bowie by Vernon Dewhurst, 1969">
+          <img src="pics/94.jpg" alt="The Beatles Walking On-Stage at Budokan Stadium in Tokyo, 1966">
+          <img src="pics/95.jpg" alt="Britney Spears at Versace's Spring Runway Show, 2003">
+          <img src="pics/96.jpg" alt="Playboi Carti and A$AP Rocky, 2018">
+          <img src="pics/97.jpg" alt="An Assortment of Stickers, 2019">
+          <img src="pics/98.jpg" alt="Debbie Harry at the Gramercy Park Hotel by Martyn Goddard, 1978">
+          <img src="pics/99.jpg" alt="An Aerial Vieew of the City of Tokyo, Japan">
+          <img src="pics/100.jpg" alt="Pieces from Chanel's S/S Ready-To-Wear Collection in 1993">
+          <img src="pics/101.jpg" alt="David Bowie and Robin Williams, Date Unknown">
+          <img src="pics/102.jpg" alt="Promotional Poster for the Cowboy Bebop Movie, 2001">
+          <img src="pics/103.jpg" alt="Poured Staircase by Ian Davenport, 2022">
+          <img src="pics/104.jpg" alt="Graffiti from Williamsburg, 2021">
+          <img src="pics/105.jpg" alt="The Beatles Traveling in a Limo, 1964">
+          <img src="pics/106.jpg" alt="John Paul Jones Performing On-Stage, Mid-1970s">
+          <img src="pics/107.jpg" alt="[Honk Kong Apartments] by Benny Lam, 2013">
+          <img src="pics/108.jpg" alt="Snoop Dogg for [Flaunt Magazine], 2001">
+          <img src="pics/109.jpg" alt="David Bowie Shooting for the Cover of his Album [Lodger], 1979">
+          <img src="pics/110.jpg" alt="Jim Morrison for 16 Magazine by Gloria Stavers, 1967">
+          <img src="pics/111.jpg" alt="Chris Cornell by Ross Halfin, 2011">
+          <img src="pics/112.jpg" alt="[Hong Kong Apartments] by Benny Lam, 2013">
+          <img src="pics/113.jpg" alt="[The Kaaba] within [Masjid al-Haram] in Saudi Arabia">
+          <img src="pics/114.jpg" alt="Jerry Seinfeld for KITH, 2022">
+          <img src="pics/115.jpg" alt="Nas on the Set for the Music Video of his song [Hate Me Now], 1998">
+          <img src="pics/116.jpg" alt="The Million Dollar Quartet [Elvis Presley, Johnny Cash, Carl Perkins and Jerry Lee Lewis] at Sun Records Studios, 1956">
+          <img src="pics/117.jpg" alt="David Bowie with The Ramones at the Mudd Club in New York, 1979">
+          <img src="pics/118.jpg" alt="Jackie Stewart in his BRM Race Car at the Monaco Grand Prix, 1966">
+          <img src="pics/119.jpg" alt="A Piece from One of Vivienne Westwood's Collections, 1990s">
+          <img src="pics/120.jpg" alt="Britney Spears Posing in front of the Eiffel Tower in Paris, 2000">
+          <img src="pics/121.jpg" alt="George Harrison and Bob Marley at the Roxy Theater in Los Angeles, 1975">
+          <img src="pics/122.jpg" alt="Jimi Hendrix by David Montgomery, 1968">
+          <img src="pics/123.jpg" alt="Marilyn Monroe Pouring a Drink for her Husband Arthur Miller, 1958">
+          <img src="pics/124.jpg" alt="Outkast with Matthew Lillard on the Set for the Music Video for the song [Land Of A Million Drums], 2002">
+          <img src="pics/125.jpg" alt="Kanye West, Travis Scott, Theophilus London, and Ian Connor, 2015">
+          <img src="pics/126.jpg" alt="Misato Katsuragi from [Neon Genesis Evangelion] by Yoshiyuki Sadamoto">
+          <img src="pics/127.jpg" alt="Brad Pitt as Tyler Durden in [Fight Club], 1999">
+          <img src="pics/128.JPG" alt="J Dilla, DJ Premiere, and The Alchemist at Electric Lady Studios in New York, 1998">
+          <img src="pics/129.JPG" alt="Mick Jagger Looking into the Mirror, 1969">
+          <img src="pics/130.JPG" alt="Max B in his Natural State, Late 2000s">
+          <img src="pics/131.jpg" alt="A Scene from [Taxi Driver] by Martin Scorsese, 1976">
+          <img src="pics/132.JPG" alt="Shelley Duvall Playing with Some Strings, Early to Mid-1970s">
+          <img src="pics/133.jpg" alt="Dwayne Wade Passing an Assist to Lebron James, 2010">
+          <img src="pics/134.JPG" alt="Balmain X H&M Silver Toe Chukkas">
+          <img src="pics/135.JPG" alt="The Introduction to [Akira] by Katsuhiro Otomo, 1982">
+          <img src="pics/136.JPG" alt="Live Recreation Of Ren Honjo and Nana Osaki from the Manga Series [NaNa]">
+          <img src="pics/137.JPG" alt="Sid Vicious During Filming of the Movie [The Great Rock N' Roll Swindle] by Malcolm Mclaren, 1978">
+          <img src="pics/138.JPG" alt="Brad Pitt During a Photoshoot as Tyler Durden for [Fight Club], 1999">
+          <img src="pics/139.JPG" alt="Pat Smear in [The Decline of Western Civilization] by Penelope Spheeris, 1980">
+          <img src="pics/140.jpg" alt="The Night Time Sky in New York City, 2025">
+          <img src="pics/141.JPG" alt="Jean-Michel Basquiat in his Soho Studio Apartment in New York by Gianfranco Gorgoni, 1982">
+          <img src="pics/142.JPG" alt="[Relief at a Ptolemaic Temple] by Kees Scherer, 1968">
+          <img src="pics/143.jpg" alt="[The Crucifixion] by Bartolomé Estebán Murillo, 1675">
+          <img src="pics/144.JPG" alt="Mac Miller and Madlib, Date Unknown">
+          <img src="pics/145.JPG" alt="Tupac Shakur after Being Shot 5 Times at Quad Studios, 1994">
+          <img src="pics/146.JPG" alt="The Shooting of the Film [Dune: Part Two] by Denis Villeneuve, 2024">
+          <img src="pics/147.JPG" alt="Chanel Black Utility Jacket">
+          <img src="pics/148.jpg" alt="Francis Ford Coppola On the Set of his Film [Apocalypse Now], 1979">
+          <img src="pics/149.jpg" alt="[Oracle] by John Wilson, 1965">
+          <img src="pics/150.jpg" alt="A Scene from the Brazilian Film [Pixote] by Hector Babenco, 1980">
+          <img src="pics/151.JPG" alt="Jake Paul Getting Rocked in the Fucking Jaw by Anthony Joshua, 2025">
+          <img src="pics/152.JPG" alt="Jackie Chan On the Set of [Police Story 3] Directed by Stanley Tong, 1992">
+          <img src="pics/153.JPG" alt="Debbie Harry for Punk Magazine by Chris Stein, 1975-1976">
+          <img src="pics/154.JPG" alt="Mac Miller Enjoying a Glass of Red Wine, Date Unknown">
+          <img src="pics/155.JPG" alt="Martin Scorsese Holding a .44 Magnum Revolver On the Set of [Taxi Driver]. Shot by Steve Schapiro, 1975">
+          <img src="pics/156.jpg" alt="The Cover of Miles Davis' Album [Bitches Brew], 1970">
+          <img src="pics/157.jpg" alt="Trappin' Out of Queens, 2025">
+          <img src="pics/158.JPG" alt="I Will Slap the Shit Out of You...If You Try Me, 2025">
+          <img src="pics/159.JPG" alt="Jimi Hendrix Performing at the Winterland Ballroom in San Francisco, California. 1968">
+          <img src="pics/160.JPG" alt="Another Shot of the Moon">
+          <img src="pics/161.JPG" alt="Sunsets from the West End, 2025">
+          <img src="pics/162.JPG" alt="Patricia Hearst Robbing a Bank in San Francisco, 1974">
+          <img src="pics/163.JPG" alt="Like the Tee Shirt Says [Off White, 2016]">
+          <img src="pics/164.JPG" alt="Michael Jackson at the 1984 Grammys">
+          <img src="pics/165.JPG" alt="The Denial of Saint Peter by Caravaggio, 1610">
+          <img src="pics/166.jpg" alt="Physical Graffiti, Artist and Date Unknown">
+          <img src="pics/167.jpg" alt="A Lone Dusse, 2025">
+          <img src="pics/168.jpg" alt="The World is Yours, 2025">
+          <img src="pics/169.JPG" alt="[Guernica] by Pablo Picasso, 1937">
+          <img src="pics/170.JPG" alt="Promotional Shot for [The Sopranos], 2000">
+          <img src="pics/171.JPG" alt="Free Palestine">
+          <img src="pics/172.JPG" alt="Kanye West and Kim Kardashian Getting Flashed by Paparazzi, Date Unknown">
+          <img src="pics/173.JPG" alt="Mads Mikkelsen, 1990s">
+          <img src="pics/174.JPG" alt="Serial Experiments Lain on PlayStation 1 for Sale">
+          <img src="pics/175.JPG" alt="Jane Birkin and Serge Gainsbourg, 1967">
+          <img src="pics/176.jpg" alt="Kendrick Lamar and Playboi Carti Backstage in Atlanta, 2025">
+          <img src="pics/177.jpg" alt="Life Be Sideways Sometimes, 2025">
+          <img src="pics/178.JPG" alt="B. Cool-Aid [Pink Siifu and Ahwlee] During Promotion for Their Album [Leather Blvd], 2023">
+          <img src="pics/179.JPG" alt="No Pain, No Game, 2025">
+          <img src="pics/180.JPG" alt="Someone Had One Hell of a Night, 2025">
+          <img src="pics/181.JPG" alt="Pieces from Undercover's A/W 2000 Collection">
+          <img src="pics/182.JPG" alt="Che Guevera by Alberto Korda, 1960">
+          <img src="pics/183.jpg" alt="Nujabes Performing Live, Date Unknown">
+          <img src="pics/184.JPG" alt="A Piece of Work from the [Sexy Robot] Series by Hajime Sorayama">
+          <img src="pics/185.jpg" alt="Beautiful Swan(s), 2025">
+          <img src="pics/186.jpg" alt="J Dilla On a Turntable Setup, Date Unknown">
+          <img src="pics/187.jpg" alt="Raekwon and his Bodyguard Posing with Elmo and a TEC-9 for [Supreme], 2005">
+          <img src="pics/188.JPG" alt="The Cover of Willie Colon's Album [Cosa Nuestra], 1969">
+          <img src="pics/189.jpg" alt="Sunshine On a Somewhat Cloudy Day, 2025">
+          <img src="pics/190.jpg" alt="James Chance Fighting an Audience Member During a Performance, Late-1970s">
+          <img src="pics/191.jpg" alt="Woody Guthrie On-Stage Holding his Iconic Guitar, 1940s">
       </div>
     </div>
   </div>
 
   <!-- The Modal -->
   <div id="myModal" class="modal">
-    <span class="close" onclick="closeModal()">&times;</span>
-    <button class="modal-nav-btn" id="modalPrevBtn" onclick="modalPrev()">&#8592;</button>
-    <button class="modal-nav-btn" id="modalNextBtn" onclick="modalNext()">&#8594;</button>
+    <button class="close" onclick="closeModal()">&times;</button>
+    <button class="modal-nav-btn" id="modalPrevBtn">&#8592;</button>
+    <button class="modal-nav-btn" id="modalNextBtn">&#8594;</button>
     <img class="modal-content" id="modalImage" alt="">
     <div id="caption"></div>
   </div>
+
+  <!-- Standalone mobile close button — lives outside the modal so nothing clips or offsets it -->
+  <button id="mobileModalClose" onclick="closeModal()"
+      style="display:none; position:fixed; top:58px; right:14px; z-index:2000;
+      background:none; border:none; color:#fff; font-size:26px; font-weight:bold;
+      cursor:pointer; padding:6px 10px; line-height:1; -webkit-appearance:none;
+      text-shadow:0 1px 6px rgba(0,0,0,0.9);">&times;</button>
 
 
 <div id="galleryFooterText" style="background-color: black; color: white; height: 85px; line-height: -10px; text-align:
     center; margin-top: 0px; margin-bottom: 0px; font-weight: 900; font-family:
     'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><br><br>
-If you happen to know the source for any of these photos, contact me so I may add their credit.</div>
+If you have any loud pictures to share, message me on Instagram.</div>
+
+<!-- Cart Overlay & Drawer -->
+<div class="cart-overlay-bg" id="cartOverlayBg"></div>
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+        <p class="cart-drawer-title">Your Bag</p>
+        <button class="cart-drawer-close" id="cartDrawerClose">&#x2715;</button>
+    </div>
+    <div class="cart-items-list" id="cartItemsList">
+        <div class="cart-empty" id="cartEmpty">Your bag is empty.</div>
+    </div>
+    <div class="cart-drawer-footer">
+        <div class="cart-total-row">
+            <span class="cart-total-label">Total</span>
+            <span class="cart-total-amount" id="cartTotal">$0</span>
+        </div>
+        <button class="checkout-btn" id="checkoutBtn">Checkout</button>
+    </div>
+</div>
 
 <!-- Custom JS -->
+    <script src="Cart.js"></script>
     <script type="text/javascript" src="Gallery.js"></script>
 
 <!-- Audio Player -->
@@ -391,7 +490,7 @@ If you happen to know the source for any of these photos, contact me so I may ad
 <script>
 (function(){
     // Hamburger menu
-    var btn = document.getElementById('hamburgerBtn');
+    var btn = document.getElementById('mobileHamburger');
     var menu = document.getElementById('mobileNavMenu');
     var overlay = document.getElementById('mobileNavOverlay');
     function toggleNav() {
@@ -404,20 +503,26 @@ If you happen to know the source for any of these photos, contact me so I may ad
 </script>
 
 <script>
-// Modal prev/next navigation
-function modalPrev() {
-    if (!images || images.length === 0) return;
-    imageIndex = (imageIndex - 1 + images.length) % images.length;
-    modalImg.src = images[imageIndex].src;
-    captionText.innerHTML = images[imageIndex].alt;
-}
+// Mobile gallery modal fixes (JS-driven so they survive CSS caching)
+(function () {
+    if (window.innerWidth > 768) return;
 
-function modalNext() {
-    if (!images || images.length === 0) return;
-    imageIndex = (imageIndex + 1) % images.length;
-    modalImg.src = images[imageIndex].src;
-    captionText.innerHTML = images[imageIndex].alt;
-}
+    var modal      = document.getElementById('myModal');
+    var mobileClose= document.getElementById('mobileModalClose');
+
+    // Apply centering styles to modal via JS
+    if (modal) {
+        modal.style.flexDirection  = 'column';
+        modal.style.alignItems     = 'center';
+        modal.style.justifyContent = 'center';
+        modal.style.padding        = '52px 8px 12px';
+        modal.style.boxSizing      = 'border-box';
+        modal.style.overflowY      = 'hidden';
+    }
+
+    // Wire the mobile close button directly to Gallery.js closeModal
+    if (mobileClose) mobileClose.addEventListener('click', function() { closeModal(); });
+}());
 </script>
 </body>
-</html>
+<script>'undefined'=== typeof _trfq || (window._trfq = []);'undefined'=== typeof _trfd && (window._trfd=[]),_trfd.push({'tccl.baseHost':'secureserver.net'},{'ap':'cpsh-oh'},{'server':'p3plzcpnl508260'},{'dcenter':'p3'},{'cp_id':'10724314'},{'cp_cl':'8'}) // Monitoring performance to make your website faster. If you want to opt-out, please contact web hosting support.</script><script src='https://img1.wsimg.com/traffic-assets/js/tccl.min.js'></script></html>

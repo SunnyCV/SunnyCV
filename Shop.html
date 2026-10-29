@@ -14,8 +14,8 @@ h1 {text-align: center; font-size: 115px; font-weight: 900;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;}
 h2 {text-align: center; font-size: 36px; font-weight: 900; color: white;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;}
-nav ul {list-style-type: none; margin: 0; padding: 0; overflow: hidden;}
-nav li {float: right;}
+nav ul {list-style-type: none; margin: 0; padding: 0; overflow: hidden; display: flex; flex-direction: row-reverse; align-items: center;}
+nav li {float: none;}
 nav img {position: absolute; float: left; margin: -50%, -50%; overflow: hidden; width: 225px;}
 li a {display: block; padding: 9px; background-color: rgb(from color r g b);
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; font-weight: 600; text-decoration: none; color: black;}
@@ -163,6 +163,75 @@ li a:hover:not(.active) {background-color: lightgray;}
     max-height: 620px;
     object-fit: contain;
     display: block;
+    will-change: transform;
+}
+
+/* ── Image Zoom ── */
+.pdp-img-zoom-wrap {
+    overflow: hidden;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: crosshair;
+    position: relative;
+    background-color: #f5f5f5;
+}
+/* Mobile image zoom lightbox */
+.img-zoom-lb {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 1600;
+    align-items: center;
+    justify-content: center;
+    touch-action: none;
+    overflow: hidden;
+}
+.img-zoom-lb.open { display: flex; }
+.img-zoom-lb-img {
+    max-width: 100vw;
+    max-height: 100vh;
+    object-fit: contain;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    display: block;
+}
+.img-zoom-lb-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    font-family: Arial, sans-serif;
+    line-height: 1;
+    padding: 0;
+}
+.img-zoom-lb-tip {
+    position: absolute;
+    bottom: 22px;
+    left: 0; right: 0;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    pointer-events: none;
 }
 .pdp-view-toggle {
     background-color: #fff;
@@ -270,14 +339,14 @@ li a:hover:not(.active) {background-color: lightgray;}
     z-index: 900;
     align-items: center;
     justify-content: center;
-    padding: 30px 20px;
+    padding: 16px 12px;
 }
 .sc-overlay.open { display: flex; }
 .sc-box {
     background-color: #fff;
     width: 100%;
-    max-width: 780px;
-    max-height: 90vh;
+    max-width: 1100px;
+    max-height: 96vh;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -336,9 +405,9 @@ li a:hover:not(.active) {background-color: lightgray;}
 .sc-chart-img {
     background-color: #fff;
     width: 100%;
-    max-width: 720px;
+    max-width: 100%;
     display: block;
-    object-fit: contain;
+    height: auto;
 }
 
 /* ── Cart Icon in Nav ── */
@@ -722,15 +791,16 @@ li a:hover:not(.active) {background-color: lightgray;}
 .mobile-cart-badge.visible { display: inline-flex; }
 
 @media (max-width: 768px) {
-    .mobile-header { display: flex; }
+    .mobile-header { display: flex; z-index: 1500; }
     nav { display: none; }
     body { overflow-y: auto; padding-top: 48px; }
-    /* Cart drawer full-width */
-    .cart-drawer { width: 100%; right: -100%; }
+    /* Cart drawer full-width, starts below mobile header so header stays tappable */
+    .cart-drawer { width: 100%; right: -100%; top: 48px; height: calc(100% - 48px); }
     .cart-drawer.open { right: 0; }
-    /* PDP modal — full-screen on mobile, fully contained, no off-screen overflow */
-    /* z-index raised above mobile header (1090) so the close button is always tappable */
-    .pdp-overlay { overflow: hidden; z-index: 1200; }
+    /* PDP modal — starts below mobile header so header stays always tappable */
+    .pdp-overlay { overflow-y: auto; z-index: 1100; inset: 48px 0 0 0; }
+    /* Size chart — above PDP overlay so it opens on top of the product card */
+    .sc-overlay { z-index: 1200; }
     .pdp-overlay.open {
         padding: 0;
         align-items: stretch;
@@ -756,7 +826,7 @@ li a:hover:not(.active) {background-color: lightgray;}
     }
     .pdp-images {
         width: 100%;
-        padding: 48px 16px 10px;
+        padding: 16px 16px 10px;
         height: 54%;
         flex-shrink: 0;
         background-color: #f5f5f5;
@@ -764,7 +834,8 @@ li a:hover:not(.active) {background-color: lightgray;}
         position: relative;
         overflow: hidden;
     }
-    .pdp-main-img { flex: 1; min-height: 0; width: 100%; object-fit: contain; }
+    .pdp-img-zoom-wrap { flex: 1; min-height: 0; cursor: pointer; align-self: stretch; }
+    .pdp-main-img { flex: none; width: 100%; max-height: 100%; object-fit: contain; }
     .pdp-view-toggle { margin-top: 0; margin-bottom: 8px; background-color: #fff; }
     .pdp-info {
         width: 100%;
@@ -829,20 +900,20 @@ li a:hover:not(.active) {background-color: lightgray;}
 <!-- ── Mobile Header Bar ── -->
 <div class="mobile-header" id="mobileHeader">
     <button class="mobile-header-hamburger" id="mobileHamburger" aria-label="Menu">&#9776;</button>
-    <img class="mobile-header-logo" src="png-logo.png" alt="NOISE">
+    <a href="index.html" style="display:contents;"><img class="mobile-header-logo" src="png-logo.png" alt="NOISE"></a>
     <button class="mobile-header-cart" id="mobileCartBtn" aria-label="Cart">
         &#128722;<span class="mobile-cart-badge" id="mobileBadge"></span>
     </button>
 </div>
 
 <nav>
-<img src="png-logo.png" alt="">
+<a href="index.html" style="display:contents;"><img src="png-logo.png" alt=""></a>
     <ul>
-        <li><button class="cart-nav-btn" id="cartIconBtn">Cart <span class="cart-badge" id="cartBadge">0</span></button></li>
         <li><a href="index.html">Home</a></li>
         <li><a class="active" href="Shop.html">Shop</a></li>
         <li><a href="Gallery.html">Gallery</a></li>
         <li><a href="About.html">About</a></li>
+        <li><button class="cart-nav-btn" id="cartIconBtn">&#128722;<span class="cart-badge" id="cartBadge"></span></button></li>
     </ul>
 </nav>
 
@@ -876,7 +947,9 @@ li a:hover:not(.active) {background-color: lightgray;}
 
         <!-- Images -->
         <div class="pdp-images" id="pdpImagesArea">
-            <img class="pdp-main-img" id="pdpMainImg" src="" alt="">
+            <div class="pdp-img-zoom-wrap" id="pdpImgZoomWrap">
+                <img class="pdp-main-img" id="pdpMainImg" src="" alt="">
+            </div>
             <div class="pdp-view-toggle" id="pdpToggle">
                 <button class="view-btn active-view" id="btnFront">Front</button>
                 <button class="view-btn" id="btnBack">Back</button>
@@ -897,11 +970,11 @@ li a:hover:not(.active) {background-color: lightgray;}
             <!-- Size Select -->
             <select class="size-select" id="sizeSelect">
                 <option value="" disabled selected>Select a Size</option>
-                <option value="XS">XS — Extra Small</option>
                 <option value="S">S — Small</option>
                 <option value="M">M — Medium</option>
                 <option value="L">L — Large</option>
                 <option value="XL">XL — Extra Large</option>
+                <option value="2XL">2XL — XX-Large</option>
             </select>
 
             <!-- Add to Cart -->
@@ -931,6 +1004,13 @@ li a:hover:not(.active) {background-color: lightgray;}
 </div>
 
 <script type="text/javascript" src="Shop.js"></script>
+
+<!-- ── Mobile Image Zoom Lightbox ── -->
+<div class="img-zoom-lb" id="imgZoomLb">
+    <button class="img-zoom-lb-close" id="imgZoomLbClose">&#x2715;</button>
+    <img class="img-zoom-lb-img" id="imgZoomLbImg" src="" alt="">
+    <p class="img-zoom-lb-tip">Pinch to zoom &nbsp;&bull;&nbsp; Double-tap to reset</p>
+</div>
 
 <!-- ── Size Chart Lightbox ── -->
 <div class="sc-overlay" id="scOverlay">
@@ -967,14 +1047,14 @@ const products = [
         back:  "clothes/Fuck Segregation Tee Back.png"
     },
     {
-        id: 4, name: "Graffiti Galleria Tee", category: "tees", price: 30,
-        front: "clothes/Graffiti Galleria Tee.png",
-        back:  null
+        id: 4, name: "Market Tee", category: "tees", price: 30,
+        front: "clothes/Market Tee Front.png",
+        back:  "clothes/Market Tee Back.png"
     },
     {
-        id: 5, name: "Iceberg Slim Tee", category: "tees", price: 30,
-        front: "clothes/Iceberg Slim Tee Front.png",
-        back:  "clothes/Iceberg Slim Tee Back.png"
+        id: 5, name: "Graffiti Galleria Tee", category: "tees", price: 30,
+        front: "clothes/Graffiti Galleria Tee.png",
+        back:  null
     },
     {
         id: 6, name: "Lennon Tee", category: "tees", price: 30,
@@ -1076,8 +1156,8 @@ function showAll() {
 }
 
 // ── Inventory (5 per size per product) ──
-const sizes = ['XS', 'S', 'M', 'L', 'XL'];
-const sizeLabels = { XS: 'Extra Small', S: 'Small', M: 'Medium', L: 'Large', XL: 'Extra Large' };
+const sizes = ['S', 'M', 'L', 'XL', '2XL'];
+const sizeLabels = { S: 'Small', M: 'Medium', L: 'Large', XL: 'Extra Large', '2XL': 'XX-Large' };
 const inventory = {};
 products.forEach(p => {
     inventory[p.id] = {};
@@ -1086,6 +1166,19 @@ products.forEach(p => {
 
 // ── Cart State ──
 let cart = [];
+// Load persisted cart from sessionStorage and adjust inventory accordingly
+try {
+    const _saved = JSON.parse(sessionStorage.getItem('noiseCart'));
+    if (_saved && Array.isArray(_saved)) {
+        cart = _saved;
+        cart.forEach(function(item) {
+            if (inventory[item.productId] && item.size &&
+                inventory[item.productId][item.size] > 0) {
+                inventory[item.productId][item.size]--;
+            }
+        });
+    }
+} catch(e) {}
 
 function cartTotal() {
     return cart.reduce((sum, item) => sum + item.price, 0);
@@ -1122,6 +1215,8 @@ function renderCart() {
     }
     totalEl.textContent = `$${cartTotal()}`;
     updateBadge();
+    // Persist so other pages stay in sync
+    try { sessionStorage.setItem('noiseCart', JSON.stringify(cart)); } catch(e) {}
 }
 
 function openCart() {
@@ -1134,11 +1229,38 @@ function closeCart() {
     document.getElementById('cartDrawer').classList.remove('open');
 }
 
-document.getElementById('cartIconBtn').addEventListener('click', openCart);
+renderCart(); // initialize drawer + badge from loaded sessionStorage state
 
-document.getElementById('checkoutBtn').addEventListener('click', () => {
-    try { sessionStorage.setItem('noiseCart', JSON.stringify(cart)); } catch(e) {}
-    window.location.href = 'Checkout.html';
+document.getElementById('cartIconBtn').addEventListener('click', function () {
+    var dr = document.getElementById('cartDrawer');
+    if (dr && dr.classList.contains('open')) closeCart(); else openCart();
+});
+
+document.getElementById('checkoutBtn').addEventListener('click', function() {
+    if (cart.length === 0) return;
+    const btn = document.getElementById('checkoutBtn');
+    btn.textContent = 'Processing...';
+    btn.disabled = true;
+    fetch('stripe-checkout.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: cart })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.url) {
+            window.location.href = data.url;
+        } else {
+            alert('Something went wrong. Please try again.');
+            btn.textContent = 'Checkout';
+            btn.disabled = false;
+        }
+    })
+    .catch(() => {
+        alert('Something went wrong. Please try again.');
+        btn.textContent = 'Checkout';
+        btn.disabled = false;
+    });
 });
 document.getElementById('cartDrawerClose').addEventListener('click', closeCart);
 document.getElementById('cartOverlayBg').addEventListener('click', closeCart);
@@ -1397,7 +1519,9 @@ document.querySelectorAll('.sc-tab').forEach(tab => {
     // Cart button opens the cart drawer
     if (cartBtn) {
         cartBtn.addEventListener('click', function() {
-            if (typeof openCart === 'function') openCart();
+            var dr = document.getElementById('cartDrawer');
+            if (dr && dr.classList.contains('open')) { if (typeof closeCart === 'function') closeCart(); }
+            else { if (typeof openCart === 'function') openCart(); }
         });
     }
 
@@ -1416,5 +1540,128 @@ document.querySelectorAll('.sc-tab').forEach(tab => {
 })();
 </script>
 
+<script>
+// ── Desktop Image Hover Zoom ──────────────────────────────────────────────
+(function () {
+    if ('ontouchstart' in window) return;
+    var wrap = document.getElementById('pdpImgZoomWrap');
+    var img  = document.getElementById('pdpMainImg');
+    if (!wrap || !img) return;
+
+    wrap.addEventListener('mousemove', function (e) {
+        var r = wrap.getBoundingClientRect();
+        var x = ((e.clientX - r.left) / r.width)  * 100;
+        var y = ((e.clientY - r.top)  / r.height) * 100;
+        img.style.transition = '';
+        img.style.transformOrigin = x + '% ' + y + '%';
+        img.style.transform = 'scale(2.5)';
+    });
+
+    wrap.addEventListener('mouseleave', function () {
+        img.style.transition = 'transform 0.22s ease';
+        img.style.transform = '';
+        img.style.transformOrigin = '';
+        setTimeout(function() { img.style.transition = ''; }, 220);
+    });
+
+    // Reset transform when PDP closes so the next open starts unzoomed
+    function resetZoom() { img.style.transition = ''; img.style.transform = ''; img.style.transformOrigin = ''; }
+    var pdpCloseBtn = document.getElementById('pdpClose');
+    var pdpOv       = document.getElementById('pdpOverlay');
+    if (pdpCloseBtn) pdpCloseBtn.addEventListener('click', resetZoom);
+    if (pdpOv)       pdpOv.addEventListener('click', resetZoom);
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') resetZoom(); });
+}());
+
+// ── Mobile Image Zoom Lightbox (tap → fullscreen, pinch/double-tap zoom) ──
+(function () {
+    if (!('ontouchstart' in window)) return;
+
+    var lb      = document.getElementById('imgZoomLb');
+    var lbImg   = document.getElementById('imgZoomLbImg');
+    var closeBtn= document.getElementById('imgZoomLbClose');
+    var wrap    = document.getElementById('pdpImgZoomWrap');
+    var mainImg = document.getElementById('pdpMainImg');
+    if (!lb || !wrap) return;
+
+    var sc = 1, tx = 0, ty = 0;
+    var lastSc = 1;
+    var pinching = false, startDist = 0;
+    var dragging = false, dragSx = 0, dragSy = 0;
+    var lastTap  = 0;
+
+    function applyT() {
+        lbImg.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + sc + ')';
+    }
+    function reset() { sc = 1; tx = 0; ty = 0; applyT(); }
+
+    function openLb() {
+        lbImg.src = mainImg.src;
+        reset();
+        lb.classList.add('open');
+    }
+    function closeLb() { lb.classList.remove('open'); }
+
+    function touchDist(t) {
+        var dx = t[0].clientX - t[1].clientX, dy = t[0].clientY - t[1].clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    // Tap image area to open lightbox using touch events so swipes don't accidentally trigger it
+    var tapStartX = 0, tapStartY = 0;
+    wrap.addEventListener('touchstart', function (e) {
+        tapStartX = e.touches[0].clientX;
+        tapStartY = e.touches[0].clientY;
+    }, { passive: true });
+    wrap.addEventListener('touchend', function (e) {
+        var dx = Math.abs(e.changedTouches[0].clientX - tapStartX);
+        var dy = Math.abs(e.changedTouches[0].clientY - tapStartY);
+        if (dx < 10 && dy < 10) openLb();
+    }, { passive: true });
+    closeBtn.addEventListener('click', function (e) { e.stopPropagation(); closeLb(); });
+
+    lb.addEventListener('touchstart', function (e) {
+        if (e.touches.length === 2) {
+            pinching  = true;
+            dragging  = false;
+            startDist = touchDist(e.touches);
+            lastSc    = sc;
+            e.preventDefault();
+        } else if (e.touches.length === 1 && !pinching) {
+            dragging = true;
+            dragSx   = e.touches[0].clientX - tx;
+            dragSy   = e.touches[0].clientY - ty;
+        }
+    }, { passive: false });
+
+    lb.addEventListener('touchmove', function (e) {
+        if (e.touches.length === 2 && pinching) {
+            sc = Math.max(1, Math.min(5, lastSc * (touchDist(e.touches) / startDist)));
+            applyT();
+            e.preventDefault();
+        } else if (e.touches.length === 1 && dragging && sc > 1) {
+            tx = e.touches[0].clientX - dragSx;
+            ty = e.touches[0].clientY - dragSy;
+            applyT();
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    lb.addEventListener('touchend', function (e) {
+        if (e.touches.length < 2) pinching = false;
+        if (e.touches.length === 0) {
+            dragging = false;
+            if (sc <= 1.02) reset();
+            // Double-tap: zoom in / reset
+            var now = Date.now();
+            if (now - lastTap < 300) {
+                if (sc > 1) { reset(); } else { sc = 2.5; applyT(); }
+            }
+            lastTap = now;
+        }
+    });
+}());
+</script>
+
 </body>
-</html>
+<script>'undefined'=== typeof _trfq || (window._trfq = []);'undefined'=== typeof _trfd && (window._trfd=[]),_trfd.push({'tccl.baseHost':'secureserver.net'},{'ap':'cpsh-oh'},{'server':'p3plzcpnl508260'},{'dcenter':'p3'},{'cp_id':'10724314'},{'cp_cl':'8'}) // Monitoring performance to make your website faster. If you want to opt-out, please contact web hosting support.</script><script src='https://img1.wsimg.com/traffic-assets/js/tccl.min.js'></script></html>

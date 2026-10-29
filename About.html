@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NOISE</title>
+<link rel="stylesheet" href="Cart.css">
+<link rel="icon" type="image/x-icon" href="WL Web Logo.png">
 <style>
 	html {overflow-y: scroll;}
 div {background-color: black;}
@@ -29,10 +31,7 @@ li a:hover:not(.active) {background-color: #373737;}
 .header2 {text-align: center; font-size: 40px; font-weight: 900; color: white;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;}
 .pnotes {text-align: center; font-size: 28px; font-weight: bold; color: white;}
-h1.header::first-line {text-align: center; font-size: 96px; font-weight: 900; 
-    color: white; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;}
-	p.pnotes::first-line {font-size: 36px;}
-
+.year-label {font-size: 36px; margin-bottom: 0;}
 /* ── Mobile / Hamburger ── */
 .hamburger-btn {
     display: none;
@@ -90,22 +89,37 @@ h1.header::first-line {text-align: center; font-size: 96px; font-weight: 900;
     nav img { height: 34px; width: auto; position: absolute; left: 50%; transform: translateX(-50%); top: 7px; }
     nav { height: 48px; position: relative; background-color: #000; display: flex; align-items: center; justify-content: center; }
     body { overflow-y: auto; }
-    h1 { font-size: 36px; }
-    h1.header { font-size: 36px; }
+    h1 { font-size: 26px; }
+    h1.header { font-size: 26px; line-height: 1.1; }
+    .about-label { display: block; font-size: 46px; }
+    .about-wl-label { display: block; font-size: 40px; }
+    .year-label { font-size: 28px; margin-bottom: 12px; }
     p.pnotes { font-size: 15px; padding: 0 20px; line-height: 1.7; }
     p.pnotes br { display: none; }
-    p.pnotes::first-line { font-size: 20px; }
     div { word-break: break-word; }
+}
+@media (min-width: 769px) {
+    h1.header::first-line { font-size: 96px; font-weight: 900; }
 }
 @keyframes audioMarquee {
     0%   { transform: translateX(0%); }
     100% { transform: translateX(-100%); }
 }
+/* ── Cart badge colours (dark page) ── */
+.cart-badge { background-color: #fff; color: #000; }
+.mobile-header { background-color: #000; border-bottom: 1px solid #222; color: #fff; }
+.mobile-cart-badge { background-color: #fff; color: #000; }
+.cart-nav-btn { color: white; }
 </style>
 </head>
 <body>
+<!-- Mobile Header Bar -->
+<div class="mobile-header" id="mobileHeader">
+    <button class="mobile-header-hamburger" id="mobileHamburger" aria-label="Menu">&#9776;</button>
+    <a href="index.html" style="display:contents;"><img class="mobile-header-logo" src="png-logo-inv.png" alt="NOISE"></a>
+    <button class="mobile-header-cart" id="mobileCartBtn" aria-label="Cart">&#128722;<span class="mobile-cart-badge" id="mobileBadge"></span></button>
+</div>
 <!-- Mobile Nav -->
-<button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">&#9776;</button>
 <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
 <div class="mobile-nav-menu" id="mobileNavMenu">
     <a href="index.html">HOME</a>
@@ -115,12 +129,13 @@ h1.header::first-line {text-align: center; font-size: 96px; font-weight: 900;
 </div>
 
 <nav>
-<img src="png-logo-inv.png" alt="">
+<a href="index.html" style="display:contents;"><img src="png-logo-inv.png" alt=""></a>
     <ul>
         <li><a href="index.html">Home</a></li>
         <li><a href="Shop.html">Shop</a></li>
         <li><a href="Gallery.html">Gallery</a></li>
         <li><a class="active" href="About.html">About</a></li>
+        <li><button class="cart-nav-btn" id="cartIconBtn">&#128722;<span class="cart-badge" id="cartBadge"></span></button></li>
     </ul>
 	</nav>
     <div>
@@ -134,16 +149,16 @@ h1.header::first-line {text-align: center; font-size: 96px; font-weight: 900;
     'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"></div>
 
 
-<h1 class="header">What About Us</h1>
+<h1 class="header"><span class="about-wl-label">About WITH LOVE</span></h1>
 
 
     <div style="background-color: white; height: 85px; line-height: -10px; text-align: 
     center; margin: auto; height: 21px; width: 100%; font-weight: 900; font-family: 
     'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"></div>
 
-    <br>
+	<p class="year-label">2021</p>
 
-	<p class="pnotes">2021<br><br>
+	<p class="pnotes">
 	It was a simple, friendly idea. Start a brand and just sell clothes that I found cool.<br>
 	That's all it was and had been for a while. Then, as time passed on and my mind and identity<br>
 	grew with me, I realized what I had isn't just a brand but a domain where I can<br>
@@ -168,7 +183,26 @@ h1.header::first-line {text-align: center; font-size: 96px; font-weight: 900;
 	<div style="background-color: white; color: black; height: 85px; line-height: -10px; text-align: 
     center; margin-top: 0px; margin-bottom: 0px; font-weight: 900; font-family: 
     'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"><br><br>
-© 2021 WITH LOVE - All Rights Reserved.</div>
+&copy; 2021 WITH LOVE - All Rights Reserved.</div>
+
+<!-- Cart Overlay & Drawer -->
+<div class="cart-overlay-bg" id="cartOverlayBg"></div>
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-drawer-header">
+        <p class="cart-drawer-title">Your Bag</p>
+        <button class="cart-drawer-close" id="cartDrawerClose">&#x2715;</button>
+    </div>
+    <div class="cart-items-list" id="cartItemsList">
+        <div class="cart-empty" id="cartEmpty">Your bag is empty.</div>
+    </div>
+    <div class="cart-drawer-footer">
+        <div class="cart-total-row">
+            <span class="cart-total-label">Total</span>
+            <span class="cart-total-amount" id="cartTotal">$0</span>
+        </div>
+        <button class="checkout-btn" id="checkoutBtn">Checkout</button>
+    </div>
+</div>
 
 <!-- Audio Player -->
 <audio id="bgAudio" loop>
@@ -212,9 +246,10 @@ h1.header::first-line {text-align: center; font-size: 96px; font-weight: 900;
 </script>
 
 
+<script src="Cart.js"></script>
 <script>
 (function(){
-    var btn = document.getElementById("hamburgerBtn");
+    var btn = document.getElementById("mobileHamburger");
     var menu = document.getElementById("mobileNavMenu");
     var overlay = document.getElementById("mobileNavOverlay");
     function toggleNav() {
@@ -226,5 +261,4 @@ h1.header::first-line {text-align: center; font-size: 96px; font-weight: 900;
 })();
 </script>
 </body>
-</html>
-                                                                                                                                                                                                                                                                     
+<script>'undefined'=== typeof _trfq || (window._trfq = []);'undefined'=== typeof _trfd && (window._trfd=[]),_trfd.push({'tccl.baseHost':'secureserver.net'},{'ap':'cpsh-oh'},{'server':'p3plzcpnl508260'},{'dcenter':'p3'},{'cp_id':'10724314'},{'cp_cl':'8'}) // Monitoring performance to make your website faster. If you want to opt-out, please contact web hosting support.</script><script src='https://img1.wsimg.com/traffic-assets/js/tccl.min.js'></script></html>
