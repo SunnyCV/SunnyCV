@@ -51,16 +51,15 @@
     position: relative;
     overflow: hidden;
 }
+/* soft vignette so the photo sinks into the dark dining-room palette */
 .story-visual::after {
-    content: 'Chef portrait here';
+    content: '';
     position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-label);
-    font-size: 11px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: rgba(242,232,216,0.28);
+    background: linear-gradient(180deg, rgba(21,17,13,0) 55%, rgba(21,17,13,0.55) 100%);
+    box-shadow: inset 0 0 0 1px rgba(217,154,78,0.18);
+    pointer-events: none;
 }
+.story-visual img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; display: block; filter: brightness(0.82) sepia(0.18) saturate(1.05); }
 .story-text h2 {
     font-size: clamp(28px, 4vw, 40px);
     font-style: italic;
@@ -232,7 +231,7 @@
 
 <section class="story">
     <div class="container story-grid">
-        <div class="story-visual reveal"></div>
+        <div class="story-visual reveal"><img src="images/chef.jpg" alt="A Serenade chef plating a dish under the kitchen’s copper lights" loading="lazy"></div>
         <div class="story-text reveal">
             <h2>Where Italian warmth<br>meets French discipline.</h2>
             <p>Serenade opened with a simple idea: take the generosity of an Italian kitchen and the precision of a French one, and let them share a single menu. No fusion gimmicks — just two traditions that, it turns out, were never that far apart.</p>
@@ -353,6 +352,7 @@
     </div>
     <p class="footer-fine">214 Vine Street, Hudson &nbsp;&middot;&nbsp; (518) 555-0147</p>
     <p class="footer-fine">&copy; 2026 Serenade. All rights reserved.</p>
+    <p class="footer-fine footer-credit">Serenade is a fictional restaurant created as a design concept. Photography from <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a>.</p>
 </footer>
 
 <script src="js/script.js"></script>
