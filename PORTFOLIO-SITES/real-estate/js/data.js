@@ -1,9 +1,10 @@
-/* Placeholder listings — swap in real properties and photo paths later.
+/* Fictional listings. Photos are free stock images from Unsplash (Unsplash License).
    Set `photos: ['images/123-main.jpg', ...]` on a listing and the site
    uses those instead of the illustrated placeholder. */
 var LISTINGS = [
     {
         id: 'maple-grove-cottage',
+        photos: ["images/listings/maple-grove-cottage-1.jpg", "images/listings/maple-grove-cottage-2.jpg", "images/listings/maple-grove-cottage-3.jpg", "images/listings/maple-grove-cottage-4.jpg"],
         title: 'Sunlit Craftsman Cottage',
         address: '418 Willow Lane',
         city: 'Maple Grove',
@@ -18,6 +19,7 @@ var LISTINGS = [
     },
     {
         id: 'lakeview-modern',
+        photos: ["images/listings/lakeview-modern-1.jpg", "images/listings/lakeview-modern-2.jpg", "images/listings/lakeview-modern-3.jpg", "images/listings/lakeview-modern-4.jpg"],
         title: 'Lakeview Modern Retreat',
         address: '22 Shoreline Drive',
         city: 'Lakeview',
@@ -32,6 +34,7 @@ var LISTINGS = [
     },
     {
         id: 'cedar-park-townhome',
+        photos: ["images/listings/cedar-park-townhome-1.jpg", "images/listings/cedar-park-townhome-2.jpg", "images/listings/cedar-park-townhome-3.jpg", "images/listings/cedar-park-townhome-4.jpg"],
         title: 'Cedar Park Townhome',
         address: '9 Birchwood Court, Unit B',
         city: 'Cedar Park',
@@ -46,6 +49,7 @@ var LISTINGS = [
     },
     {
         id: 'brookside-family',
+        photos: ["images/listings/brookside-family-1.jpg", "images/listings/brookside-family-2.jpg", "images/listings/brookside-family-3.jpg", "images/listings/brookside-family-4.jpg"],
         title: 'Brookside Family Home',
         address: '1207 Meadow Run',
         city: 'Brookside',
@@ -60,6 +64,7 @@ var LISTINGS = [
     },
     {
         id: 'sunset-hills-condo',
+        photos: ["images/listings/sunset-hills-condo-1.jpg", "images/listings/sunset-hills-condo-2.jpg", "images/listings/sunset-hills-condo-3.jpg", "images/listings/sunset-hills-condo-4.jpg"],
         title: 'Sunset Hills Corner Condo',
         address: '300 Skyline Ave, #804',
         city: 'Sunset Hills',
@@ -74,6 +79,7 @@ var LISTINGS = [
     },
     {
         id: 'maple-grove-farmhouse',
+        photos: ["images/listings/maple-grove-farmhouse-1.jpg", "images/listings/maple-grove-farmhouse-2.jpg", "images/listings/maple-grove-farmhouse-3.jpg", "images/listings/maple-grove-farmhouse-4.jpg"],
         title: 'Maple Grove Farmhouse',
         address: '75 Orchard Road',
         city: 'Maple Grove',
@@ -88,6 +94,7 @@ var LISTINGS = [
     },
     {
         id: 'lakeview-townhome',
+        photos: ["images/listings/lakeview-townhome-1.jpg", "images/listings/lakeview-townhome-2.jpg", "images/listings/lakeview-townhome-3.jpg", "images/listings/lakeview-townhome-4.jpg"],
         title: 'Lakeview Garden Townhome',
         address: '41 Reed Street',
         city: 'Lakeview',
@@ -102,6 +109,7 @@ var LISTINGS = [
     },
     {
         id: 'cedar-park-condo',
+        photos: ["images/listings/cedar-park-condo-1.jpg", "images/listings/cedar-park-condo-2.jpg", "images/listings/cedar-park-condo-3.jpg"],
         title: 'Cedar Park Loft Condo',
         address: '18 Mill Street, #3C',
         city: 'Cedar Park',
@@ -116,6 +124,7 @@ var LISTINGS = [
     },
     {
         id: 'brookside-ranch',
+        photos: ["images/listings/brookside-ranch-1.jpg", "images/listings/brookside-ranch-2.jpg", "images/listings/brookside-ranch-3.jpg"],
         title: 'Brookside Single-Level Ranch',
         address: '64 Clover Lane',
         city: 'Brookside',
