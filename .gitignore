@@ -1,3 +1,6 @@
 # Background music for madewith-luv.com: full commercial albums (one is over GitHub's
 # 100 MB file limit), kept on the web host only and not in the repo.
 music/
+# Portfolio showcase videos: each is over GitHub's 100 MB file limit,
+# so they stay on the web host only. (Videos/info-bg.mp4 is small and is kept.)
+PORTFOLIO/Videos/[0-9].mp4
