@@ -177,7 +177,7 @@ a.reach-item:hover strong { color: var(--aegean); }
                 <div class="t-item reveal"><div class="t-year">1874</div><div class="t-text"><h3>A museum for everyone</h3><p>A group of citizens, artists and collectors charters the Ashwood Museum with a promise to bring art to all people.</p></div></div>
                 <div class="t-item reveal"><div class="t-year">1880</div><div class="t-text"><h3>Into the forest</h3><p>The first building opens on the east edge of Ashwood Forest, with three galleries and a single marble statue.</p></div></div>
                 <div class="t-item reveal"><div class="t-year">1902</div><div class="t-text"><h3>The Great Hall</h3><p>The grand Ashwood Avenue facade and Great Hall are completed, giving the museum its famous columns and steps.</p></div></div>
-                <div class="t-item reveal"><div class="t-year">1926</div><div class="t-text"><h3>Treasures of the ancient world</h3><p>Ashwood’s excavations bring Egyptian and Greek collections home, and the Temple of Artemis facade is raised inside.</p></div></div>
+                <div class="t-item reveal"><div class="t-year">1926</div><div class="t-text"><h3>Treasures of the ancient world</h3><p>The Egyptian and Greek galleries open, anchored by a towering column from the Temple of Artemis at Sardis.</p></div></div>
                 <div class="t-item reveal"><div class="t-year">1987</div><div class="t-text"><h3>The Sculpture Court</h3><p>A glass-roofed court opens on the forest side, letting trees and sky into the galleries.</p></div></div>
                 <div class="t-item reveal"><div class="t-year">2024</div><div class="t-text"><h3>The next chapter</h3><p>A 150th-anniversary renewal reopens the Medieval and Arms &amp; Armor wings and makes every gallery step-free.</p></div></div>
             </div>
@@ -226,8 +226,8 @@ a.reach-item:hover strong { color: var(--aegean); }
 document.getElementById('buildingArt').innerHTML = facadeSVG();
 /* one work from each wing, linking to that wing in the collection */
 (function () {
-    var picks = [['european', 'cypresses-above-the-bay'], ['greek', 'amphora-with-meander-band'], ['egypt', 'funerary-mask-of-a-noble'], ['arms', 'close-helmet'],
-                 ['islamic', 'medallion-carpet'], ['medieval', 'lancet-window-tree-of-life'], ['asian', 'vase-with-peony-scrolls'], ['modern', 'composition-in-aegean-blue']];
+    var picks = [['european', 'wheat-field-with-cypresses'], ['greek', 'amphora-antimenes-painter'], ['egypt', 'funerary-mask-of-hatnefer'], ['arms', 'negroli-close-helmet'],
+                 ['islamic', 'the-anhalt-medallion-carpet'], ['medieval', 'window-with-grisaille-decoration'], ['asian', 'vase-with-rabbits'], ['modern', 'mada-primavesi']];
     document.getElementById('wingGrid').innerHTML = picks.map(function (p) {
         var w = WINGS[p[0]], o = findArt(p[1]);
         return '<a class="wing-tile reveal" href="collection.html?wing=' + p[0] + '"><div class="art-media">' + artHTML(o) + '</div>' +

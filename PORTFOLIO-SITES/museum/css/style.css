@@ -532,6 +532,9 @@ body.nav-open { overflow: hidden; }
 }
 .news-thanks { display: none; margin-top: 12px; color: var(--sea-glass); font-size: 15px; }
 .news-thanks.show { display: block; }
+.footer-credit { margin-top: 18px; font-size: 13px; line-height: 1.6; color: rgba(247,243,234,0.42); max-width: 760px; }
+.footer-credit a { color: rgba(247,243,234,0.65); border-bottom: 1px solid rgba(247,243,234,0.25); }
+.footer-credit a:hover { color: var(--marble); }
 .footer-bottom {
     margin-top: 70px;
     padding-top: 26px;

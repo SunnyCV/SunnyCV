@@ -79,7 +79,9 @@ function esc(s) {
                     '<form class="news-form" id="newsForm" novalidate><input type="email" placeholder="Your email" aria-label="Email address" required><button type="submit">Sign Up</button></form>' +
                     '<p class="news-thanks" id="newsThanks">Thank you, you’re on the list.</p></div>' +
             '</div>' +
-            '<div class="footer-bottom"><span>&copy; 2026 Ashwood Museum of Art &amp; History. All rights reserved.</span><span>' + MUSEUM.phone + ' &nbsp;·&nbsp; ' + MUSEUM.email + '</span></div></div>';
+            '<div class="footer-bottom"><span>&copy; 2026 Ashwood Museum of Art &amp; History. All rights reserved.</span><span>' + MUSEUM.phone + ' &nbsp;·&nbsp; ' + MUSEUM.email + '</span></div>' +
+            '<p class="footer-credit">Ashwood is a fictional museum created as a design concept. Artwork images and object information courtesy of ' +
+            '<a href="https://www.metmuseum.org/about-the-met/policies-and-documents/open-access" target="_blank" rel="noopener">The Metropolitan Museum of Art, Open Access</a> (public domain, CC0).</p></div>';
 
         $('newsForm').addEventListener('submit', function (e) {
             e.preventDefault();
@@ -161,7 +163,7 @@ function eventDateBlock(e) {
     }
     $('homeExhibitions').innerHTML = current.map(function (e) { return exCardHTML(e, true); }).join('');
 
-    var picks = ['cypresses-above-the-bay', 'close-helmet', 'medallion-carpet', 'marble-head-of-a-youth', 'funerary-mask-of-a-noble', 'lancet-window-tree-of-life', 'vase-with-peony-scrolls', 'young-man-in-a-red-doublet'];
+    var picks = ['wheat-field-with-cypresses', 'negroli-close-helmet', 'the-anhalt-medallion-carpet', 'marble-head-of-a-youth', 'funerary-mask-of-hatnefer', 'window-with-grisaille-decoration', 'vase-with-rabbits', 'bronzino-portrait-of-a-young-man'];
     $('homeHighlights').innerHTML = picks.map(function (id) { return artCardHTML(findArt(id)); }).join('');
 
     var track = $('homeHighlights');
@@ -448,11 +450,20 @@ function eventDateBlock(e) {
         ['Medium', o.medium],
         ['Dimensions', o.dimensions],
         ['Classification', o.type],
-        ['Period', o.era],
-        ['Credit Line', o.credit],
-        ['Object Number', o.accession]
+        ['Period', o.era]
     ].filter(function (r) { return r[1]; });
     $('artDetails').innerHTML = rows.map(function (r) { return '<dt>' + r[0] + '</dt><dd>' + esc(r[1]) + '</dd>'; }).join('');
+
+    /* real works are credited to The Met, with a link back to its own record */
+    if (o.met) {
+        $('artCredit').hidden = false;
+        $('artCredit').innerHTML =
+            '<span class="eyebrow">Credit</span>' +
+            '<p class="credit-main">The Metropolitan Museum of Art, New York</p>' +
+            '<p class="credit-line">' + esc(o.met.credit) + '</p>' +
+            '<p class="credit-meta">Accession number ' + esc(o.met.accession) + ' &middot; Image: Open Access (public domain, CC0)</p>' +
+            '<a class="text-link" href="' + o.met.url + '" target="_blank" rel="noopener">View on metmuseum.org &rarr;</a>';
+    }
 
     if (o.exhibition) {
         var ex = findExhibition(o.exhibition);
