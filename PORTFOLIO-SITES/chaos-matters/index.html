@@ -27,13 +27,17 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="7" rx="1.5"/><rect x="17" y="14" width="4" height="7" rx="1.5"/></svg>
         Best with sound on
     </p>
-    <button type="button" class="g-skip" id="gateSkip" hidden>Skip straight to the menu &rarr;</button>
+    <button type="button" class="g-skip" id="gateSkip" hidden>Skip the intro &rarr;</button>
 </section>
 
 <div id="standby" aria-hidden="true"><span>Chaos Matters</span><span>Please stand by</span></div>
 
+<h1 class="sr-only">Chaos Matters</h1>
+<div class="fallback-title" aria-hidden="true">Chaos<br>Matters</div>
+<button type="button" id="titleBtn" class="sr-only">Open the doors</button>
+<p id="hint">Stir the colours &middot; grab the title &middot; tap it to open the doors</p>
+
 <nav id="menu" aria-label="Rooms of the exhibit">
-    <h1 class="m-title"><span data-text="Chaos">Chaos</span><span data-text="Matters">Matters</span></h1>
     <ul class="m-list"></ul>
     <p class="m-hint">Choose a door. Every room goes deeper.</p>
 </nav>

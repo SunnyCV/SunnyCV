@@ -185,11 +185,45 @@ const Sound = (() => {
         og.gain.setValueAtTime(1.2, t);
         og.gain.exponentialRampToValueAtTime(0.001, t + 1.8);
         o.connect(og); o.start(t); o.stop(t + 1.9);
+        // the long rumble of the cloud climbing
+        const ru = noise(), rlp = filter('lowpass', 160, 0.9), rg = gain(0, fxBus);
+        rg.gain.setValueAtTime(0, t);
+        rg.gain.linearRampToValueAtTime(0.9, t + 0.6);
+        rg.gain.linearRampToValueAtTime(0.7, t + 3.5);
+        rg.gain.exponentialRampToValueAtTime(0.001, t + 6);
+        lfo(0.6, 0.15, rg.gain);
+        ru.connect(rlp).connect(rg); ru.start(t); ru.stop(t + 6.2);
         // the crack
         const c = noise(), hp = filter('highpass', 2200), cg = gain(0.7, fxBus);
         cg.gain.setValueAtTime(0.7, t);
         cg.gain.exponentialRampToValueAtTime(0.001, t + 0.25);
         c.connect(hp).connect(cg); c.start(t); c.stop(t + 0.3);
+    }
+
+    /* the cloud takes the screen: a crushed, overloaded burst as the signal dies */
+    function signalLoss() {
+        if (!ok()) return;
+        const t = now();
+        const n = noise(), sh = shaper(12), bp = filter('bandpass', 900, 0.6), g = gain(0, fxBus);
+        bp.frequency.setValueAtTime(400, t);
+        bp.frequency.exponentialRampToValueAtTime(3000, t + 0.8);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.5, t + 0.15);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 1.4);
+        n.connect(bp).connect(sh).connect(g); n.start(t); n.stop(t + 1.5);
+    }
+
+    /* little bursts of static as the title flickers into being */
+    function glitch(count = 7, spread = 1.6) {
+        if (!ok()) return;
+        const t = now();
+        for (let i = 0; i < count; i++) {
+            const st = t + Math.random() * spread, len = 0.03 + Math.random() * 0.09;
+            const n = noise(), hp = filter('bandpass', 1500 + Math.random() * 4000, 1.2), g = gain(0, fxBus);
+            g.gain.setValueAtTime(0.18 + Math.random() * 0.2, st);
+            g.gain.setValueAtTime(0, st + len);
+            n.connect(hp).connect(g); n.start(st); n.stop(st + len + 0.02);
+        }
     }
 
     /* the screen gives way to raw static */
@@ -306,5 +340,5 @@ const Sound = (() => {
         if (ok()) master.gain.setTargetAtTime(m ? 0 : 0.9, now(), 0.05);
     }
 
-    return { init, nature, planeStart, planeUpdate, whistle, hush, boom, staticRush, tuneIn, melt, pad, hover, select, stopAll, setMuted, get muted() { return muted; } };
+    return { init, signalLoss, glitch, nature, planeStart, planeUpdate, whistle, hush, boom, staticRush, tuneIn, melt, pad, hover, select, stopAll, setMuted, get muted() { return muted; } };
 })();

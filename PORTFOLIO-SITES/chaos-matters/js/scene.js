@@ -11,7 +11,7 @@ const Scene = (() => {
     const HOUSE = { x: 820, y: 560 };   // ground zero
     const INK = '#34322d';
 
-    let svg, land, washes, sunG, grassG, sunRays, blades, clouds, birds, plane, prop, bomb, shadow;
+    let svg, land, washes, sunG, smoke, flutters, grassG, sunRays, blades, clouds, birds, plane, prop, bomb, shadow;
     let batches = [];
     let rand;
 
@@ -313,7 +313,31 @@ const Scene = (() => {
 
     function buildBirds() {
         birds = el('g', { id: 'birds', opacity: 0 }, svg);
-        for (let i = 0; i < 3; i++) path(birds, '', STYLE.main).dataset.off = i;
+        for (let i = 0; i < 6; i++) path(birds, '', STYLE.main);
+    }
+
+    /* chimney smoke: little pencil curls that rise, swell and fade */
+    function buildSmoke() {
+        smoke = el('g', { id: 'smoke', opacity: 0 }, svg);
+        for (let i = 0; i < 6; i++) {
+            const pts = Array.from({ length: 14 }, (_, k) => {
+                const a = k / 13 * Math.PI * 2.6, rr = 3 + k * 0.45;
+                return [Math.cos(a) * rr, Math.sin(a) * rr * 0.8];
+            });
+            path(smoke, curve(pts, 0.4), STYLE.light);
+        }
+    }
+
+    /* two butterflies over the grass */
+    function buildFlutters() {
+        flutters = el('g', { id: 'flutters', opacity: 0 }, svg);
+        for (let i = 0; i < 2; i++) {
+            const g = el('g', {}, flutters);
+            const w = el('g', {}, g);
+            path(w, curve([[0, 0], [-5, -7], [-9, -4], [-6, 1], [0, 0]], 0.2) + curve([[0, 0], [-6, 3], [-4, 6], [0, 1]], 0.2), STYLE.main);
+            path(w, curve([[0, 0], [5, -7], [9, -4], [6, 1], [0, 0]], 0.2) + curve([[0, 0], [6, 3], [4, 6], [0, 1]], 0.2), STYLE.main);
+            el('path', { d: 'M-5 -3 L-3 -5 L-7 -4 Z M5 -3 L3 -5 L7 -4 Z', fill: i ? '#e0a03a' : '#6aa8d8', opacity: 0.8 }, w);
+        }
     }
 
     function buildPlane() {
@@ -341,14 +365,19 @@ const Scene = (() => {
         prop = el('ellipse', { cx: 117, cy: 1, rx: 2.5, ry: 25, fill: 'rgba(52,50,45,0.12)', stroke: INK, 'stroke-width': 1, 'stroke-opacity': 0.6 }, plane);
         el('circle', { cx: 115, cy: 1, r: 3, fill: INK }, plane);
 
-        shadow = el('ellipse', { id: 'planeShadow', cx: 0, cy: 712, rx: 80, ry: 7, fill: '#3b3a2c', opacity: 0, filter: 'url(#soft)' }, svg);
+        shadow = el('ellipse', { id: 'planeShadow', cx: 0, cy: 712, rx: 46, ry: 5, fill: '#3b3a2c', opacity: 0, filter: 'url(#soft)' }, svg);
 
         bomb = el('g', { id: 'bomb', opacity: 0 }, svg);
         const bb = el('g', { filter: 'url(#boil)' }, bomb);
-        [curve([[-14, 0], [-9, -5.5], [5, -6], [15, 0]], 0.2), curve([[-14, 0], [-9, 5.5], [5, 6], [15, 0]], 0.2),
-         poly([[-13, -2], [-21, -8], [-18, 0], [-21, 8], [-13, 2]], 0.2, false).join(''), rline(-5, -6, -5, 6, 0.1)]
+        // a fat, rounded bomb with a box tail
+        const egg = Array.from({ length: 25 }, (_, i) => {
+            const a = i / 24 * Math.PI * 2;
+            return [Math.cos(a) * (Math.cos(a) > 0 ? 15 : 12), Math.sin(a) * 9.5];
+        });
+        [curve(egg, 0.2), ...poly([[-11, -6], [-24, -7], [-24, 7], [-11, 6]], 0.2, false), rline(-24, -7, -24, 7, 0.1),
+         rline(-18, -6.5, -18, 6.5, 0.1), rline(2, -9.3, 2, 9.3, 0.1), rline(7, -8.5, 7, 8.5, 0.1)]
             .forEach(d => path(bb, d, STYLE.main));
-        path(bb, hatch([[-14, 0], [15, 0], [5, 6], [-9, 5.5]], 70, 2.2, 0.1), STYLE.hatch);
+        path(bb, hatch([[-12, 1], [15, 1], [12, 6], [0, 9.5], [-10, 7]], 70, 2.2, 0.1), STYLE.hatch);
     }
 
     function build(host) {
@@ -363,7 +392,9 @@ const Scene = (() => {
         buildClouds();
         buildLand();
         buildBirds();
+        buildSmoke();
         buildPlane();
+        buildFlutters();
         buildGrass();
         host.appendChild(svg);
 
@@ -379,14 +410,15 @@ const Scene = (() => {
     }
 
     /* Animate every stroke in. Returns the time (s) the last stroke finishes. */
-    function startDrawing(offset) {
+    function startDrawing(offset, slow = 1) {
         let end = 0;
         batches.forEach(b => {
+            const b0 = b.t0 * slow, bd = b.dur * slow;
             const total = b.lens.reduce((s, l) => s + l, 0);
             let cum = 0;
             b.els.forEach((e, i) => {
-                const start = b.t0 + b.dur * (cum / total);
-                const dur = Math.max(0.1, b.dur * (b.lens[i] / total) * 1.5);
+                const start = b0 + bd * (cum / total);
+                const dur = Math.max(0.12, bd * (b.lens[i] / total) * 1.5);
                 cum += b.lens[i];
                 e.animate(
                     [{ strokeDashoffset: b.lens[i] + 1 }, { strokeDashoffset: 0 }],
@@ -440,27 +472,51 @@ const Scene = (() => {
             const bt = t - state.birds;
             birds.setAttribute('opacity', Math.min(1, bt));
             [...birds.children].forEach((p, i) => {
-                const x = v.left - 80 + bt * 34 + i * 38 - (i === 1 ? 20 : 0);
-                const y = 330 - bt * 6 + i * 16 + Math.sin(bt * 0.8 + i) * 6;
-                const flap = Math.sin(bt * 7 + i * 1.9), s = 1 - i * 0.12;
+                const flock = i < 3 ? 0 : 1, j = i % 3;
+                const x = flock ? v.right + 80 - (bt - 6) * 28 - j * 30 : v.left - 80 + bt * 34 + j * 38 - (j === 1 ? 20 : 0);
+                const y = (flock ? 260 : 330) - bt * (flock ? 2 : 6) + j * 16 + Math.sin(bt * 0.8 + i) * 6;
+                const flap = Math.sin(bt * 7 + i * 1.9), s = (1 - j * 0.12) * (flock ? 0.8 : 1);
                 p.setAttribute('d', `M${f(x - 11 * s)} ${f(y)}Q${f(x - 5 * s)} ${f(y - 7 * flap * s)} ${f(x)} ${f(y)}Q${f(x + 5 * s)} ${f(y - 7 * flap * s)} ${f(x + 11 * s)} ${f(y)}`);
             });
         }
 
-        // the plane: flies left to right, passing ahead of ground zero when the bomb leaves
+        if (state.smoke != null) {
+            const st = t - state.smoke;
+            smoke.setAttribute('opacity', Math.min(1, st * 0.5));
+            [...smoke.children].forEach((p, i) => {
+                const ph = (st * 0.16 + i / 6) % 1;
+                const x = 851 + ph * 46 + Math.sin(ph * 7 + i) * 5, y = 488 - ph * 95;
+                p.setAttribute('transform', `translate(${f(x)} ${f(y)}) rotate(${f(st * 40 + i * 60)}) scale(${f(0.5 + ph * 1.6)})`);
+                p.setAttribute('stroke-opacity', f(Math.sin(ph * Math.PI) * 0.55 * 10) / 10);
+            });
+        }
+
+        if (state.flutters != null) {
+            const ft = t - state.flutters;
+            flutters.setAttribute('opacity', Math.min(1, ft));
+            [...flutters.children].forEach((g, i) => {
+                const cx = i ? Math.min(1180, v.right - 140) : Math.max(420, v.left + 120);
+                const x = cx + Math.sin(ft * 0.5 + i * 2) * 60 + Math.sin(ft * 1.3 + i) * 18;
+                const y = 760 + Math.sin(ft * 0.7 + i * 3) * 40 + Math.sin(ft * 2.1) * 8;
+                g.setAttribute('transform', `translate(${f(x)} ${f(y)}) scale(${i ? 1.1 : 1.3})`);
+                g.firstChild.setAttribute('transform', `scale(${f(0.25 + 0.75 * Math.abs(Math.sin(ft * 11 + i)))} 1)`);
+            });
+        }
+
+        // the plane: a small bomber flying left to right, passing ahead of ground zero when the bomb leaves
         const P = state.plane;
         if (P) {
-            const s = v.width < 900 ? 0.72 : 1;
-            const releaseX = HOUSE.x - 230 * s;
-            const speed = Math.max(170, (releaseX - (v.left - 200)) / (P.release - P.enter));
+            const s = v.width < 900 ? 0.48 : 0.6;
+            const releaseX = HOUSE.x - 110 * s;
+            const speed = Math.max(120, (releaseX - (v.left - 160)) / (P.release - P.enter));
             const x = releaseX + (t - P.release) * speed;
-            const y = 250 + Math.sin(t * 1.3) * 4;
+            const y = 170 + Math.sin(t * 1.1) * 3;
             P.x = x; P.y = y; P.s = s; P.speed = speed;
             plane.setAttribute('opacity', t > P.enter - 0.2 ? 1 : 0);
             plane.setAttribute('transform', `translate(${f(x)} ${f(y)}) rotate(${f(Math.sin(t * 1.1) * 1.5)}) scale(${s})`);
             prop.setAttribute('ry', f(25 * Math.abs(Math.cos(t * 42)) + 2));
             shadow.setAttribute('cx', f(x + 20));
-            shadow.setAttribute('opacity', 0.14);
+            shadow.setAttribute('opacity', 0.1);
             P.pan = Math.max(-1, Math.min(1, (x - (v.left + v.width / 2)) / (v.width / 2)));
             P.near = Math.max(0, 1 - Math.abs(x - (v.left + v.width / 2)) / (v.width * 0.9 + 300));
         }
@@ -469,10 +525,11 @@ const Scene = (() => {
         const B = state.bomb;
         if (B) {
             const p = Math.min(1, (t - B.t0) / B.dur);
-            const x = B.x0 + (HOUSE.x - B.x0) * (1 - Math.pow(1 - p, 1.7));
-            const y = B.y0 + (HOUSE.y - B.y0) * p * p;
-            const vx = (HOUSE.x - B.x0) * 1.7 * Math.pow(1 - p, 0.7), vy = (HOUSE.y - B.y0) * 2 * p + 1;
-            const ang = Math.atan2(vy, vx) * 180 / Math.PI;
+            // nice and easy: it eases down, swaying a little as it goes
+            const x = B.x0 + (HOUSE.x - B.x0) * (1 - Math.pow(1 - p, 1.5)) + Math.sin(p * 9) * 3 * (1 - p);
+            const y = B.y0 + (HOUSE.y - B.y0) * Math.pow(p, 1.35);
+            const vx = (HOUSE.x - B.x0) * 1.5 * Math.pow(1 - p, 0.5), vy = (HOUSE.y - B.y0) * 1.35 * Math.pow(p + 0.02, 0.35);
+            const ang = Math.atan2(vy, vx) * 180 / Math.PI + Math.sin(p * 11) * 4;
             bomb.setAttribute('opacity', p < 1 ? 1 : 0);
             bomb.setAttribute('transform', `translate(${f(x)} ${f(y)}) rotate(${f(ang)}) scale(${f(B.s * (1 - p * 0.55))})`);
         }
@@ -487,7 +544,7 @@ const Scene = (() => {
     async function snapshot(paperCanvas, scale) {
         const W = Math.round(innerWidth * scale), H = Math.round(innerHeight * scale);
         const clone = svg.cloneNode(true);
-        ['#plane', '#bomb', '#planeShadow', '#birds'].forEach(q => clone.querySelector(q)?.remove());
+        ['#plane', '#bomb', '#planeShadow', '#birds', '#smoke', '#flutters'].forEach(q => clone.querySelector(q)?.remove());
         clone.removeAttribute('style');
         clone.setAttribute('width', W);
         clone.setAttribute('height', H);
