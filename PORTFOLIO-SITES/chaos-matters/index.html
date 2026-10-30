@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Chaos Matters</title>
+<meta name="description" content="Chaos Matters — an online art exhibit. One canvas, and every page is another streak of paint.">
+<meta name="theme-color" content="#f3efe6">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23111'/%3E%3Cpath d='M0 0h5v22H0zM5 0h4v22H5zM9 0h5v22H9zM14 0h4v22h-4zM18 0h5v22h-5zM23 0h4v22h-4zM27 0h5v22h-5z' fill='%23bfbfbf'/%3E%3Cpath d='M5 0h4v22H5z' fill='%23bfbf00'/%3E%3Cpath d='M9 0h5v22H9z' fill='%2300bfbf'/%3E%3Cpath d='M14 0h4v22h-4z' fill='%2300bf00'/%3E%3Cpath d='M18 0h5v22h-5z' fill='%23bf00bf'/%3E%3Cpath d='M23 0h4v22h-4z' fill='%23bf0000'/%3E%3Cpath d='M27 0h5v22h-5z' fill='%230000bf'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="paper" aria-hidden="true"></div>
+<div id="stage" aria-hidden="true"></div>
+<canvas id="gl" aria-hidden="true"></canvas>
+
+<section id="gate" role="button" tabindex="0" aria-label="Enter the exhibit">
+    <p class="g-eyebrow">An exhibit in many streaks</p>
+    <h1 class="g-title"><em>Chaos</em> Matters</h1>
+    <svg class="g-line" viewBox="0 0 400 24" aria-hidden="true"><path d="M6 15 C 80 6, 150 20, 220 11 S 340 8, 394 13"/><path d="M40 19 C 120 13, 230 21, 360 15"/></svg>
+    <p class="g-enter">Click anywhere to enter</p>
+    <p class="g-sound">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="7" rx="1.5"/><rect x="17" y="14" width="4" height="7" rx="1.5"/></svg>
+        Best with sound on
+    </p>
+    <button type="button" class="g-skip" id="gateSkip" hidden>Skip straight to the menu &rarr;</button>
+</section>
+
+<div id="standby" aria-hidden="true"><span>Chaos Matters</span><span>Please stand by</span></div>
+
+<nav id="menu" aria-label="Rooms of the exhibit">
+    <h1 class="m-title"><span data-text="Chaos">Chaos</span><span data-text="Matters">Matters</span></h1>
+    <ul class="m-list"></ul>
+    <p class="m-hint">Choose a door. Every room goes deeper.</p>
+</nav>
+
+<div class="hud">
+    <span class="hud-ch">CH 01 &middot; Chaos Matters</span>
+    <div class="hud-btns">
+        <button type="button" id="sound" aria-pressed="true">Sound on</button>
+        <button type="button" id="replay">Replay</button>
+        <button type="button" id="skip" hidden>Skip intro &rarr;</button>
+    </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/audio.js"></script>
+<script src="js/scene.js"></script>
+<script src="js/screen.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
