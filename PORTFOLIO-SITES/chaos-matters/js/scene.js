@@ -156,10 +156,6 @@ const Scene = (() => {
         el('ellipse', { cx: 936, cy: 512, rx: 44, ry: 40, fill: '#000' }, occ);
         el('rect', { x: 928, y: 538, width: 15, height: 54, fill: '#000' }, occ);
 
-        const sh = el('radialGradient', { id: 'shadowG' }, d);
-        el('stop', { offset: '0', 'stop-color': '#3b3a2c', 'stop-opacity': '1' }, sh);
-        el('stop', { offset: '1', 'stop-color': '#3b3a2c', 'stop-opacity': '0' }, sh);
-
         const soft = el('filter', { id: 'soft', x: '-50%', y: '-200%', width: '200%', height: '500%' }, d);
         el('feGaussianBlur', { stdDeviation: '5' }, soft);
 
@@ -196,7 +192,7 @@ const Scene = (() => {
     }
 
     function buildLand() {
-        land = el('g', { id: 'land' }, svg);
+        land = el('g', { id: 'land', filter: 'url(#boil)' }, svg);
 
         // rolling ridges on the horizon (behind the house)
         const far = el('g', { id: 'far', mask: 'url(#behindHouse)' }, land);
@@ -277,7 +273,7 @@ const Scene = (() => {
         draw(land, marks, 3.8, 1.0, STYLE.faint);
 
         // the sun and its rays — in their own group so the sun stays in view on narrow screens
-        sunG = el('g', { id: 'sun' }, svg);
+        sunG = el('g', { id: 'sun', filter: 'url(#boil)' }, svg);
         el('circle', { class: 'cfill', cx: 1270, cy: 190, r: 140, fill: 'url(#sunG)', opacity: 0 }, sunG);
         draw(sunG, [curve(Array.from({ length: 21 }, (_, i) => [1270 + Math.cos(i / 20 * 6.4) * 44, 190 + Math.sin(i / 20 * 6.4) * 44]), 1.2)], 4.3, 0.8, STYLE.main);
         sunRays = el('g', { id: 'sunRays' }, sunG);
@@ -289,7 +285,7 @@ const Scene = (() => {
         draw(sunRays, rays, 4.7, 0.7, STYLE.light);
 
         // windmill blades live in their own group so they can turn
-        blades = el('g', { id: 'blades' }, svg);
+        blades = el('g', { id: 'blades', filter: 'url(#boil)' }, svg);
         const bl = [];
         for (let i = 0; i < 12; i++) {
             const a = i / 12 * Math.PI * 2;
@@ -325,7 +321,7 @@ const Scene = (() => {
     function buildClouds() {
         clouds = [];
         [[320, 210, 270, 4.6], [1000, 140, 200, 4.9], [1480, 280, 230, 5.2]].forEach(([cx, cy, w, t]) => {
-            const g = el('g', { class: 'cloud' }, svg);
+            const g = el('g', { class: 'cloud', filter: 'url(#boil)' }, svg);
             const pts = cloudPts(cx, cy, w);
             el('path', { class: 'cfill', d: curve(pts, 0) + 'Z', fill: '#fbf9f3', opacity: 0 }, g);
             draw(g, curve(pts, 1.5), t, 1.0, STYLE.light);
@@ -390,7 +386,7 @@ const Scene = (() => {
         // contrails and speed lines are redrawn every frame behind the bird
         trails = el('g', {}, plane);
         for (let i = 0; i < 6; i++) path(trails, '', i < 2 ? STYLE.light : STYLE.faint);
-        const body = el('g', {}, plane);
+        const body = el('g', { filter: 'url(#boil)' }, plane);
 
         const farWing = [[22, -6], [0, -13], [-28, -25], [-60, -38], [-74, -32], [-80, -18], [-82, -6]];
         const nearWing = [[24, 3], [4, 8], [-22, 17], [-50, 31], [-74, 44], [-86, 33], [-84, 18], [-86, 6]];
@@ -445,10 +441,10 @@ const Scene = (() => {
         path(wingNear, curve([[18, 4], [-20, 20], [-60, 38]], 0.3), STYLE.light);
         prop = null;
 
-        shadow = el('ellipse', { id: 'planeShadow', cx: 0, cy: 712, rx: 52, ry: 7, fill: 'url(#shadowG)', opacity: 0 }, svg);
+        shadow = el('ellipse', { id: 'planeShadow', cx: 0, cy: 712, rx: 46, ry: 5, fill: '#3b3a2c', opacity: 0, filter: 'url(#soft)' }, svg);
 
         bomb = el('g', { id: 'bomb', opacity: 0 }, svg);
-        const bb = el('g', {}, bomb);
+        const bb = el('g', { filter: 'url(#boil)' }, bomb);
         // a fat, rounded bomb with a box tail
         const egg = Array.from({ length: 25 }, (_, i) => {
             const a = i / 24 * Math.PI * 2;
@@ -532,12 +528,12 @@ const Scene = (() => {
     }
 
     function tick(t, dt, state) {
-        // a gentle hand-held "boil": the drawing shifts by a hair a few times a second
+        // line boil — about 7 new hand-drawn "takes" per second
         seedClock += dt;
         if (seedClock > 0.14) {
             seedClock = 0;
-            seed = (seed + 1) % 3;
-            land.setAttribute('transform', ['translate(0.5 -0.3)', 'translate(-0.4 0.4)', 'translate(0.1 0.5)'][seed]);
+            seed = seed % 5 + 1;
+            svg.querySelector('#boilNoise').setAttribute('seed', seed);
         }
         blades.setAttribute('transform', `rotate(${f(t * 40)} 701 472)`);
         sunRays.setAttribute('transform', `rotate(${f(t * 3)} 1270 190)`);
