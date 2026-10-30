@@ -383,10 +383,26 @@
             if (k >= 1 && ready) shown = 1;
             bar.style.transform = `scaleX(${shown.toFixed(3)})`;
             pct.textContent = String(Math.floor(shown * 100)).padStart(3, '0');
-            if (shown >= 1) { setTimeout(begin, 250); return; }
+            if (shown >= 1) { setTimeout(offerEntry, 250); return; }
             setTimeout(tick, 60 + Math.random() * 90);
         };
         tick();
+    }
+
+    /* the bar is full: one click lets the visitor in and switches the sound on */
+    function offerEntry() {
+        const btn = $('#enter');
+        if (matchMedia('(hover: none)').matches) btn.firstChild.textContent = 'Tap to enter';
+        btn.hidden = false;
+        loader.classList.add('ready');
+        btn.addEventListener('click', () => {
+            btn.disabled = true;
+            Sound.unlock();
+            let started = false;
+            const go = () => { if (!started) { started = true; begin(); } };
+            Sound.whenRunning(go);
+            setTimeout(go, 400);      // never wait long on a browser that is slow to hand over audio
+        }, { once: true });
     }
 
     function begin() {
@@ -429,7 +445,7 @@
 
         skipBtn.addEventListener('click', jumpHome);
 
-        // sound is always on, but a browser only lets it play after the first tap, click or key
+        // the enter click turns the sound on; this is a fallback if the browser still held it back
         const unlock = () => { if (Sound.unlock()) Sound.whenRunning(soundCatchUp); };
         ['pointerdown', 'keydown', 'touchend'].forEach(ev => addEventListener(ev, unlock, { capture: true }));
 

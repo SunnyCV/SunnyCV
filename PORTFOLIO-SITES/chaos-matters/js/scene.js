@@ -148,6 +148,14 @@ const Scene = (() => {
         el('feDisplacementMap', { in: 'SourceGraphic', in2: 'n', scale: '34', xChannelSelector: 'R', yChannelSelector: 'G', result: 'd' }, wash);
         el('feGaussianBlur', { in: 'd', stdDeviation: '1.4' }, wash);
 
+        // the house and the tree are solid: hills and hatching behind them stop at their outlines
+        const occ = el('mask', { id: 'behindHouse', maskUnits: 'userSpaceOnUse', x: -200, y: -200, width: 2000, height: 1300 }, d);
+        el('rect', { x: -200, y: -200, width: 2000, height: 1300, fill: '#fff' }, occ);
+        el('path', { d: 'M762 543 L800 503 L863 500 L893 531 L887 533 L887 582 L830 590 L768 590 Z', fill: '#000' }, occ);
+        el('rect', { x: 844, y: 489, width: 13, height: 24, fill: '#000' }, occ);
+        el('ellipse', { cx: 936, cy: 512, rx: 44, ry: 40, fill: '#000' }, occ);
+        el('rect', { x: 928, y: 538, width: 15, height: 54, fill: '#000' }, occ);
+
         const soft = el('filter', { id: 'soft', x: '-50%', y: '-200%', width: '200%', height: '500%' }, d);
         el('feGaussianBlur', { stdDeviation: '5' }, soft);
 
@@ -171,7 +179,7 @@ const Scene = (() => {
         washes = el('g', { id: 'washes', filter: 'url(#wash)' }, svg);
         el('rect', { id: 'skyWash', x: -100, y: -100, width: 1800, height: 640, fill: 'url(#skyG)', opacity: 0.5 }, washes);
         el('path', { id: 'fieldWash', d: 'M-100 520 C 300 500 640 492 900 510 S 1400 490 1700 500 L1700 1000 L-100 1000 Z', fill: 'url(#fieldG)', opacity: 0.5 }, washes);
-        el('path', { id: 'hillWash', d: 'M-100 520 C200 500 420 512 640 494 C 900 512 1150 488 1400 506 L1700 498 L1700 560 L-100 562 Z', fill: '#8fb08a', opacity: 0.42 }, washes);
+        el('path', { id: 'hillWash', mask: 'url(#behindHouse)', d: 'M-100 520 C200 500 420 512 640 494 C 900 512 1150 488 1400 506 L1700 498 L1700 560 L-100 562 Z', fill: '#8fb08a', opacity: 0.42 }, washes);
         el('path', { id: 'pathWash', d: 'M640 900 C 700 780 770 680 793 590 L808 590 C 840 680 900 780 1010 900 Z', fill: '#d6b27c', opacity: 0.55 }, washes);
         const hw = el('g', { id: 'houseWash' }, washes);
         el('path', { d: 'M800 506 L861 503 L890 531 L834 539 Z', fill: '#b5523b', opacity: 0.6 }, hw);
@@ -186,12 +194,13 @@ const Scene = (() => {
     function buildLand() {
         land = el('g', { id: 'land', filter: 'url(#boil)' }, svg);
 
-        // rolling ridges on the horizon
-        draw(land, curve([[-60, 520], [200, 500], [420, 514], [640, 494], [900, 512], [1150, 488], [1400, 506], [1660, 496]], 1.5), 0, 1.3, STYLE.light);
-        draw(land, curve([[-60, 562], [260, 546], [560, 560], [900, 549], [1200, 562], [1660, 550]], 1.2), 0.35, 1.2, STYLE.main);
+        // rolling ridges on the horizon (behind the house)
+        const far = el('g', { id: 'far', mask: 'url(#behindHouse)' }, land);
+        draw(far, curve([[-60, 520], [200, 500], [420, 514], [640, 494], [900, 512], [1150, 488], [1400, 506], [1660, 496]], 1.5), 0, 1.3, STYLE.light);
+        draw(far, curve([[-60, 562], [260, 546], [560, 560], [900, 549], [1200, 562], [1660, 550]], 1.2), 0.35, 1.2, STYLE.main);
         // hatching that thins out toward its ends instead of stopping in a box
-        draw(land, hatch([[-60, 524], [200, 505], [420, 518], [560, 506], [500, 532], [380, 548], [160, 552], [-60, 556]], 18, 7), 1.2, 0.7, STYLE.faint);
-        draw(land, hatch([[1240, 498], [1400, 510], [1660, 500], [1660, 548], [1420, 552], [1300, 534]], -16, 7), 1.3, 0.7, STYLE.faint);
+        draw(far, hatch([[-60, 524], [200, 505], [420, 518], [560, 506], [500, 532], [380, 548], [160, 552], [-60, 556]], 18, 7), 1.2, 0.7, STYLE.faint);
+        draw(far, hatch([[1240, 498], [1400, 510], [1660, 500], [1660, 548], [1420, 552], [1300, 534]], -16, 7), 1.3, 0.7, STYLE.faint);
 
         // far trees on the ridge
         draw(land, scribble(312, 538, 32, 13, 40), 1.4, 0.6, STYLE.light);
@@ -570,27 +579,36 @@ const Scene = (() => {
             });
         }
 
-        // the eagle: screams in on a shallow dive, lets go, then pulls up hard and is gone
+        // the eagle: flies straight and level across the sky, beating its wings hard the whole way
         const P = state.plane;
         if (P) {
             const s = v.width < 900 ? 0.75 : 0.95;
             const releaseX = HOUSE.x - 40 * s;
             const speed = Math.max(220, (releaseX - (v.left - 200)) / (P.release - P.enter));
-            const x = releaseX + (t - P.release) * speed * (1 + Math.max(0, t - P.release) * 0.4);
-            const before = Math.max(0, P.release - t), after = Math.max(0, t - P.release);
-            const y = 178 - Math.min(1, before / 2.8) * 70 - after * after * 38 + Math.sin(t * 2.3) * 2;
-            const pitch = before > 0 ? 6 * Math.min(1, before / 2.8) : -Math.min(28, after * 30);
+            const x = releaseX + (t - P.release) * speed;
+            P.phase = (P.phase || 0) + dt * 2.3;                     // wing beats per second
+            const ph = P.phase * Math.PI * 2;
+            // a quick, powerful downstroke and a slower recovery
+            const flap = Math.sin(ph) * 0.75 + Math.sin(ph * 2) * 0.25;   // +1 wings up, -1 wings down
+            const y = 172 - Math.cos(ph) * 5;                         // the body lifts on each downstroke
+            const pitch = Math.sin(ph + 0.6) * 2.5;
             P.x = x; P.y = y; P.s = s; P.speed = speed; P.bx = 6; P.by = 27;
+            P.beat = Math.floor(P.phase) !== P.lastBeat;
+            P.lastBeat = Math.floor(P.phase);
             plane.setAttribute('opacity', t > P.enter - 0.2 ? 1 : 0);
             plane.setAttribute('transform', `translate(${f(x)} ${f(y)}) rotate(${f(pitch)}) scale(${s})`);
-            // wings flex with the air rather than flap
-            const flex = Math.sin(t * 9) * 0.5 + Math.sin(t * 2.1);
-            wingNear.setAttribute('transform', `rotate(${f(flex * 1.5)} 20 4) scale(1 ${f(1 + flex * 0.04)})`);
-            wingFar.setAttribute('transform', `rotate(${f(-flex * 1.5)} 20 -6) scale(1 ${f(1 - flex * 0.05)})`);
+            // the near wing is drawn hanging down and the far wing raised: flipping them through the body line flaps them together
+            // big, full strokes: at the top the wings tower over the body, at the bottom they hang below it
+            const near = -flap * 1.55, farK = flap * 1.4;
+            const edge = v => Math.sign(v || 1) * Math.max(0.22, Math.abs(v));   // never fully edge-on
+            wingNear.setAttribute('transform', `translate(20 2) rotate(${f(flap * 14)}) scale(${f(1 - Math.abs(flap) * 0.12)} ${f(edge(near))}) translate(-20 -2)`);
+            wingFar.setAttribute('transform', `translate(20 -4) rotate(${f(-flap * 10)}) scale(${f(1 - Math.abs(flap) * 0.15)} ${f(edge(farK))}) translate(-20 4)`);
+            const flex = flap;
             const len = 120 + Math.min(260, (t - P.enter) * 160);
             const tr = [...trails.children];
-            tr[0].setAttribute('d', `M-74 44 L${f(-74 - len)} ${f(44 + flex)}`);
-            tr[1].setAttribute('d', `M-60 -38 L${f(-60 - len * 0.8)} ${f(-38 - flex)}`);
+            // contrails stream from the body as the wings sweep
+            tr[0].setAttribute('d', `M-84 6 L${f(-84 - len)} ${f(6 + flex * 2)}`);
+            tr[1].setAttribute('d', `M-84 -4 L${f(-84 - len * 0.8)} ${f(-4 - flex * 2)}`);
             for (let i = 2; i < 6; i++) {
                 const yy = -18 + (i - 2) * 12, ph = (t * 3 + i * 0.37) % 1;
                 tr[i].setAttribute('d', `M${f(-95 - ph * 60)} ${yy} L${f(-130 - ph * 90)} ${yy}`);
@@ -676,6 +694,8 @@ const Scene = (() => {
         ['#house', '#houseWash', '#treeTop', '#treeWash', '#blades', '#sun', '#smoke'].forEach(q => c.querySelector(q)?.remove());
         c.querySelectorAll('.cloud').forEach(n => n.remove());
         c.querySelector('#ruins').removeAttribute('style');
+        // with the house gone, the hills behind it show again
+        ['#far', '#hillWash'].forEach(q => c.querySelector(q).removeAttribute('mask'));
         c.querySelector('#windmill').setAttribute('transform', 'rotate(-17 700 592)');
         c.querySelector('#fence').setAttribute('transform', 'translate(0 860) skewX(-9) translate(0 -860)');
         c.querySelector('#grass').setAttribute('transform', 'translate(0 905) skewX(-16) translate(0 -905)');
