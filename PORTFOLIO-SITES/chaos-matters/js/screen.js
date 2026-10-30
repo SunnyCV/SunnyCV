@@ -55,6 +55,7 @@ varying vec2 vUv;
 uniform sampler2D uScene;
 uniform sampler2D uField;
 uniform sampler2D uTitle;
+uniform sampler2D uNoise;   // 256px value noise; G is R shifted, for cheap 3D noise
 uniform vec2  uRes;
 uniform float uTime;     // running clock
 uniform float uT;        // seconds since impact
@@ -76,6 +77,7 @@ uniform vec2  uG2;
 
 float hash(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
 float hash1(float n) { return fract(sin(n) * 43758.5453); }
+float sq(float x) { return x * x; }
 float vnoise(vec2 p) {
     vec2 i = floor(p), f = fract(p);
     f = f * f * (3.0 - 2.0 * f);
@@ -85,6 +87,66 @@ float fbm(vec2 p) {
     float s = 0.0, a = 0.5;
     for (int i = 0; i < 5; i++) { s += a * vnoise(p); p = p * 2.03 + vec2(1.7, 9.2); a *= 0.5; }
     return s;
+}
+
+float noise3(vec3 x) {
+    vec3 p = floor(x), f = fract(x);
+    f = f * f * (3.0 - 2.0 * f);
+    vec2 uv = (p.xy + vec2(37.0, 17.0) * p.z) + f.xy;
+    vec2 rg = texture2D(uNoise, (uv + 0.5) / 256.0).yx;
+    return mix(rg.x, rg.y, f.z);
+}
+float fbm3(vec3 p) {
+    return (0.5 * noise3(p) + 0.25 * noise3(p * 2.03 + 1.7) + 0.125 * noise3(p * 4.01 + 3.1)) / 0.875;
+}
+float fbm2(vec2 p, float z) { return fbm3(vec3(p, z)); }
+
+/* ---- the mushroom cloud, as a volume ---- */
+float cH, cRt, cRr, cRs, cRb, cRbr, cHeat;
+float sdTorus(vec3 p, float R, float r) { return length(vec2(length(p.xz) - R, p.y)) - r; }
+float smin(float a, float b, float k) { float h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0); return mix(b, a, h) - k * h * (1.0 - h); }
+float cloudSDF(vec3 p) {
+    float cap = sdTorus(p - vec3(0.0, cH, 0.0), cRt, cRr);
+    float dome = length((p - vec3(0.0, cH + cRr * 0.3, 0.0)) * vec3(1.0, 1.4, 1.0)) - cRt * 0.95;
+    cap = smin(cap, dome, 0.05);
+    float stem = length(p.xz) - cRs * (1.0 + 2.0 * smoothstep(cH * 0.5, cH, p.y));
+    stem = max(stem, max(-p.y, p.y - cH));
+    float base = sdTorus(p - vec3(0.0, cRbr * 0.5, 0.0), cRb, cRbr);
+    return smin(smin(cap, stem, 0.05), base, 0.04);
+}
+
+/* march straight through the cloud at this point of the screen; returns colour + transmittance */
+vec4 marchCloud(vec2 w, float s, float jit) {
+    float zr = cRt + cRr + 0.04;
+    if (abs(w.x) > max(zr, cRb + cRbr) + 0.06 || w.y < -0.06 || w.y > cH + cRr + cRt * 0.6 + 0.1) return vec4(0.0, 0.0, 0.0, 1.0);
+    const int STEPS = 30;
+    float dz = 2.0 * zr / float(STEPS);
+    vec3 acc = vec3(0.0);
+    float T = 1.0;
+    for (int i = 0; i < STEPS; i++) {
+        vec3 p = vec3(w.x, w.y, -zr + (float(i) + jit) * dz);
+        float d = cloudSDF(p);
+        if (d > 0.09) continue;
+        // billows roll upward and outward over time
+        vec3 np = p * 9.0 + vec3(0.0, -s * 0.45, s * 0.12);
+        float n = fbm3(np);
+        float dens = clamp((-d + (n - 0.5) * (0.09 + 0.03 * s * 0.1)) / 0.025, 0.0, 1.0);
+        if (dens <= 0.0) continue;
+        // heat lives in the rolling ring of the cap and the root of the stem, and cools with time
+        float ring = length(vec2(length(p.xz) - cRt, p.y - cH)) / max(cRr, 1e-3);
+        float core = max(1.0 - ring, 0.0) * 0.9 + max(0.0, 1.0 - p.y / (cH * 0.35)) * 0.5;
+        float temp = clamp(cHeat * (0.25 + core) * (0.55 + 0.9 * n), 0.0, 1.2);
+        vec3 fire = vec3(1.0, 0.28 + 0.55 * temp, 0.05 + 0.35 * temp * temp) * temp * 3.2;
+        float top = clamp((p.y - cH) / (cRr + cRt * 0.4) + 0.5, 0.0, 1.0);
+        vec3 smoke = mix(vec3(0.17, 0.12, 0.1), vec3(0.66, 0.44, 0.32), clamp(top * 0.7 + n * 0.6 - 0.2, 0.0, 1.0));
+        smoke += vec3(0.9, 0.35, 0.1) * 0.35 * cHeat * (1.0 - top);
+        vec3 c = smoke + fire;
+        float a = 1.0 - exp(-dens * dz * 55.0);
+        acc += T * a * c;
+        T *= 1.0 - a;
+        if (T < 0.02) break;
+    }
+    return vec4(acc, T);
 }
 
 vec3 bars(vec2 uv) {
@@ -142,71 +204,100 @@ void main() {
     float grain = hash(floor(uv * uRes / 2.0) + fract(t * 13.0) * vec2(91.0, 37.0));
     float scan = 0.88 + 0.12 * sin(uv.y * uRes.y * 1.4);
 
-    /* ---- 1. the drawing, and the cloud that swallows it ---- */
+    /* ---- 1. the blast: a white-out, then the same land in ruins under the cloud ---- */
     if (uStatic < 0.999 && uBars < 0.999) {
-        vec2 su = uv;
-        float shake = 0.022 * exp(-s * 1.8) + 0.005 * smoothstep(0.0, 1.0, s) * (1.0 - smoothstep(4.0, 5.5, s));
-        su += (vec2(hash1(floor(t * 45.0)), hash1(floor(t * 45.0) + 7.0)) - 0.5) * shake;
+        // the cloud's shape over time
+        float grow = 1.0 - exp(-s * 0.45);
+        cH  = 0.04 + 0.4 * grow;
+        cRt = 0.04 + 0.15 * (1.0 - exp(-s * 0.5));
+        cRr = 0.04 + 0.08 * (1.0 - exp(-s * 0.5));
+        cRs = 0.022 + 0.022 * (1.0 - exp(-s * 0.7));
+        cRb = 0.02 + 0.07 * s;
+        cRbr = 0.018 + 0.01 * s;
+        cHeat = 1.15 * exp(-s * 0.28);
+
+        // in the last seconds the camera is swallowed: we push into the cap
+        float e = smoothstep(4.6, 8.4, s);
+        vec2 capUv = uCenter + vec2(0.0, cH);
+        float Z = 1.0 + 1.4 * e * e;
+        vec2 su = mix(capUv, vec2(0.5, 0.55), e) + (uv - capUv) / Z;
+
+        float shake = 0.02 * exp(-s * 1.6) + 0.004 * (1.0 - smoothstep(6.0, 8.5, s));
+        su += (vec2(hash1(floor(t * 40.0)), hash1(floor(t * 40.0) + 7.0)) - 0.5) * shake;
         vec2 d = (su - uCenter) * A;
         float r = length(d);
-        float R = s * 0.75;
-        su -= normalize(d + 1e-5) / A * exp(-pow((r - R) * 8.0, 2.0)) * 0.1 * exp(-s * 0.6);
-        // the signal fails once the cloud has taken everything
-        float fail = smoothstep(4.7, 6.0, s);
+        float R = s * 0.7;
+        su -= normalize(d + 1e-5) / A * exp(-sq((r - R) * 8.0)) * 0.06 * exp(-s * 0.6);
+        // heat shimmer above the fire
+        su.x += sin(su.y * 90.0 + t * 12.0) * 0.0018 * smoothstep(0.5, 0.0, abs(su.y - uCenter.y - 0.05));
+        // the signal starts to fail as the smoke closes in
+        float fail = smoothstep(8.1, 9.2, s);
         float row = floor(su.y * 46.0);
         su.x += step(1.0 - fail * 0.6, hash(vec2(row, floor(t * 16.0)))) * (hash(vec2(row, floor(t * 16.0) + 3.0)) - 0.5) * 0.3 * fail;
-        float px = mix(1.0, 70.0, smoothstep(5.2, 6.1, s));
+        float px = mix(1.0, 70.0, smoothstep(8.6, 9.4, s));
         if (px > 1.5) { vec2 g = uRes / px; su = (floor(su * g) + 0.5) / g; }
-        vec2 zu = uCenter + (su - uCenter) / uZoom;
-        float ab = 0.002 + 0.03 * fail;
-        vec3 sc = vec3(texture2D(uScene, zu + vec2(ab, 0.0)).r, texture2D(uScene, zu).g, texture2D(uScene, zu - vec2(ab, 0.0)).b);
-        // the land glows in the light of the blast
-        sc += vec3(1.0, 0.55, 0.25) * 0.45 * exp(-s * 0.7) * exp(-r * 2.0);
-        sc += vec3(1.0, 0.86, 0.62) * exp(-pow((r - R) * 16.0, 2.0)) * 0.4 * exp(-s * 1.1);
 
-        // the mushroom cloud, drawn in the same pencil-and-wash hand as the scene
-        float grow = 1.0 - exp(-s * 0.9);
-        float H  = 0.03 + 0.34 * grow + 0.01 * s;
-        float Rc = 0.025 + 0.15 * grow + 0.01 * s;
-        float ws = 0.01 + 0.028 * grow;
-        float Rb = 0.02 + 0.16 * grow;
-        // then it comes for us: the cap swells toward the viewer and drifts to the centre of the frame
-        float e = smoothstep(2.4, 5.0, s);
-        vec2 capUv = uCenter + vec2(0.0, H);
-        vec2 m = vec2(0.0, H) + (su - mix(capUv, vec2(0.5), e)) * A / (1.0 + 7.0 * e * e);
-        vec2 cp = (m - vec2(0.0, H)) / vec2(Rc * 1.2, Rc * 0.62);
-        float capD = length(cp) - 1.0;
-        float flare = 1.0 + 0.7 * smoothstep(H * 0.55, H, m.y);
-        float stemD = (abs(m.x + 0.008 * sin(m.y * 28.0 + t * 2.0)) - ws * flare) / (ws * 3.0);
-        stemD = max(stemD, -m.y * 30.0);
-        stemD = max(stemD, (m.y - H) * 30.0);
-        float skirtD = length(m / vec2(Rb, Rb * 0.2)) - 1.0;
-        float dd = min(capD, min(stemD, skirtD));
-        // rolling billows: the noise churns upward and around the cap
-        vec2 bp = m * 9.0 / (0.35 + grow);
-        bp = rot(0.4 * sin(t * 0.3)) * bp;
-        float n = fbm(bp + vec2(0.0, -t * 0.55)) ;
-        dd += (n - 0.5) * 0.95;
-        float cloud = smoothstep(0.08, -0.08, dd) * step(0.0, s);
-        if (cloud > 0.001) {
-            float heat = clamp(1.0 - length(cp) * 0.75, 0.0, 1.0) * exp(-s * 0.4)
-                       + exp(-s * 1.1) * smoothstep(0.25, 0.0, length(m));
-            float lit = clamp((m.y - H + Rc * 0.7) / (Rc * 1.3), 0.0, 1.0) * 0.6 + n * 0.5;
-            vec3 smoke = mix(vec3(0.36, 0.3, 0.26), vec3(0.93, 0.86, 0.76), clamp(lit, 0.0, 1.0));
-            vec3 fire = mix(vec3(1.0, 0.42, 0.1), vec3(1.0, 0.96, 0.78), clamp(heat * 1.2, 0.0, 1.0));
-            vec3 cc = mix(smoke, fire, clamp(heat * 1.5, 0.0, 1.0));
-            // pencil hatching in the shadows, ink on the billow lines and the outline
-            float hl = abs(fract((gl_FragCoord.x + gl_FragCoord.y) / 7.0) - 0.5);
-            cc *= 1.0 - 0.4 * (1.0 - clamp(lit, 0.0, 1.0)) * smoothstep(0.14, 0.04, hl) * (1.0 - heat);
-            float bl = abs(fract(n * 5.0 - t * 0.15) - 0.5);
-            cc *= 1.0 - 0.3 * smoothstep(0.07, 0.0, bl) * (1.0 - heat);
-            cc = mix(cc, vec3(0.2, 0.19, 0.17), (1.0 - smoothstep(0.0, 0.06, abs(dd))) * 0.65 * (1.0 - heat));
-            sc = mix(sc, cc, cloud);
+        vec2 zu = uCenter + (su - uCenter) / uZoom;
+        float ab = 0.0015 + 0.03 * fail;
+        vec3 sc = vec3(texture2D(uScene, zu + vec2(ab, 0.0)).r, texture2D(uScene, zu).g, texture2D(uScene, zu - vec2(ab, 0.0)).b);
+
+        // drifting smoke across the burning sky
+        float above = smoothstep(uCenter.y - 0.02, uCenter.y + 0.12, su.y);
+        float wisps = fbm2(su * A * 3.0 + vec2(t * 0.04, -t * 0.02), t * 0.05);
+        sc = mix(sc, vec3(0.07, 0.04, 0.035), smoothstep(0.45, 0.75, wisps) * 0.6 * above);
+
+        // fires among the ruins, and their light
+        float fl = 0.0;
+        for (int i = 0; i < 7; i++) {
+            float fi = float(i);
+            vec2 fp = uCenter + vec2((hash1(fi * 3.1) - 0.5) * 0.3 / asp * 1.6, -0.004 - hash1(fi * 7.7) * 0.05);
+            vec2 q = (su - fp) * A;
+            float hgt = (0.018 + 0.03 * hash1(fi)) * (0.75 + 0.5 * noise3(vec3(fi * 5.0, t * 7.0, 0.0)));
+            float along = clamp(q.y / hgt, 0.0, 1.0);
+            float width = 0.006 * (1.0 - along) + 0.0008;
+            fl += exp(-sq(q.x / width + sin(q.y * 140.0 + t * 15.0 + fi) * 0.5)) * step(0.0, q.y) * (1.0 - along);
+            sc *= 1.0 + 0.6 * exp(-dot(q, q) * 300.0) * smoothstep(0.4, 1.2, s);
         }
-        // flashes: one at detonation, a greater one as the cloud swallows the screen
-        sc += vec3(1.0, 0.95, 0.85) * exp(-s * 4.0) * 1.7;
-        sc = mix(sc, vec3(1.15, 1.12, 1.05), smoothstep(4.0, 5.0, s) * (1.0 - smoothstep(5.3, 6.0, s) * 0.6));
-        if (s > 5.0 && hash1(floor(t * 20.0)) > 0.8) sc = 1.0 - sc;
+        sc += vec3(1.0, 0.5, 0.12) * fl * 1.4 * smoothstep(0.4, 1.2, s);
+
+        // embers rising, ash drifting down
+        vec2 eg = su * A * 16.0;
+        eg.y -= t * 0.9;
+        vec2 eid = floor(eg);
+        vec2 ef = fract(eg) - 0.5 - (vec2(hash(eid), hash(eid + 5.0)) - 0.5) * 0.7;
+        float ember = smoothstep(0.07, 0.0, length(ef)) * step(0.82, hash(eid + 2.0)) * (0.5 + 0.5 * sin(t * 9.0 + hash(eid) * 20.0));
+        sc += vec3(1.0, 0.45, 0.1) * ember * 1.3 * smoothstep(0.6, 1.6, s);
+
+        // the cloud itself
+        vec2 w = (su - uCenter) * A;
+        vec4 cl = marchCloud(w, s, hash(gl_FragCoord.xy + fract(t)));
+        // its glow lights the sky around it
+        float gd = length((w - vec2(0.0, cH)) / vec2(1.0, 0.8));
+        sc += vec3(1.0, 0.45, 0.15) * 0.55 * cHeat * exp(-gd * gd * 9.0);
+        sc = sc * cl.a + cl.rgb;
+
+        // the surge: a churning wall of dust and smoke rushes out from ground zero and swallows the frame
+        vec2 dq = (su - uCenter) * A;
+        vec2 sq2 = vec2(dq.x, max(dq.y + 0.02, 0.0) * mix(3.2, 0.85, e) + min(dq.y + 0.02, 0.0) * 0.6);
+        float rr = length(sq2);
+        float rf = sq(smoothstep(4.3, 8.2, s)) * 1.8;
+        // billows churn in place and boil upward; no radial streaking
+        vec3 bp = vec3(dq * vec2(4.0, 5.0) + vec2(0.0, -s * 0.35), t * 0.1 + s * 0.15);
+        float bn = fbm3(bp);
+        float bd = fbm3(bp + vec3(0.03, 0.05, 0.0));
+        float bf = fbm3(bp * 2.7 + 9.0);
+        float edge = rr - rf + (bn - 0.5) * 0.45 + (bf - 0.5) * 0.12;
+        float inside = smoothstep(0.03, -0.04, edge) * step(4.3, s);
+        float lit = clamp((bn - bd) * 9.0 + 0.5, 0.0, 1.0);
+        vec3 dust = mix(vec3(0.13, 0.07, 0.05), vec3(0.85, 0.46, 0.22), clamp(lit * (0.4 + bn) + bf * 0.25 - 0.1, 0.0, 1.0));
+        dust += vec3(1.0, 0.42, 0.1) * 0.7 * smoothstep(-0.18, 0.0, edge) * (1.0 - e * 0.5);
+        dust *= 0.65 + 0.55 * bn;
+        dust *= 1.0 - 0.35 * smoothstep(7.2, 8.6, s);
+        sc = mix(sc, dust, inside);
+
+        // white-out at detonation, fading into the aftermath
+        sc = mix(sc, vec3(1.0, 0.97, 0.9), s < 0.12 ? 1.0 : exp(-(s - 0.12) * 2.4));
+        if (s > 8.4 && hash1(floor(t * 20.0)) > 0.8) sc = 1.0 - sc;
         col = sc;
     }
 
@@ -298,7 +389,7 @@ void main() {
     gl_FragColor = vec4(col, 1.0);
 }`;
 
-    let gl, prog, fprog, tex, titleTex, canvas, U = {}, FU = {}, ok = false;
+    let gl, prog, fprog, tex, titleTex, noiseTex, canvas, U = {}, FU = {}, ok = false;
     let fieldTex = [], fieldFb = [], fw = 0, fh = 0, ping = 0;
 
     function compile(vs, fs) {
@@ -345,12 +436,24 @@ void main() {
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
         gl.enableVertexAttribArray(0);
         gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
-        ['uScene', 'uField', 'uTitle', 'uRes', 'uTime', 'uT', 'uCenter', 'uZoom', 'uStatic', 'uBars', 'uRoll', 'uPsy', 'uDim',
+        ['uScene', 'uField', 'uTitle', 'uNoise', 'uRes', 'uTime', 'uT', 'uCenter', 'uZoom', 'uStatic', 'uBars', 'uRoll', 'uPsy', 'uDim',
          'uMouse', 'uRipple', 'uTP', 'uTS', 'uTA', 'uTF', 'uG1', 'uG2'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
         ['uPrev', 'uTexel', 'uAsp', 'uP1', 'uV1', 'uP2', 'uV2'].forEach(n => FU[n] = gl.getUniformLocation(fprog, n));
 
         tex = makeTex(1, 1, new Uint8Array([243, 239, 230, 255]));
         titleTex = makeTex(1, 1, new Uint8Array([0, 0, 0, 0]));
+        // value noise; G holds R shifted by (37,17) so one fetch gives two z-slices
+        const nz = new Uint8Array(256 * 256 * 4), R = new Uint8Array(256 * 256);
+        for (let i = 0; i < R.length; i++) R[i] = Math.random() * 256;
+        for (let y = 0; y < 256; y++) for (let x = 0; x < 256; x++) {
+            const i = (y * 256 + x) * 4;
+            nz[i] = R[y * 256 + x];
+            nz[i + 1] = R[((y - 17) & 255) * 256 + ((x - 37) & 255)];
+            nz[i + 3] = 255;
+        }
+        noiseTex = makeTex(256, 256, nz);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
         ok = true;
         return true;
     }
@@ -422,10 +525,12 @@ void main() {
         gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tex);
         gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, fieldTex[ping]);
         gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, titleTex);
+        gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, noiseTex);
         gl.activeTexture(gl.TEXTURE0);
         gl.uniform1i(U.uScene, 0);
         gl.uniform1i(U.uField, 1);
         gl.uniform1i(U.uTitle, 2);
+        gl.uniform1i(U.uNoise, 3);
         gl.uniform2f(U.uRes, canvas.width, canvas.height);
         gl.uniform1f(U.uTime, u.time);
         gl.uniform1f(U.uT, u.T);

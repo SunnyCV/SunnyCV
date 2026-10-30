@@ -11,7 +11,7 @@ const Scene = (() => {
     const HOUSE = { x: 820, y: 560 };   // ground zero
     const INK = '#34322d';
 
-    let svg, land, washes, sunG, smoke, flutters, grassG, sunRays, blades, clouds, birds, plane, prop, bomb, shadow;
+    let svg, land, washes, sunG, smoke, flutters, wingNear, wingFar, ruins, grassG, sunRays, blades, clouds, birds, plane, prop, bomb, shadow;
     let batches = [];
     let rand;
 
@@ -157,6 +157,10 @@ const Scene = (() => {
         const field = el('linearGradient', { id: 'fieldG', x1: '0', y1: '0', x2: '0', y2: '1' }, d);
         el('stop', { offset: '0', 'stop-color': '#c8cf86' }, field);
         el('stop', { offset: '1', 'stop-color': '#94b35a' }, field);
+        const apo = el('linearGradient', { id: 'apoSky', x1: '0', y1: '0', x2: '0', y2: '1' }, d);
+        el('stop', { offset: '0', 'stop-color': '#140b09' }, apo);
+        el('stop', { offset: '0.55', 'stop-color': '#4a1c10' }, apo);
+        el('stop', { offset: '1', 'stop-color': '#d0581e' }, apo);
         const sun = el('radialGradient', { id: 'sunG' }, d);
         el('stop', { offset: '0', 'stop-color': '#ffe08a', 'stop-opacity': '1' }, sun);
         el('stop', { offset: '0.45', 'stop-color': '#ffd766', 'stop-opacity': '0.75' }, sun);
@@ -165,15 +169,16 @@ const Scene = (() => {
 
     function buildWashes() {
         washes = el('g', { id: 'washes', filter: 'url(#wash)' }, svg);
-        el('rect', { x: -100, y: -100, width: 1800, height: 640, fill: 'url(#skyG)', opacity: 0.5 }, washes);
-        el('path', { d: 'M-100 520 C 300 500 640 492 900 510 S 1400 490 1700 500 L1700 1000 L-100 1000 Z', fill: 'url(#fieldG)', opacity: 0.5 }, washes);
-        el('path', { d: 'M-100 520 C200 500 420 512 640 494 C 900 512 1150 488 1400 506 L1700 498 L1700 560 L-100 562 Z', fill: '#8fb08a', opacity: 0.42 }, washes);
-        el('path', { d: 'M640 900 C 700 780 770 680 793 590 L808 590 C 840 680 900 780 1010 900 Z', fill: '#d6b27c', opacity: 0.55 }, washes);
-        el('path', { d: 'M800 506 L861 503 L890 531 L834 539 Z', fill: '#b5523b', opacity: 0.6 }, washes);
-        el('path', { d: 'M766 540 L800 506 L834 538 Z', fill: '#b5523b', opacity: 0.35 }, washes);
-        el('path', { d: 'M770 540 L830 538 L830 588 L770 588 Z', fill: '#f6efe0', opacity: 0.7 }, washes);
-        el('path', { d: 'M830 538 L885 532 L885 580 L830 588 Z', fill: '#c9b48e', opacity: 0.55 }, washes);
-        el('ellipse', { cx: 936, cy: 512, rx: 42, ry: 38, fill: '#6f9a52', opacity: 0.55 }, washes);
+        el('rect', { id: 'skyWash', x: -100, y: -100, width: 1800, height: 640, fill: 'url(#skyG)', opacity: 0.5 }, washes);
+        el('path', { id: 'fieldWash', d: 'M-100 520 C 300 500 640 492 900 510 S 1400 490 1700 500 L1700 1000 L-100 1000 Z', fill: 'url(#fieldG)', opacity: 0.5 }, washes);
+        el('path', { id: 'hillWash', d: 'M-100 520 C200 500 420 512 640 494 C 900 512 1150 488 1400 506 L1700 498 L1700 560 L-100 562 Z', fill: '#8fb08a', opacity: 0.42 }, washes);
+        el('path', { id: 'pathWash', d: 'M640 900 C 700 780 770 680 793 590 L808 590 C 840 680 900 780 1010 900 Z', fill: '#d6b27c', opacity: 0.55 }, washes);
+        const hw = el('g', { id: 'houseWash' }, washes);
+        el('path', { d: 'M800 506 L861 503 L890 531 L834 539 Z', fill: '#b5523b', opacity: 0.6 }, hw);
+        el('path', { d: 'M766 540 L800 506 L834 538 Z', fill: '#b5523b', opacity: 0.35 }, hw);
+        el('path', { d: 'M770 540 L830 538 L830 588 L770 588 Z', fill: '#f6efe0', opacity: 0.7 }, hw);
+        el('path', { d: 'M830 538 L885 532 L885 580 L830 588 Z', fill: '#c9b48e', opacity: 0.55 }, hw);
+        el('ellipse', { id: 'treeWash', cx: 936, cy: 512, rx: 42, ry: 38, fill: '#6f9a52', opacity: 0.55 }, washes);
         el('ellipse', { cx: 312, cy: 540, rx: 34, ry: 14, fill: '#6f9a52', opacity: 0.4 }, washes);
         el('ellipse', { cx: 1330, cy: 545, rx: 22, ry: 10, fill: '#6f9a52', opacity: 0.4 }, washes);
     }
@@ -198,25 +203,26 @@ const Scene = (() => {
         draw(land, curve([[1010, 900], [900, 780], [840, 680], [808, 592]], 1), 1.15, 0.8, STYLE.main);
 
         // the farmhouse — gable end facing us, side wall receding
+        const house = el('g', { id: 'house' }, land);
         const front = [[770, 540], [830, 538], [830, 588], [770, 588]];
         const side = [[830, 538], [885, 532], [885, 580], [830, 588]];
-        draw(land, poly(front, 0.5), 1.7, 0.6, STYLE.bold);
-        draw(land, poly(side, 0.5), 2.1, 0.5, STYLE.bold);
-        draw(land, [rline(764, 542, 800, 505, 0.4), rline(800, 505, 836, 540, 0.4)], 2.4, 0.4, STYLE.bold);
-        draw(land, [rline(800, 505, 862, 502, 0.4), rline(862, 502, 891, 531, 0.4), rline(891, 531, 836, 540, 0.4)], 2.65, 0.45, STYLE.bold);
-        draw(land, poly([[846, 512], [846, 492], [855, 491], [855, 509]], 0.3, false), 2.95, 0.25, STYLE.main);
-        draw(land, poly([[793, 588], [793, 562], [807, 562], [807, 588]], 0.3, false), 3.05, 0.25, STYLE.main);
-        draw(land, [...poly([[776, 552], [788, 552], [788, 566], [776, 566]], 0.3), rline(782, 552, 782, 566, 0.2), rline(776, 559, 788, 559, 0.2)], 3.2, 0.3, STYLE.light);
-        draw(land, [...poly([[812, 552], [824, 552], [824, 566], [812, 566]], 0.3), rline(818, 552, 818, 566, 0.2), rline(812, 559, 824, 559, 0.2)], 3.35, 0.3, STYLE.light);
-        draw(land, [...poly([[796, 519], [804, 519], [804, 529], [796, 529]], 0.2)], 3.45, 0.2, STYLE.light);
-        draw(land, [...poly([[842, 550], [853, 549], [853, 563], [842, 564]], 0.3), ...poly([[864, 547], [874, 546], [874, 559], [864, 560]], 0.3)], 3.55, 0.35, STYLE.light);
-        draw(land, hatch(side, 62, 3.4, 0.3), 3.6, 0.5, STYLE.hatch);
-        draw(land, hatch([[800, 505], [862, 502], [891, 531], [836, 540]], -24, 3.2, 0.3), 3.7, 0.5, STYLE.hatch);
-        draw(land, hatch([[885, 580], [930, 586], [900, 592], [830, 592], [830, 588]], 8, 2.6, 0.3), 3.85, 0.3, STYLE.hatch);
+        draw(house, poly(front, 0.5), 1.7, 0.6, STYLE.bold);
+        draw(house, poly(side, 0.5), 2.1, 0.5, STYLE.bold);
+        draw(house, [rline(764, 542, 800, 505, 0.4), rline(800, 505, 836, 540, 0.4)], 2.4, 0.4, STYLE.bold);
+        draw(house, [rline(800, 505, 862, 502, 0.4), rline(862, 502, 891, 531, 0.4), rline(891, 531, 836, 540, 0.4)], 2.65, 0.45, STYLE.bold);
+        draw(house, poly([[846, 512], [846, 492], [855, 491], [855, 509]], 0.3, false), 2.95, 0.25, STYLE.main);
+        draw(house, poly([[793, 588], [793, 562], [807, 562], [807, 588]], 0.3, false), 3.05, 0.25, STYLE.main);
+        draw(house, [...poly([[776, 552], [788, 552], [788, 566], [776, 566]], 0.3), rline(782, 552, 782, 566, 0.2), rline(776, 559, 788, 559, 0.2)], 3.2, 0.3, STYLE.light);
+        draw(house, [...poly([[812, 552], [824, 552], [824, 566], [812, 566]], 0.3), rline(818, 552, 818, 566, 0.2), rline(812, 559, 824, 559, 0.2)], 3.35, 0.3, STYLE.light);
+        draw(house, [...poly([[796, 519], [804, 519], [804, 529], [796, 529]], 0.2)], 3.45, 0.2, STYLE.light);
+        draw(house, [...poly([[842, 550], [853, 549], [853, 563], [842, 564]], 0.3), ...poly([[864, 547], [874, 546], [874, 559], [864, 560]], 0.3)], 3.55, 0.35, STYLE.light);
+        draw(house, hatch(side, 62, 3.4, 0.3), 3.6, 0.5, STYLE.hatch);
+        draw(house, hatch([[800, 505], [862, 502], [891, 531], [836, 540]], -24, 3.2, 0.3), 3.7, 0.5, STYLE.hatch);
+        draw(house, hatch([[885, 580], [930, 586], [900, 592], [830, 592], [830, 588]], 8, 2.6, 0.3), 3.85, 0.3, STYLE.hatch);
 
         // the shade tree beside the house
         draw(land, [rline(931, 590, 933, 540, 0.6), rline(940, 590, 938, 542, 0.6)], 2.8, 0.4, STYLE.main);
-        draw(land, scribble(936, 512, 40, 36, 70), 3.0, 1.0, STYLE.light);
+        draw(el('g', { id: 'treeTop' }, land), scribble(936, 512, 40, 36, 70), 3.0, 1.0, STYLE.light);
 
         // windmill: tapered lattice tower
         const legs = [rline(686, 592, 698, 478, 0.4), rline(714, 592, 704, 478, 0.4)];
@@ -226,9 +232,10 @@ const Scene = (() => {
             const w1 = 14 - i * 2.6, w2 = 14 - (i + 1) * 2.6;
             braces.push(rline(700 - w1, y1, 700 + w2, y2, 0.3), rline(700 + w1, y1, 700 - w2, y2, 0.3));
         }
-        draw(land, legs, 2.4, 0.4, STYLE.main);
-        draw(land, braces, 2.75, 0.6, STYLE.faint);
-        draw(land, [rline(701, 472, 738, 470, 0.3), ...poly([[730, 462], [744, 458], [744, 480], [730, 477]], 0.3)], 3.3, 0.3, STYLE.main);
+        const mill = el('g', { id: 'windmill' }, land);
+        draw(mill, legs, 2.4, 0.4, STYLE.main);
+        draw(mill, braces, 2.75, 0.6, STYLE.faint);
+        draw(mill, [rline(701, 472, 738, 470, 0.3), ...poly([[730, 462], [744, 458], [744, 480], [730, 477]], 0.3)], 3.3, 0.3, STYLE.main);
 
         // fence posts receding toward the house
         const posts = [], rails = [];
@@ -241,8 +248,9 @@ const Scene = (() => {
             if (prev) rails.push(rline(prev.x, prev.y - prev.h * 0.85, x, y - h * 0.85, 0.6), rline(prev.x, prev.y - prev.h * 0.45, x, y - h * 0.45, 0.6));
             prev = { x, y, h };
         }
-        draw(land, posts, 3.2, 1.1, STYLE.main);
-        draw(land, rails, 3.9, 0.8, STYLE.light);
+        const fence = el('g', { id: 'fence' }, land);
+        draw(fence, posts, 3.2, 1.1, STYLE.main);
+        draw(fence, rails, 3.9, 0.8, STYLE.light);
 
         // field marks: sparse far away, longer up close
         let marks = '';
@@ -276,7 +284,29 @@ const Scene = (() => {
         }
         bl.push(curve(Array.from({ length: 17 }, (_, i) => [701 + Math.cos(i / 16 * 6.3) * 31, 472 + Math.sin(i / 16 * 6.3) * 31]), 0.6));
         draw(blades, bl, 3.4, 0.6, STYLE.light);
+        buildRuins();
         el('circle', { id: 'groundZero', cx: HOUSE.x, cy: HOUSE.y, r: 0.5, fill: 'none' }, svg);
+    }
+
+    /* what is left afterwards: wall stumps, a fallen roof, planks, a stripped tree */
+    function buildRuins() {
+        ruins = el('g', { id: 'ruins', filter: 'url(#boil)', style: 'display:none' }, svg);
+        el('ellipse', { cx: 820, cy: 594, rx: 150, ry: 16, fill: '#140c08', opacity: 0.55 }, ruins);
+        const st = [
+            ...poly([[770, 588], [770, 566], [776, 573], [781, 559], [786, 571], [791, 588]], 0.5, false),
+            ...poly([[838, 587], [841, 568], [849, 575], [856, 561], [864, 574], [872, 567], [881, 580]], 0.5, false),
+            ...poly([[846, 581], [846, 566], [854, 568], [855, 582]], 0.4, false),
+            ...poly([[795, 587], [830, 571], [862, 585], [824, 593]], 0.5),
+        ];
+        st.forEach(d => path(ruins, d, STYLE.bold));
+        path(ruins, hatch([[795, 587], [830, 571], [862, 585], [824, 593]], -20, 2.6, 0.3), STYLE.hatch);
+        let planks = '';
+        for (let i = 0; i < 26; i++) {
+            const x = r(700, 950), y = r(586, 604), a = r(-0.6, 0.6), l = r(6, 20);
+            planks += rline(x, y, x + Math.cos(a) * l, y + Math.sin(a) * l * 0.4, 0.3);
+        }
+        path(ruins, planks, STYLE.main);
+        [[933, 545, 958, 518], [935, 556, 962, 548], [933, 538, 946, 506], [944, 526, 960, 520]].forEach(([a, b, c, e]) => path(ruins, rline(a, b, c, e, 0.4), STYLE.main));
     }
 
     function buildClouds() {
@@ -340,30 +370,51 @@ const Scene = (() => {
         }
     }
 
+    /* a bald eagle in profile, carrying the bomb in its talons */
+    function wing(parent, light) {
+        const g = el('g', {}, parent);
+        const lead = [[0, 0], [10, -14], [14, -32], [10, -52], [4, -66]];
+        const trail = [[-26, -58], [-30, -40], [-24, -20], [-14, -6], [0, 0]];
+        el('path', { d: curve([...lead, [-6, -68], [-16, -66], ...trail], 0) + 'Z', fill: light ? '#8a6a4c' : '#5b3a22', opacity: light ? 0.55 : 0.8 }, g);
+        const st = light ? STYLE.light : STYLE.main;
+        path(g, curve(lead, 0.4), st);
+        path(g, curve(trail, 0.4), st);
+        let fingers = '';
+        for (let i = 0; i < 5; i++) {
+            const bx = 6 - i * 6, by = -54 + i * 2;
+            fingers += rline(bx, by, bx - 3 - i * 1.5, by - 14 + i * 0.5, 0.3);
+        }
+        path(g, fingers, st);
+        path(g, hatch([[0, 0], [10, -14], [14, -32], [-24, -20], [-14, -6]], 60, 3.2, 0.2), STYLE.hatch);
+        return g;
+    }
+
     function buildPlane() {
         plane = el('g', { id: 'plane', opacity: 0 }, svg);
         const body = el('g', { filter: 'url(#boil)' }, plane);
-        const s = STYLE.main;
-        const strokes = [
-            curve([[108, -4], [80, -14], [30, -17], [-40, -12], [-100, -6]], 0.6),
-            curve([[108, 6], [70, 14], [0, 15], [-60, 8], [-104, 2]], 0.6),
-            rline(-100, -6, -104, 2, 0.3),
-            curve([[108, -4], [114, 1], [108, 6]], 0.3),
-            curve([[40, -16], [48, -27], [68, -27], [78, -15]], 0.5),
-            rline(58, -27, 60, -16, 0.3),
-            curve([[-14, 3], [20, -1], [58, 3]], 0.4),
-            curve([[-14, 3], [20, 8], [58, 3]], 0.4),
-            curve([[-70, -11], [-88, -40], [-104, -42], [-100, -6]], 0.5),
-            curve([[-112, -1], [-92, -5], [-72, -1]], 0.3),
-            curve([[-112, -1], [-92, 2], [-72, -1]], 0.3),
-            curve(Array.from({ length: 9 }, (_, k) => [-90 + Math.cos(k / 8 * 6.4) * 5, -24 + Math.sin(k / 8 * 6.4) * 5]), 0.3),
-            rline(-8, 14, 24, 15, 0.3),
-        ];
-        strokes.forEach(d => path(body, d, s));
-        for (let k = 0; k < 4; k++) path(body, curve(Array.from({ length: 7 }, (_, q) => [-32 + k * 15 + Math.cos(q / 6 * 6.4) * 2.2, -5 + Math.sin(q / 6 * 6.4) * 2.2]), 0.1), STYLE.light);
-        path(body, hatch([[108, 6], [70, 14], [0, 15], [-60, 8], [-104, 2], [-100, 0], [108, 1]], 72, 3.5, 0.2), STYLE.hatch);
-        prop = el('ellipse', { cx: 117, cy: 1, rx: 2.5, ry: 25, fill: 'rgba(52,50,45,0.12)', stroke: INK, 'stroke-width': 1, 'stroke-opacity': 0.6 }, plane);
-        el('circle', { cx: 115, cy: 1, r: 3, fill: INK }, plane);
+        wingFar = wing(el('g', { transform: 'translate(4 -3)' }, body), true);
+        // fills first, lines on top
+        el('path', { d: curve([[30, -6], [10, -10], [-15, -9], [-35, -4], [-35, 3], [-15, 9], [8, 11], [30, 6]], 0) + 'Z', fill: '#5b3a22', opacity: 0.8 }, body);
+        el('path', { d: curve([[30, -6], [38, -10], [46, -8], [50, -3], [50, 2], [42, 6], [30, 6], [27, 0], [30, -6]], 0) + 'Z', fill: '#fbf8f0', opacity: 0.95 }, body);
+        el('path', { d: curve([[-35, -4], [-58, -8], [-62, 0], [-58, 7], [-35, 3]], 0) + 'Z', fill: '#fbf8f0', opacity: 0.95 }, body);
+        el('path', { d: 'M50 -3 C55 -4 58 -1 57 2 C55 4 52 3 50 2 Z', fill: '#e8b43a' }, body);
+        [
+            curve([[30, -6], [10, -10], [-15, -9], [-35, -4]], 0.5),
+            curve([[30, 6], [8, 11], [-15, 9], [-35, 3]], 0.5),
+            curve([[30, -6], [38, -10], [46, -8], [50, -3]], 0.3),
+            curve([[50, -3], [56, -3], [58, 1], [54, 3]], 0.2),
+            curve([[54, 3], [51, 2], [50, 2]], 0.1),
+            curve([[50, 2], [42, 6], [30, 6]], 0.3),
+            curve([[31, -6], [28, -1], [31, 2], [29, 6]], 0.3),
+            curve([[-35, -4], [-58, -8], [-62, 0], [-58, 7], [-35, 3]], 0.4),
+            rline(-38, 0, -58, -3, 0.2) + rline(-38, 1, -59, 3, 0.2),
+            rline(4, 9, 6, 22, 0.2) + rline(-4, 9, -3, 22, 0.2),
+            curve([[1, 22], [6, 21], [9, 24]], 0.1) + curve([[-7, 22], [-3, 21], [0, 24]], 0.1),
+        ].forEach(d => path(body, d, STYLE.main));
+        el('circle', { cx: 44, cy: -5, r: 1.4, fill: INK }, body);
+        path(body, hatch([[30, 6], [8, 11], [-15, 9], [-35, 3], [-35, 0], [30, 0]], 70, 3, 0.2), STYLE.hatch);
+        wingNear = wing(body, false);
+        prop = null;
 
         shadow = el('ellipse', { id: 'planeShadow', cx: 0, cy: 712, rx: 46, ry: 5, fill: '#3b3a2c', opacity: 0, filter: 'url(#soft)' }, svg);
 
@@ -503,22 +554,35 @@ const Scene = (() => {
             });
         }
 
-        // the plane: a small bomber flying left to right, passing ahead of ground zero when the bomb leaves
+        // the eagle: flies left to right, flapping in bursts and gliding between
         const P = state.plane;
         if (P) {
-            const s = v.width < 900 ? 0.48 : 0.6;
-            const releaseX = HOUSE.x - 110 * s;
-            const speed = Math.max(120, (releaseX - (v.left - 160)) / (P.release - P.enter));
+            const s = v.width < 900 ? 0.85 : 1.05;
+            const releaseX = HOUSE.x - 60 * s;
+            const speed = Math.max(110, (releaseX - (v.left - 140)) / (P.release - P.enter));
             const x = releaseX + (t - P.release) * speed;
-            const y = 170 + Math.sin(t * 1.1) * 3;
+            const after = Math.max(0, t - P.release);
+            const cyc = (t * 0.55) % 1, flapping = cyc < 0.6 || after > 0;
+            const rate = after > 0 ? 3.4 : 2.6;
+            P.phase = flapping ? (P.phase || 0) + dt * rate : (P.phase || 0);
+            const ph = P.phase * Math.PI * 2;
+            const k = flapping ? Math.cos(ph) : 0.75;                 // +1 wings up, -1 wings down
+            const y = 190 - after * after * 9 + (flapping ? Math.sin(ph) * 4 : Math.sin(t * 1.4) * 2);
             P.x = x; P.y = y; P.s = s; P.speed = speed;
+            P.beat = flapping && Math.floor(P.phase) !== P.lastBeat;
+            P.lastBeat = Math.floor(P.phase);
             plane.setAttribute('opacity', t > P.enter - 0.2 ? 1 : 0);
-            plane.setAttribute('transform', `translate(${f(x)} ${f(y)}) rotate(${f(Math.sin(t * 1.1) * 1.5)}) scale(${s})`);
-            prop.setAttribute('ry', f(25 * Math.abs(Math.cos(t * 42)) + 2));
-            shadow.setAttribute('cx', f(x + 20));
-            shadow.setAttribute('opacity', 0.1);
+            plane.setAttribute('transform', `translate(${f(x)} ${f(y)}) rotate(${f(-4 - after * 3 + Math.sin(t * 1.1) * 2)}) scale(${s})`);
+            wingNear.setAttribute('transform', `translate(8 -5) rotate(${f(-8 + k * 10)}) scale(1 ${f(k * 0.95 + (k > 0 ? 0.05 : -0.05))})`);
+            wingFar.setAttribute('transform', `translate(6 -6) rotate(${f(-14 + k * 10)}) scale(0.9 ${f(k * 0.85 + (k > 0 ? 0.05 : -0.05))})`);
+            shadow.setAttribute('cx', f(x + 10));
+            shadow.setAttribute('opacity', 0.08);
             P.pan = Math.max(-1, Math.min(1, (x - (v.left + v.width / 2)) / (v.width / 2)));
             P.near = Math.max(0, 1 - Math.abs(x - (v.left + v.width / 2)) / (v.width * 0.9 + 300));
+            if (!state.bomb) {
+                bomb.setAttribute('opacity', t > P.enter - 0.2 ? 1 : 0);
+                bomb.setAttribute('transform', `translate(${f(x + 1 * s)} ${f(y + 31 * s)}) scale(${f(s * 0.8)})`);
+            }
         }
 
         // the bomb: tumbles nose-down and shrinks into the distance
@@ -531,7 +595,7 @@ const Scene = (() => {
             const vx = (HOUSE.x - B.x0) * 1.5 * Math.pow(1 - p, 0.5), vy = (HOUSE.y - B.y0) * 1.35 * Math.pow(p + 0.02, 0.35);
             const ang = Math.atan2(vy, vx) * 180 / Math.PI + Math.sin(p * 11) * 4;
             bomb.setAttribute('opacity', p < 1 ? 1 : 0);
-            bomb.setAttribute('transform', `translate(${f(x)} ${f(y)}) rotate(${f(ang)}) scale(${f(B.s * (1 - p * 0.55))})`);
+            bomb.setAttribute('transform', `translate(${f(x)} ${f(y)}) rotate(${f(ang * Math.min(1, p * 3))}) scale(${f(B.s * (1 - p * 0.55))})`);
         }
     }
 
@@ -541,7 +605,7 @@ const Scene = (() => {
     }
 
     /* Render the finished drawing (without plane or bomb) into a canvas for the shader. */
-    async function snapshot(paperCanvas, scale) {
+    async function snapshot(paperCanvas, scale, ruined = false) {
         const W = Math.round(innerWidth * scale), H = Math.round(innerHeight * scale);
         const clone = svg.cloneNode(true);
         ['#plane', '#bomb', '#planeShadow', '#birds', '#smoke', '#flutters'].forEach(q => clone.querySelector(q)?.remove());
@@ -550,6 +614,7 @@ const Scene = (() => {
         clone.setAttribute('height', H);
         clone.querySelector('#washes').setAttribute('opacity', '1');
         clone.querySelectorAll('.cfill').forEach(c => c.setAttribute('opacity', '0.85'));
+        if (ruined) ruin(clone);
         const src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(clone));
         const img = new Image();
         img.src = src;
@@ -560,12 +625,44 @@ const Scene = (() => {
         x.fillStyle = x.createPattern(paperCanvas, 'repeat');
         x.fillRect(0, 0, W, H);
         x.drawImage(img, 0, 0, W, H);
+        if (ruined) {
+            // everything burns: darken through a red-brown filter, then light it from ground zero
+            const gz = svg.querySelector('#groundZero').getBoundingClientRect();
+            const zx = (gz.left + gz.width / 2) / innerWidth * W, zy = (gz.top + gz.height / 2) / innerHeight * H;
+            x.globalCompositeOperation = 'multiply';
+            const m = x.createLinearGradient(0, 0, 0, H);
+            m.addColorStop(0, '#5a2a1c'); m.addColorStop(0.55, '#c8703c'); m.addColorStop(1, '#9a6646');
+            x.fillStyle = m;
+            x.fillRect(0, 0, W, H);
+            x.globalCompositeOperation = 'screen';
+            const g = x.createRadialGradient(zx, zy, 0, zx, zy, Math.max(W, H) * 0.6);
+            g.addColorStop(0, 'rgba(255,120,40,0.55)'); g.addColorStop(0.4, 'rgba(160,50,15,0.25)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+            x.fillStyle = g;
+            x.fillRect(0, 0, W, H);
+            x.globalCompositeOperation = 'source-over';
+        }
         const v = x.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.max(W, H) * 0.75);
         v.addColorStop(0, 'rgba(80,60,30,0)');
         v.addColorStop(1, 'rgba(80,60,30,0.2)');
         x.fillStyle = v;
         x.fillRect(0, 0, W, H);
         return c;
+    }
+
+    /* turn a clone of the lovely day into its aftermath */
+    function ruin(c) {
+        ['#house', '#houseWash', '#treeTop', '#treeWash', '#blades', '#sun', '#smoke'].forEach(q => c.querySelector(q)?.remove());
+        c.querySelectorAll('.cloud').forEach(n => n.remove());
+        c.querySelector('#ruins').removeAttribute('style');
+        c.querySelector('#windmill').setAttribute('transform', 'rotate(-17 700 592)');
+        c.querySelector('#fence').setAttribute('transform', 'translate(0 860) skewX(-9) translate(0 -860)');
+        c.querySelector('#grass').setAttribute('transform', 'translate(0 905) skewX(-16) translate(0 -905)');
+        c.querySelectorAll('.tuft').forEach(n => n.removeAttribute('style'));
+        const set = (q, fill, op) => { const n = c.querySelector(q); n.setAttribute('fill', fill); n.setAttribute('opacity', op); };
+        set('#skyWash', 'url(#apoSky)', 1);
+        set('#fieldWash', '#6b5038', 0.7);
+        set('#hillWash', '#3a2418', 0.8);
+        set('#pathWash', '#8a6a48', 0.7);
     }
 
     return { build, startDrawing, finishDrawing, paint, tick, groundZero, snapshot, visible, HOUSE, get plane() { return plane; } };

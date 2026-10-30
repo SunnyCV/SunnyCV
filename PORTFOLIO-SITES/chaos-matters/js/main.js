@@ -12,10 +12,10 @@
 
     // the score, in seconds from the moment the visitor enters
     const T = { draw: 1.0, slow: 1.7, birds: 2.6, smoke: 6.4, flutters: 8.5, wash: 11.0,
-                engine: 12.4, enter: 13.4, release: 17.6, fall: 4.2 };
+                eagle: 12.4, enter: 13.4, release: 17.6, fall: 4.2 };
     T.impact = T.release + T.fall;
     // after impact
-    const A = { loss: 4.9, static: 5.1, bars: 8.6, standby: 9.3, melt: 11.4, title: 15.2, done: 19.4 };
+    const A = { loss: 8.4, static: 8.6, bars: 12.0, standby: 12.7, melt: 14.8, title: 18.6, done: 22.8 };
 
     const $ = s => document.querySelector(s);
     const body = document.body;
@@ -200,13 +200,15 @@
         cue(T.flutters, () => { state.flutters = clock; });
         cue(T.wash, () => Scene.paint());
         cue(drawEnd + 0.3, () => Scene.finishDrawing());
-        cue(T.engine, () => { Sound.planeStart(); state.plane = { enter: T.enter, release: T.release }; });
+        cue(T.eagle, () => { state.plane = { enter: T.enter, release: T.release }; });
+        cue(T.enter + 0.4, () => Sound.cry(-0.7, 0.7));
+        cue(T.release + 0.2, () => Sound.cry(state.plane ? state.plane.pan : 0, 1));
         cue(T.release - 2.2, async () => {
-            try { snapshot = await Scene.snapshot(paper, glScale); } catch (e) { snapshot = null; }
+            try { snapshot = await Scene.snapshot(paper, glScale, true); } catch (e) { snapshot = null; }
         });
         cue(T.release, () => {
             const P = state.plane;
-            state.bomb = { t0: clock, dur: T.fall, x0: P.x + 8 * P.s, y0: P.y + 14 * P.s, s: P.s * 1.5 };
+            state.bomb = { t0: clock, dur: T.fall, x0: P.x + 1 * P.s, y0: P.y + 31 * P.s, s: P.s * 0.8 };
             Sound.whistle(T.fall);
             const gz = Scene.groundZero();
             svg.style.transformOrigin = `${gz.x}px ${gz.y}px`;
@@ -256,7 +258,7 @@
         if (phase === 'intro' && clock < T.impact) {
             Scene.tick(clock, dt, state);
             const P = state.plane;
-            if (P && P.x != null) Sound.planeUpdate(P.pan, P.near, P.x < Scene.HOUSE.x);
+            if (P && P.beat) Sound.wingbeat(P.pan, P.near);
             if (state.bomb) {
                 const p = smooth(T.release, T.impact, clock);
                 zoom = 1 + 0.16 * p * p;
@@ -297,7 +299,7 @@
             Screen.render({
                 time: reduced ? clock * 0.25 : clock,
                 T: u, center, zoom,
-                static: smooth(5.3, 6.1, u) * (u < A.bars + 0.6 ? 1 : 0),
+                static: smooth(8.8, 9.5, u) * (u < A.bars + 0.6 ? 1 : 0),
                 bars, roll: k * k * (u - A.bars) * 1.7, psy, dim, field,
                 mouse, ripple,
                 title: { pos: title.pos, amt: tAmt,

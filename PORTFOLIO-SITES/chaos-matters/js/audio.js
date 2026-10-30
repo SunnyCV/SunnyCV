@@ -118,24 +118,44 @@ const Sound = (() => {
         birdTimer = setTimeout(() => { chirp(0); scheduleBird(1.4 + Math.random() * 3); }, after * 1000);
     }
 
-    /* ---------- Act 2: the plane ---------- */
-    function planeStart() {
+    /* ---------- Act 2: the eagle ---------- */
+    /* the cry: a raspy, falling "kee-eeee-arr", echoing across the prairie */
+    function cry(pan = 0, loud = 1) {
         if (!ok()) return;
-        const lp = filter('lowpass', 650), am = gain(0.7), pan = ctx.createStereoPanner(), g = gain(0, fxBus);
-        const freqs = [78, 79.3, 39.2];
-        const oscs = freqs.map((fq, i) => { const o = osc(i === 2 ? 'square' : 'sawtooth', fq); o.connect(lp); o.start(); return o; });
-        lfo(23, 0.3, am.gain);           // propeller beat
-        lp.connect(am).connect(pan).connect(g);
-        N.plane = { g, pan, oscs, freqs };
+        const t = now(), p = ctx.createStereoPanner();
+        p.pan.value = pan;
+        const g = gain(0), bp = filter('bandpass', 2600, 2.5);
+        p.connect(fxBus); g.connect(p); g.connect(echoIn);
+        const o = osc('sawtooth', 2400), n = noise(), ng = gain(0.25);
+        o.frequency.setValueAtTime(2300, t);
+        o.frequency.linearRampToValueAtTime(3100, t + 0.12);
+        o.frequency.setValueAtTime(3050, t + 0.3);
+        o.frequency.exponentialRampToValueAtTime(1700, t + 1.25);
+        const rasp = lfo(38, 90, o.frequency);
+        bp.frequency.setValueAtTime(2600, t);
+        bp.frequency.exponentialRampToValueAtTime(1900, t + 1.25);
+        o.connect(bp); n.connect(ng).connect(bp);
+        bp.connect(g);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.12 * loud, t + 0.06);
+        g.gain.setValueAtTime(0.1 * loud, t + 0.9);
+        g.gain.exponentialRampToValueAtTime(0.0005, t + 1.35);
+        o.start(t); o.stop(t + 1.4); n.start(t); n.stop(t + 1.4); rasp.stop(t + 1.4);
     }
-    function planeUpdate(pan, near, approaching) {
-        const P = N.plane;
-        if (!P) return;
-        const t = now();
-        P.pan.pan.setTargetAtTime(pan * 0.9, t, 0.08);
-        P.g.gain.setTargetAtTime(0.03 + Math.pow(near, 1.6) * 0.42, t, 0.15);
-        const doppler = approaching ? 1.05 : 0.93;
-        P.oscs.forEach((o, i) => o.frequency.setTargetAtTime(P.freqs[i] * doppler, t, 0.4));
+
+    /* one wing beat: a soft whoosh of air */
+    function wingbeat(pan, near) {
+        if (!ok() || near < 0.05) return;
+        const t = now(), p = ctx.createStereoPanner();
+        p.pan.value = pan;
+        p.connect(fxBus);
+        const n = noise(), bp = filter('bandpass', 380, 1.1), g = gain(0, p);
+        bp.frequency.setValueAtTime(260, t);
+        bp.frequency.linearRampToValueAtTime(600, t + 0.18);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.22 * near * near, t + 0.08);
+        g.gain.linearRampToValueAtTime(0, t + 0.3);
+        n.connect(bp).connect(g); n.start(t); n.stop(t + 0.32);
     }
 
     /* the falling whistle — higher and quieter far away, deeper and louder as it arrives */
@@ -163,7 +183,6 @@ const Sound = (() => {
         natureBus.gain.cancelScheduledValues(t);
         natureBus.gain.setValueAtTime(natureBus.gain.value, t);
         natureBus.gain.linearRampToValueAtTime(0, t + fade);
-        if (N.plane) N.plane.g.gain.setTargetAtTime(0, t, fade / 3);
     }
 
     /* ---------- Act 3: impact ---------- */
@@ -189,10 +208,21 @@ const Sound = (() => {
         const ru = noise(), rlp = filter('lowpass', 160, 0.9), rg = gain(0, fxBus);
         rg.gain.setValueAtTime(0, t);
         rg.gain.linearRampToValueAtTime(0.9, t + 0.6);
-        rg.gain.linearRampToValueAtTime(0.7, t + 3.5);
-        rg.gain.exponentialRampToValueAtTime(0.001, t + 6);
+        rg.gain.linearRampToValueAtTime(0.8, t + 5);
+        rg.gain.linearRampToValueAtTime(0.95, t + 8);
+        rg.gain.exponentialRampToValueAtTime(0.001, t + 9.5);
         lfo(0.6, 0.15, rg.gain);
-        ru.connect(rlp).connect(rg); ru.start(t); ru.stop(t + 6.2);
+        ru.connect(rlp).connect(rg); ru.start(t); ru.stop(t + 9.6);
+        // the roar of the fireball boiling upward, swelling as the smoke closes in
+        const ro = noise(), rbp = filter('bandpass', 320, 0.7), rog = gain(0, fxBus);
+        rbp.frequency.setValueAtTime(900, t);
+        rbp.frequency.exponentialRampToValueAtTime(220, t + 8);
+        rog.gain.setValueAtTime(0, t);
+        rog.gain.linearRampToValueAtTime(0.35, t + 1);
+        rog.gain.linearRampToValueAtTime(0.25, t + 4);
+        rog.gain.linearRampToValueAtTime(0.5, t + 8.2);
+        rog.gain.linearRampToValueAtTime(0, t + 8.6);
+        ro.connect(rbp).connect(rog); ro.start(t); ro.stop(t + 8.7);
         // the crack
         const c = noise(), hp = filter('highpass', 2200), cg = gain(0.7, fxBus);
         cg.gain.setValueAtTime(0.7, t);
@@ -340,5 +370,5 @@ const Sound = (() => {
         if (ok()) master.gain.setTargetAtTime(m ? 0 : 0.9, now(), 0.05);
     }
 
-    return { init, signalLoss, glitch, nature, planeStart, planeUpdate, whistle, hush, boom, staticRush, tuneIn, melt, pad, hover, select, stopAll, setMuted, get muted() { return muted; } };
+    return { init, signalLoss, glitch, nature, cry, wingbeat, whistle, hush, boom, staticRush, tuneIn, melt, pad, hover, select, stopAll, setMuted, get muted() { return muted; } };
 })();
