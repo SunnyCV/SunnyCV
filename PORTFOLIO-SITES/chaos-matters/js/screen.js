@@ -68,6 +68,7 @@ uniform float uPsy;      // 0..1 the melt
 uniform float uDim;      // 0..1 darkening when the doors are open
 uniform vec2  uMouse;
 uniform vec3  uRipple;   // xy = where, z = seconds since
+uniform vec3  uHot;      // hovered room: xy, strength
 uniform vec2  uTP;       // title centre (uv)
 uniform vec2  uTS;       // title size (uv)
 uniform float uTA;       // title presence 0..1 (flickers in)
@@ -331,6 +332,9 @@ void main() {
         vec2 p = uv - fv * 0.07 * amt;
         vec2 md = (p - uMouse) * A;
         p = uMouse + (rot(0.9 * exp(-dot(md, md) * 6.0) * amt) * md) / A;
+        // a hovered room twists the paint around itself
+        vec2 hd0 = (p - uHot.xy) * A;
+        p = uHot.xy + (rot(2.2 * uHot.z * exp(-dot(hd0, hd0) * 14.0) * sin(t * 1.7)) * hd0) / A;
         vec2 rd = (p - uRipple.xy) * A;
         float rr = length(rd), rf = uRipple.z * 0.9;
         p += normalize(rd + 1e-5) / A * sin((rr - rf) * 38.0) * 0.025 * exp(-uRipple.z * 1.3) * exp(-abs(rr - rf) * 7.0);
@@ -353,6 +357,11 @@ void main() {
         pc *= 1.0 - 0.18 * amt * (1.0 - smoothstep(0.0, 0.07, c));
         // and it glows
         pc = pc * (1.0 + 0.18 * amt) + 0.05 * amt;
+        // the hovered room radiates: a hot core and turning rays of colour
+        vec2 hd = (uv - uHot.xy) * A;
+        float hr = length(hd);
+        float rays = pow(0.5 + 0.5 * sin(atan(hd.y, hd.x) * 12.0 + t * 3.0 - hr * 20.0), 3.0);
+        pc += hueShift(vec3(1.0, 0.25, 0.8), t * 2.0 + hr * 8.0) * uHot.z * (exp(-hr * hr * 70.0) * 0.7 + rays * exp(-hr * 4.5) * 0.35);
         col = mix(col, pc, smoothstep(0.0, 0.2, uPsy));
     }
 
@@ -437,7 +446,7 @@ void main() {
         gl.enableVertexAttribArray(0);
         gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
         ['uScene', 'uField', 'uTitle', 'uNoise', 'uRes', 'uTime', 'uT', 'uCenter', 'uZoom', 'uStatic', 'uBars', 'uRoll', 'uPsy', 'uDim',
-         'uMouse', 'uRipple', 'uTP', 'uTS', 'uTA', 'uTF', 'uG1', 'uG2'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
+         'uMouse', 'uRipple', 'uHot', 'uTP', 'uTS', 'uTA', 'uTF', 'uG1', 'uG2'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
         ['uPrev', 'uTexel', 'uAsp', 'uP1', 'uV1', 'uP2', 'uV2'].forEach(n => FU[n] = gl.getUniformLocation(fprog, n));
 
         tex = makeTex(1, 1, new Uint8Array([243, 239, 230, 255]));
@@ -543,6 +552,7 @@ void main() {
         gl.uniform1f(U.uDim, u.dim);
         gl.uniform2f(U.uMouse, u.mouse[0], u.mouse[1]);
         gl.uniform3f(U.uRipple, u.ripple[0], u.ripple[1], u.ripple[2]);
+        gl.uniform3f(U.uHot, u.hot[0], u.hot[1], u.hot[2]);
         gl.uniform2f(U.uTP, u.title.pos[0], u.title.pos[1]);
         gl.uniform2f(U.uTS, u.title.size[0], u.title.size[1]);
         gl.uniform1f(U.uTA, u.title.amt);

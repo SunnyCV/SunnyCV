@@ -13,7 +13,7 @@ const Sound = (() => {
     const N = {};                  // named nodes we keep adjusting
 
     function init() {
-        if (ctx) { ctx.resume(); return; }
+        if (ctx) return;
         const AC = window.AudioContext || window.webkitAudioContext;
         if (!AC) return;
         ctx = new AC();
@@ -65,7 +65,20 @@ const Sound = (() => {
         s.curve = c;
         return s;
     }
-    function ok() { return !!ctx; }
+    // nothing is scheduled while the browser is holding the audio back
+    function ok() { return !!ctx && ctx.state === 'running'; }
+
+    /* call from a tap/click/key: lets the sound out; true if it was being held back */
+    function unlock() {
+        if (!ctx || ctx.state === 'running') return false;
+        ctx.resume();
+        return true;
+    }
+    function whenRunning(fn) {
+        if (!ctx) return;
+        if (ctx.state === 'running') fn();
+        else ctx.addEventListener('statechange', function go() { if (ctx.state === 'running') { ctx.removeEventListener('statechange', go); fn(); } });
+    }
 
     /* ---------- Act 1: a sunny day ---------- */
     function nature() {
@@ -141,6 +154,28 @@ const Sound = (() => {
         g.gain.setValueAtTime(0.1 * loud, t + 0.9);
         g.gain.exponentialRampToValueAtTime(0.0005, t + 1.35);
         o.start(t); o.stop(t + 1.4); n.start(t); n.stop(t + 1.4); rasp.stop(t + 1.4);
+    }
+
+    /* the eagle tearing past like a jet: a rising, panning rush of air */
+    function swoop(dur) {
+        if (!ok()) return;
+        const t = now(), p = ctx.createStereoPanner();
+        p.pan.setValueAtTime(-1, t);
+        p.pan.linearRampToValueAtTime(1, t + dur);
+        p.connect(fxBus);
+        const n = noise(), bp = filter('bandpass', 500, 1.4), g = gain(0, p);
+        bp.frequency.setValueAtTime(500, t);
+        bp.frequency.exponentialRampToValueAtTime(2600, t + dur * 0.55);
+        bp.frequency.exponentialRampToValueAtTime(700, t + dur);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.32, t + dur * 0.55);
+        g.gain.linearRampToValueAtTime(0, t + dur);
+        n.connect(bp).connect(g); n.start(t); n.stop(t + dur + 0.05);
+        const lo = noise(), lp = filter('lowpass', 140), lg = gain(0, p);
+        lg.gain.setValueAtTime(0, t);
+        lg.gain.linearRampToValueAtTime(0.35, t + dur * 0.5);
+        lg.gain.linearRampToValueAtTime(0, t + dur);
+        lo.connect(lp).connect(lg); lo.start(t); lo.stop(t + dur + 0.05);
     }
 
     /* one wing beat: a soft whoosh of air */
@@ -370,5 +405,5 @@ const Sound = (() => {
         if (ok()) master.gain.setTargetAtTime(m ? 0 : 0.9, now(), 0.05);
     }
 
-    return { init, signalLoss, glitch, nature, cry, wingbeat, whistle, hush, boom, staticRush, tuneIn, melt, pad, hover, select, stopAll, setMuted, get muted() { return muted; } };
+    return { init, unlock, whenRunning, signalLoss, glitch, nature, cry, swoop, wingbeat, whistle, hush, boom, staticRush, tuneIn, melt, pad, hover, select, stopAll, setMuted, get muted() { return muted; } };
 })();

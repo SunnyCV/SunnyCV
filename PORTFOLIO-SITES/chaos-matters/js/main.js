@@ -1,7 +1,8 @@
 /* ==========================================================
    Chaos Matters — the conductor
-   Runs the timeline: gate → sketch → bomber → mushroom cloud
-   → static → test card → the oil-slick dream and its title.
+   Runs the timeline: loading bar → sketch → eagle → nuclear
+   blast → static → test card → the oil-slick dream, where the
+   title drifts with its rooms circling it.
    ========================================================== */
 
 (() => {
@@ -10,28 +11,29 @@
         'Seventeen Suns', 'The Weight of Feathers', 'Echoes for Rent', 'Paper Thunder'
     ];
 
-    // the score, in seconds from the moment the visitor enters
-    const T = { draw: 1.0, slow: 1.7, birds: 2.6, smoke: 6.4, flutters: 8.5, wash: 11.0,
-                eagle: 12.4, enter: 13.4, release: 17.6, fall: 4.2 };
+    // the score, in seconds from the moment the loading bar finishes
+    const T = { draw: 0.6, slow: 1.7, birds: 2.2, smoke: 6.0, flutters: 8.1, wash: 10.6,
+                eagle: 12.4, enter: 13.0, release: 15.8, fall: 2.4 };
     T.impact = T.release + T.fall;
     // after impact
-    const A = { loss: 8.4, static: 8.6, bars: 12.0, standby: 12.7, melt: 14.8, title: 18.6, done: 22.8 };
+    const A = { loss: 8.4, static: 8.6, bars: 12.0, standby: 12.7, melt: 14.8, title: 18.6, rooms: 20.2, done: 22.8 };
 
     const $ = s => document.querySelector(s);
     const body = document.body;
-    const stage = $('#stage'), glCanvas = $('#gl'), gate = $('#gate'), menu = $('#menu');
+    const stage = $('#stage'), glCanvas = $('#gl'), loader = $('#loader'), menu = $('#menu');
     const standby = $('#standby'), skipBtn = $('#skip'), toast = $('#toast');
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     let svg, paper, snapshot = null;
-    let phase = 'gate', t0 = 0, last = 0, clock = 0;
+    let phase = 'loading', t0 = 0, last = 0, clock = 0;
     let cues = [], state = {}, impactAt = Infinity, center = [0.5, 0.5], zoom = 1;
     const mouse = [0.5, 0.5], pointer = [0.5, 0.5], lastPointer = [0.5, 0.5];
     let pointerActive = false, ripple = [0.5, 0.5, 99];
-    let dim = 0, doorsOpen = false;
-    let glScale = 1;
+    let glScale = 1, roomsOn = false, hot = -1, hotAmt = 0;
+    const hotPos = [0.5, 0.5];
 
-    const title = { pos: [0.5, 0.5], vel: [0, 0], size: [0.5, 0.2], aspect: 0.5, drag: false, grab: [0, 0], hist: [], down: null };
+    const title = { pos: [0.5, 0.5], vel: [0, 0], size: [0.5, 0.2], aspect: 0.5, drag: false, grab: [0, 0], hist: [] };
+    const rooms = [];   // { li, a, label, x, y, w, h }
 
     /* ---------- paper ---------- */
     function makePaper() {
@@ -56,6 +58,20 @@
         }
         document.documentElement.style.setProperty('--grain', `url(${c.toDataURL()})`);
         return c;
+    }
+
+    /* a tile of TV static that the room names are filled with when they glitch */
+    function makeStatic() {
+        const c = document.createElement('canvas');
+        c.width = c.height = 96;
+        const x = c.getContext('2d'), img = x.createImageData(96, 96);
+        for (let i = 0; i < img.data.length; i += 4) {
+            const v = 120 + Math.random() * 135;
+            img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
+            img.data[i + 3] = 255;
+        }
+        x.putImageData(img, 0, 0);
+        document.documentElement.style.setProperty('--static', `url(${c.toDataURL()})`);
     }
 
     function pickGlScale() {
@@ -87,23 +103,24 @@
         sizeTitle();
     }
 
+    const wide = () => innerWidth > 760;
+
     function sizeTitle() {
-        const wPx = innerWidth > 760 ? Math.min(innerWidth * 0.56, 960) : innerWidth * 0.9;
+        const wPx = wide() ? Math.min(innerWidth * 0.42, 760) : innerWidth * 0.7;
         title.size = [wPx / innerWidth, wPx * title.aspect / innerHeight];
     }
 
-    // where the title would like to drift: a slow, looping wander that stays on screen
+    // where the title would like to drift: a slow loop that leaves room for its orbit of rooms
     function wander(t) {
-        const ax = Math.max(0, 0.5 - title.size[0] / 2 - 0.03), ay = Math.max(0, 0.5 - title.size[1] / 2 - 0.08);
+        const mx = wide() ? 0.2 : 0.05, my = wide() ? 0.17 : 0.24;
+        const ax = Math.max(0, 0.5 - title.size[0] / 2 - mx), ay = Math.max(0, 0.5 - title.size[1] / 2 - my);
         return [0.5 + ax * (0.7 * Math.sin(t * 0.13) + 0.3 * Math.sin(t * 0.31 + 1)),
                 0.5 + ay * (0.6 * Math.sin(t * 0.17 + 2) + 0.4 * Math.sin(t * 0.23))];
     }
 
     function moveTitle(u) {
-        // with the doors open (on wide screens) the title settles in the middle and the rooms circle it
-        const settle = doorsOpen && innerWidth > 760;
-        const target = title.drag ? [pointer[0] - title.grab[0], pointer[1] - title.grab[1]] : settle ? [0.5, 0.5] : wander(u - A.title);
-        const k = title.drag ? 0.22 : settle ? 0.012 : 0.0022, damp = title.drag ? 0.62 : settle ? 0.88 : 0.975;
+        const target = title.drag ? [pointer[0] - title.grab[0], pointer[1] - title.grab[1]] : wander(u - A.title);
+        const k = title.drag ? 0.22 : 0.0022, damp = title.drag ? 0.62 : 0.975;
         for (let i = 0; i < 2; i++) {
             title.vel[i] = (title.vel[i] + (target[i] - title.pos[i]) * k) * damp;
             title.pos[i] += title.vel[i];
@@ -119,7 +136,7 @@
         return Math.abs(p[0] - title.pos[0]) < title.size[0] * 0.46 && Math.abs(p[1] - title.pos[1]) < title.size[1] * 0.44;
     }
 
-    /* ---------- the doors (rooms), behind the title ---------- */
+    /* ---------- the rooms: they circle the title and travel with it ---------- */
     const GLYPHS = '▓▒░#%&@$*+=/\\<>?!~^';
     function scramble(node, text, dur = 700) {
         const start = performance.now();
@@ -138,47 +155,77 @@
         ROOMS.forEach((name, i) => {
             const li = document.createElement('li');
             li.className = 'm-item';
-            li.style.setProperty('--bob', `${(4 + (i % 3)).toFixed(1)}s`);
-            li.style.setProperty('--delay', `${-i * 0.7}s`);
-            li.innerHTML = `<a href="#room-${i + 1}" data-i="${i}"><span class="m-num">${String(i + 1).padStart(2, '0')}</span><span class="m-label">${name}</span></a>`;
+            li.innerHTML = `<a href="#room-${i + 1}"><span class="m-num">${String(i + 1).padStart(2, '0')}</span><span class="m-label" data-text="${name}">${name}</span></a>`;
             list.appendChild(li);
             const a = li.querySelector('a'), label = li.querySelector('.m-label');
-            a.addEventListener('mouseenter', () => { Sound.hover(i); scramble(label, name, 380); });
+            const room = { li, a, label, x: innerWidth / 2, y: innerHeight / 2, w: 0, h: 0 };
+            rooms.push(room);
+            const heat = on => {
+                li.classList.toggle('hot', on);
+                if (on) { hot = i; Sound.hover(i); Sound.glitch(2, 0.15); scramble(label, name, 380); }
+                else if (hot === i) hot = -1;
+            };
+            a.addEventListener('mouseenter', () => heat(true));
+            a.addEventListener('mouseleave', () => heat(false));
+            a.addEventListener('focus', () => heat(true));
+            a.addEventListener('blur', () => heat(false));
             a.addEventListener('click', e => {
                 e.preventDefault();
                 Sound.select();
-                const r = a.getBoundingClientRect();
-                ripple = [(r.left + r.width / 2) / innerWidth, 1 - (r.top + r.height / 2) / innerHeight, 0];
+                ripple = [room.x / innerWidth, 1 - room.y / innerHeight, 0];
                 showToast(`Room ${String(i + 1).padStart(2, '0')} · “${name}” is still being dreamed up.`);
             });
         });
-        placeMenu();
     }
 
-    function placeMenu() {
-        const items = [...menu.querySelectorAll('.m-item')];
-        const wide = innerWidth > 760;
-        items.forEach((li, i) => {
-            if (!wide) { li.style.left = li.style.top = ''; return; }
-            const a = -Math.PI / 2 + (i + 0.5) / items.length * Math.PI * 2;
-            li.style.left = (50 + Math.cos(a) * 36) + '%';
-            li.style.top = (50 + Math.sin(a) * 36) + '%';
-        });
+    function measureRooms() {
+        rooms.forEach(r => { r.w = r.li.offsetWidth; r.h = r.li.offsetHeight; });
     }
 
-    function setDoors(open) {
-        doorsOpen = open;
-        menu.classList.toggle('on', open);
-        body.classList.toggle('doors', open);
-        Sound.glitch(4, 0.4);
-        menu.querySelectorAll('.m-item').forEach((li, i) => {
-            li.classList.remove('in');
-            if (!open) return;
-            setTimeout(() => {
-                li.classList.add('in');
-                scramble(li.querySelector('.m-label'), ROOMS[i], 800);
-            }, 120 + i * 110);
+    function placeRooms(dt, u) {
+        const W = innerWidth, H = innerHeight;
+        const cx = title.pos[0] * W, cy = (1 - title.pos[1]) * H;
+        const tw = title.size[0] * W, th = title.size[1] * H;
+        const spin = u * 0.035;
+        rooms.forEach((r, i) => {
+            if (!r.shown && u >= roomsAt + 0.12 + i * 0.12) {
+                r.shown = true;
+                r.li.classList.add('in');
+                scramble(r.label, ROOMS[i], 900);
+            }
+            let tx, ty;
+            if (wide()) {
+                const a = -Math.PI / 2 + (i + 0.5) / rooms.length * Math.PI * 2 + spin;
+                tx = cx + Math.cos(a) * (tw * 0.5 + 175);
+                ty = cy + Math.sin(a) * (th * 0.5 + 110);
+            } else {
+                // phones: two columns above the title and two below
+                const row = i % 4, col = i < 4 ? 0 : 1;
+                tx = cx + (col ? 0.25 : -0.25) * W;
+                const up = row < 2;
+                ty = cy + (up ? -1 : 1) * (th * 0.5 + 56 + (up ? 1 - row : row - 2) * 58);
+            }
+            // each room trails the title a little differently, so the group moves like one loose body
+            tx += Math.sin(u * 0.7 + i * 1.7) * 6;
+            ty += Math.cos(u * 0.9 + i * 2.3) * 6;
+            tx = Math.max(r.w / 2 + 8, Math.min(W - r.w / 2 - 8, tx));
+            ty = Math.max(r.h / 2 + 8, Math.min(H - r.h / 2 - 40, ty));
+            const k = Math.min(1, dt * (2.2 + i * 0.35));
+            r.x += (tx - r.x) * k;
+            r.y += (ty - r.y) * k;
+            r.li.style.transform = `translate3d(${(r.x - r.w / 2).toFixed(1)}px, ${(r.y - r.h / 2).toFixed(1)}px, 0)`;
         });
+        if (hot >= 0) { hotPos[0] = rooms[hot].x / W; hotPos[1] = 1 - rooms[hot].y / H; }
+    }
+
+    let roomsAt = 0;
+    function revealRooms() {
+        roomsOn = true;
+        roomsAt = clock - impactAt;
+        menu.classList.add('on');
+        measureRooms();
+        rooms.forEach(r => { r.x = title.pos[0] * innerWidth; r.y = (1 - title.pos[1]) * innerHeight; r.shown = false; });  // burst out from the title
+        Sound.glitch(6, 1.2);
     }
 
     let toastTimer;
@@ -194,27 +241,27 @@
 
     function score(drawEnd) {
         cues = [];
-        cue(0.25, () => Sound.nature());
+        cue(0.1, () => Sound.nature());
         cue(T.birds, () => { state.birds = clock; });
         cue(T.smoke, () => { state.smoke = clock; });
         cue(T.flutters, () => { state.flutters = clock; });
         cue(T.wash, () => Scene.paint());
         cue(drawEnd + 0.3, () => Scene.finishDrawing());
         cue(T.eagle, () => { state.plane = { enter: T.enter, release: T.release }; });
-        cue(T.enter + 0.4, () => Sound.cry(-0.7, 0.7));
-        cue(T.release + 0.2, () => Sound.cry(state.plane ? state.plane.pan : 0, 1));
-        cue(T.release - 2.2, async () => {
+        cue(T.enter + 0.2, () => { Sound.cry(-0.8, 0.8); Sound.swoop(T.release - T.enter + 1.4); });
+        cue(T.release + 0.1, () => Sound.cry(state.plane ? state.plane.pan : 0, 1));
+        cue(T.release - 2.0, async () => {
             try { snapshot = await Scene.snapshot(paper, glScale, true); } catch (e) { snapshot = null; }
         });
         cue(T.release, () => {
             const P = state.plane;
-            state.bomb = { t0: clock, dur: T.fall, x0: P.x + 1 * P.s, y0: P.y + 31 * P.s, s: P.s * 0.8 };
+            state.bomb = { t0: clock, dur: T.fall, x0: P.x + P.bx * P.s, y0: P.y + P.by * P.s, s: P.s * 0.8 };
             Sound.whistle(T.fall);
             const gz = Scene.groundZero();
             svg.style.transformOrigin = `${gz.x}px ${gz.y}px`;
             center = [gz.x / innerWidth, 1 - gz.y / innerHeight];
         });
-        cue(T.impact - 0.6, () => Sound.hush(0.5));
+        cue(T.impact - 0.45, () => Sound.hush(0.4));
         cue(T.impact, () => {
             impactAt = clock;
             Sound.boom();
@@ -233,6 +280,7 @@
         cue(T.impact + A.standby, () => standby.classList.add('on'));
         cue(T.impact + A.melt, () => { Sound.melt(8); standby.classList.remove('on'); });
         cue(T.impact + A.title, () => { Sound.glitch(9, 1.8); if (!Screen.ok) body.classList.add('show-title'); });
+        cue(T.impact + A.rooms, () => revealRooms());
         cue(T.impact + A.done, () => arrive());
     }
 
@@ -240,7 +288,15 @@
         phase = 'home';
         body.classList.add('home');
         skipBtn.hidden = true;
-        try { localStorage.setItem('cm-visited', '1'); } catch (e) { /* storage blocked */ }
+    }
+
+    /* where are we, for sound that starts late (browsers keep audio silent until the first tap or key) */
+    function soundCatchUp() {
+        const u = clock - impactAt;
+        if (clock < T.impact - 0.5) Sound.nature();
+        else if (u < A.bars) Sound.staticRush();
+        else if (u < A.melt) Sound.tuneIn();
+        else Sound.pad(2);
     }
 
     /* ---------- frame loop ---------- */
@@ -270,13 +326,14 @@
             const u = clock - impactAt;
             mouse[0] += (pointer[0] - mouse[0]) * 0.08;
             mouse[1] += (pointer[1] - mouse[1]) * 0.08;
-            dim += ((doorsOpen ? 1 : 0) - dim) * Math.min(1, dt * 5);
             ripple[2] += dt;
+            hotAmt += ((hot >= 0 ? 1 : 0) - hotAmt) * Math.min(1, dt * 6);
             const bars = u < A.bars ? 0 : u < A.bars + 0.6 ? (Math.floor(u * 14) % 3 ? 1 : 0) : 1;
             const k = 1 - smooth(A.bars, A.bars + 1.6, u);
             const psy = Math.pow(smooth(A.melt, A.done, u), 1.5);
             const tAmt = smooth(A.title, A.title + 2.2, u);
             if (tAmt > 0) moveTitle(u);
+            if (roomsOn) placeRooms(dt, u);
 
             // stir the oil: the pointer pushes and tints it, the drifting title drags it along
             let field = null;
@@ -294,136 +351,115 @@
             lastPointer[0] = pointer[0]; lastPointer[1] = pointer[1];
 
             // afterimages from about 0.12s and 0.3s ago, whatever the frame rate
-            const wide = innerWidth > 760;
             const h = title.hist, ago = d => h.find(p => u - p[2] <= d) || title.pos;
             Screen.render({
                 time: reduced ? clock * 0.25 : clock,
                 T: u, center, zoom,
                 static: smooth(8.8, 9.5, u) * (u < A.bars + 0.6 ? 1 : 0),
-                bars, roll: k * k * (u - A.bars) * 1.7, psy, dim, field,
-                mouse, ripple,
-                title: { pos: title.pos, amt: tAmt,
-                         size: wide ? [title.size[0] * (1 - 0.32 * dim), title.size[1] * (1 - 0.32 * dim)] : title.size,
-                         fade: wide ? 1 : 1 - 0.88 * dim,
-                         g1: ago(0.12), g2: ago(0.3) }
+                bars, roll: k * k * (u - A.bars) * 1.7, psy, dim: 0, field,
+                mouse, ripple, hot: [hotPos[0], hotPos[1], hotAmt],
+                title: { pos: title.pos, size: title.size, amt: tAmt, fade: 1, g1: ago(0.12), g2: ago(0.3) }
             });
         }
         requestAnimationFrame(frame);
     }
 
-    /* ---------- entering, skipping, replaying ---------- */
+    /* ---------- loading, then straight into it ---------- */
+    function load() {
+        const bar = loader.querySelector('.ld-fill'), pct = loader.querySelector('.ld-pct');
+        const start = performance.now(), minTime = 2600;
+        let ready = false;
+        Promise.all([
+            document.fonts.load('800 220px Syne').catch(() => {}),
+            document.fonts.ready,
+            new Promise(r => setTimeout(r, 50)),
+        ]).then(() => { makeTitle(); ready = true; });
+        // the bar stutters forward like something being pulled off a slow disk
+        let shown = 0;
+        const tick = () => {
+            const k = Math.min(1, (performance.now() - start) / minTime);
+            const target = ready ? k : Math.min(k, 0.9);
+            if (Math.random() < 0.35) shown += (target - shown) * (0.25 + Math.random() * 0.5);
+            if (k >= 1 && ready) shown = 1;
+            bar.style.transform = `scaleX(${shown.toFixed(3)})`;
+            pct.textContent = String(Math.floor(shown * 100)).padStart(3, '0');
+            if (shown >= 1) { setTimeout(begin, 250); return; }
+            setTimeout(tick, 60 + Math.random() * 90);
+        };
+        tick();
+    }
+
     function begin() {
-        Sound.init();
-        gate.classList.add('gone');
+        loader.classList.add('gone');
         body.classList.add('playing');
         skipBtn.hidden = false;
         if (reduced) { jumpHome(); return; }
         phase = 'intro';
         t0 = performance.now();
         state = {}; impactAt = Infinity; zoom = 1; snapshot = null;
-        resetTitle();
         const drawEnd = Scene.startDrawing(T.draw, T.slow);
         score(drawEnd);
     }
 
-    function resetTitle() {
-        title.pos = [0.5, 0.5]; title.vel = [0, 0]; title.hist = []; title.drag = false;
-    }
-
     function jumpHome() {
         Sound.stopAll();
-        Sound.init();
         Sound.pad(1.5);
         t0 = performance.now();
         clock = 0;
         impactAt = -A.done;           // as if the bomb fell long ago
         cues = [];
-        resetTitle();
         if (svg) svg.style.visibility = 'hidden';
         standby.classList.remove('on');
         body.classList.add('tv', 'playing');
         if (Screen.ok) glCanvas.classList.add('on'); else body.classList.add('no-gl', 'show-title');
-        gate.classList.add('gone');
+        loader.classList.add('gone');
+        if (!roomsOn) revealRooms();
         arrive();
-    }
-
-    function replay() {
-        Sound.stopAll();
-        setDoors(false);
-        glCanvas.classList.remove('on');
-        body.classList.remove('tv', 'home', 'no-gl', 'show-title');
-        standby.classList.remove('on');
-        svg.remove();
-        svg = Scene.build(stage);
-        begin();
     }
 
     /* ---------- wiring ---------- */
     function setup() {
         paper = makePaper();
+        makeStatic();
         svg = Scene.build(stage);
         Screen.init(glCanvas);
+        Sound.init();
         pickGlScale();
         buildMenu();
-        document.fonts.load('800 220px Syne').catch(() => {}).then(makeTitle);
 
-        let visited = false;
-        try { visited = localStorage.getItem('cm-visited') === '1'; } catch (e) { /* storage blocked */ }
-        $('#gateSkip').hidden = !visited;
-
-        gate.addEventListener('click', e => {
-            if (e.target.closest('#gateSkip')) return;
-            if (phase === 'gate') begin();
-        });
-        gate.addEventListener('keydown', e => {
-            if ((e.key === 'Enter' || e.key === ' ') && phase === 'gate') { e.preventDefault(); begin(); }
-        });
-        $('#gateSkip').addEventListener('click', () => { Sound.init(); jumpHome(); });
         skipBtn.addEventListener('click', jumpHome);
-        $('#replay').addEventListener('click', replay);
-        const soundBtn = $('#sound');
-        soundBtn.addEventListener('click', () => {
-            Sound.setMuted(!Sound.muted);
-            soundBtn.textContent = Sound.muted ? 'Sound off' : 'Sound on';
-            soundBtn.setAttribute('aria-pressed', String(!Sound.muted));
-        });
-        $('#titleBtn').addEventListener('click', () => { if (phase === 'home') setDoors(!doorsOpen); });
+
+        // sound is always on, but a browser only lets it play after the first tap, click or key
+        const unlock = () => { if (Sound.unlock()) Sound.whenRunning(soundCatchUp); };
+        ['pointerdown', 'keydown', 'touchend'].forEach(ev => addEventListener(ev, unlock, { capture: true }));
 
         const toUv = e => [e.clientX / innerWidth, 1 - e.clientY / innerHeight];
         addEventListener('pointermove', e => {
             [pointer[0], pointer[1]] = toUv(e);
             pointerActive = true;
-            if (phase === 'home' && !doorsOpen) body.style.cursor = title.drag ? 'grabbing' : overTitle(pointer) ? 'grab' : '';
+            if (phase === 'home') body.style.cursor = title.drag ? 'grabbing' : overTitle(pointer) ? 'grab' : '';
         });
         addEventListener('pointerdown', e => {
             if (phase !== 'home' || e.target.closest('a,button')) return;
             [pointer[0], pointer[1]] = toUv(e);
             lastPointer[0] = pointer[0]; lastPointer[1] = pointer[1];
             pointerActive = true;
-            if (!doorsOpen && overTitle(pointer)) {
+            if (overTitle(pointer)) {
                 title.drag = true;
                 title.grab = [pointer[0] - title.pos[0], pointer[1] - title.pos[1]];
-                title.down = { x: pointer[0], y: pointer[1], at: performance.now() };
                 body.style.cursor = 'grabbing';
-            } else if (doorsOpen && !e.target.closest('.m-item')) {
-                setDoors(false);
+                Sound.glitch(3, 0.3);
             } else {
                 ripple = [pointer[0], pointer[1], 0];
             }
         });
-        addEventListener('pointerup', () => {
-            if (!title.drag) return;
-            title.drag = false;
-            const d = title.down;
-            // a tap (not a drag) on the title opens the doors
-            if (d && Math.hypot(pointer[0] - d.x, pointer[1] - d.y) < 0.012 && performance.now() - d.at < 350) setDoors(true);
-            body.style.cursor = '';
-        });
+        addEventListener('pointerup', () => { if (title.drag) { title.drag = false; body.style.cursor = ''; } });
         addEventListener('pointercancel', () => { title.drag = false; });
-        addEventListener('resize', () => { pickGlScale(); placeMenu(); sizeTitle(); });
+        addEventListener('resize', () => { pickGlScale(); sizeTitle(); measureRooms(); });
 
         window.__chaosTitle = title;   // read by the test scripts
         requestAnimationFrame(t => { last = t; frame(t); });
+        load();
     }
 
     setup();

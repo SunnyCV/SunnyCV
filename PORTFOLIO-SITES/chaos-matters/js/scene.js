@@ -11,7 +11,7 @@ const Scene = (() => {
     const HOUSE = { x: 820, y: 560 };   // ground zero
     const INK = '#34322d';
 
-    let svg, land, washes, sunG, smoke, flutters, wingNear, wingFar, ruins, grassG, sunRays, blades, clouds, birds, plane, prop, bomb, shadow;
+    let svg, land, washes, sunG, smoke, flutters, wingNear, wingFar, trails, ruins, grassG, sunRays, blades, clouds, birds, plane, prop, bomb, shadow;
     let batches = [];
     let rand;
 
@@ -370,50 +370,66 @@ const Scene = (() => {
         }
     }
 
-    /* a bald eagle in profile, carrying the bomb in its talons */
-    function wing(parent, light) {
-        const g = el('g', {}, parent);
-        const lead = [[0, 0], [10, -14], [14, -32], [10, -52], [4, -66]];
-        const trail = [[-26, -58], [-30, -40], [-24, -20], [-14, -6], [0, 0]];
-        el('path', { d: curve([...lead, [-6, -68], [-16, -66], ...trail], 0) + 'Z', fill: light ? '#8a6a4c' : '#5b3a22', opacity: light ? 0.55 : 0.8 }, g);
-        const st = light ? STYLE.light : STYLE.main;
-        path(g, curve(lead, 0.4), st);
-        path(g, curve(trail, 0.4), st);
-        let fingers = '';
-        for (let i = 0; i < 5; i++) {
-            const bx = 6 - i * 6, by = -54 + i * 2;
-            fingers += rline(bx, by, bx - 3 - i * 1.5, by - 14 + i * 0.5, 0.3);
-        }
-        path(g, fingers, st);
-        path(g, hatch([[0, 0], [10, -14], [14, -32], [-24, -20], [-14, -6]], 60, 3.2, 0.2), STYLE.hatch);
-        return g;
-    }
-
+    /* a war eagle built like a Concorde: needle body, drooping hooked beak,
+       swept delta wings, the bomb clamped in its talons */
     function buildPlane() {
         plane = el('g', { id: 'plane', opacity: 0 }, svg);
+        // contrails and speed lines are redrawn every frame behind the bird
+        trails = el('g', {}, plane);
+        for (let i = 0; i < 6; i++) path(trails, '', i < 2 ? STYLE.light : STYLE.faint);
         const body = el('g', { filter: 'url(#boil)' }, plane);
-        wingFar = wing(el('g', { transform: 'translate(4 -3)' }, body), true);
-        // fills first, lines on top
-        el('path', { d: curve([[30, -6], [10, -10], [-15, -9], [-35, -4], [-35, 3], [-15, 9], [8, 11], [30, 6]], 0) + 'Z', fill: '#5b3a22', opacity: 0.8 }, body);
-        el('path', { d: curve([[30, -6], [38, -10], [46, -8], [50, -3], [50, 2], [42, 6], [30, 6], [27, 0], [30, -6]], 0) + 'Z', fill: '#fbf8f0', opacity: 0.95 }, body);
-        el('path', { d: curve([[-35, -4], [-58, -8], [-62, 0], [-58, 7], [-35, 3]], 0) + 'Z', fill: '#fbf8f0', opacity: 0.95 }, body);
-        el('path', { d: 'M50 -3 C55 -4 58 -1 57 2 C55 4 52 3 50 2 Z', fill: '#e8b43a' }, body);
+
+        const farWing = [[22, -6], [0, -13], [-28, -25], [-60, -38], [-74, -32], [-80, -18], [-82, -6]];
+        const nearWing = [[24, 3], [4, 8], [-22, 17], [-50, 31], [-74, 44], [-86, 33], [-84, 18], [-86, 6]];
+        wingFar = el('g', {}, body);
+        el('path', { d: curve(farWing, 0) + 'Z', fill: '#6b4a30', opacity: 0.6 }, wingFar);
+        path(wingFar, curve(farWing.slice(0, 4), 0.4), STYLE.light);
+        path(wingFar, poly(farWing.slice(3), 0.3, false).join(''), STYLE.light);
+        [[-60, -38, -82, -44], [-64, -35, -85, -38], [-68, -31, -86, -31]].forEach(([a, b, c, d]) => path(wingFar, rline(a, b, c, d, 0.2), STYLE.light));
+
+        const bodyPts = [[28, -8], [0, -8], [-40, -6], [-80, -3], [-80, 3], [-40, 9], [0, 11], [28, 8]];
+        el('path', { d: curve(bodyPts, 0) + 'Z', fill: '#3d2414', opacity: 0.85 }, body);
+        const head = [[28, -8], [40, -9], [52, -6], [66, -4], [56, 3], [44, 7], [28, 8], [25, 4], [29, 1], [24, -2], [28, -5]];
+        el('path', { d: curve(head, 0) + 'Z', fill: '#fbf8f0' }, body);
+        const tail = [[-80, -3], [-112, -6], [-120, 0], [-112, 5], [-80, 3]];
+        el('path', { d: curve(tail, 0) + 'Z', fill: '#fbf8f0', opacity: 0.95 }, body);
+        el('path', { d: 'M52 -6 C 62 -5 74 -2 80 1 C 80 4 77 5 75 4 C 70 3 62 3 56 3 Z', fill: '#f0b429' }, body);
+        el('path', { d: 'M41 -5.5 L52 -7.5 L54.5 -4.2 L44 -3 Z', fill: '#ffb21a' }, body);
+        el('circle', { cx: 49.5, cy: -5.3, r: 1.6, fill: '#111' }, body);
         [
-            curve([[30, -6], [10, -10], [-15, -9], [-35, -4]], 0.5),
-            curve([[30, 6], [8, 11], [-15, 9], [-35, 3]], 0.5),
-            curve([[30, -6], [38, -10], [46, -8], [50, -3]], 0.3),
-            curve([[50, -3], [56, -3], [58, 1], [54, 3]], 0.2),
-            curve([[54, 3], [51, 2], [50, 2]], 0.1),
-            curve([[50, 2], [42, 6], [30, 6]], 0.3),
-            curve([[31, -6], [28, -1], [31, 2], [29, 6]], 0.3),
-            curve([[-35, -4], [-58, -8], [-62, 0], [-58, 7], [-35, 3]], 0.4),
-            rline(-38, 0, -58, -3, 0.2) + rline(-38, 1, -59, 3, 0.2),
-            rline(4, 9, 6, 22, 0.2) + rline(-4, 9, -3, 22, 0.2),
-            curve([[1, 22], [6, 21], [9, 24]], 0.1) + curve([[-7, 22], [-3, 21], [0, 24]], 0.1),
+            curve([[28, -8], [0, -8], [-40, -6], [-80, -3]], 0.5),
+            curve([[28, 8], [0, 11], [-40, 9], [-80, 3]], 0.5),
+            curve([[28, -8], [40, -9], [52, -6]], 0.3),
+            curve([[52, -6], [66, -4], [80, 1], [76, 4.5]], 0.2),
+            curve([[76, 4.5], [66, 3], [56, 3]], 0.2),
+            curve([[56, 3], [44, 7], [28, 8]], 0.3),
+            poly([[28, -8], [25, -4], [29, -1], [24, 2], [28, 8]], 0.3, false).join(''),
+            curve(tail, 0.4),
+            rline(-82, -1, -114, -3, 0.2) + rline(-82, 1, -114, 3, 0.2),
+            // talons gripping the bomb
+            rline(8, 10, 12, 21, 0.2) + rline(-3, 10, 0, 21, 0.2),
+            curve([[8, 21], [13, 20], [15, 24]], 0.1) + curve([[-4, 21], [1, 20], [3, 24]], 0.1),
         ].forEach(d => path(body, d, STYLE.main));
-        el('circle', { cx: 44, cy: -5, r: 1.4, fill: INK }, body);
-        path(body, hatch([[30, 6], [8, 11], [-15, 9], [-35, 3], [-35, 0], [30, 0]], 70, 3, 0.2), STYLE.hatch);
-        wingNear = wing(body, false);
+        // the scowl: a heavy brow cut down over the eye
+        path(body, rline(36, -11.5, 56, -5.6, 0.15), { w: 3.6, o: 0.95 });
+        path(body, hatch([[28, 8], [0, 11], [-40, 9], [-80, 3], [-80, 1], [28, 1]], 70, 3, 0.2), STYLE.hatch);
+
+        wingNear = el('g', {}, body);
+        el('path', { d: curve(nearWing, 0) + 'Z', fill: '#4a2c18', opacity: 0.88 }, wingNear);
+        path(wingNear, curve(nearWing.slice(0, 5), 0.4), STYLE.main);
+        let edge = '';                                   // a feathered, saw-toothed trailing edge
+        for (let i = 0; i < 7; i++) {
+            const k = i / 7, x = -74 - k * 12 + (i % 2) * 4, y = 44 - k * 38;
+            edge += rline(x, y, -84 - (k + 1 / 7) * 2 + ((i + 1) % 2) * 4, 44 - (k + 1 / 7) * 38, 0.2);
+        }
+        path(wingNear, edge, STYLE.main);
+        path(wingNear, hatch(nearWing, 35, 3.4, 0.2), STYLE.hatch);
+        // primary feathers splayed off the wingtip like fingers
+        [[-74, 44, -98, 50], [-77, 41, -100, 44], [-80, 37, -101, 38], [-82, 33, -100, 32]].forEach(([a, b, c, d]) => {
+            el('path', { d: `M${a} ${b} L${c} ${d} L${a - 4} ${b - 3} Z`, fill: '#3d2414', opacity: 0.9 }, wingNear);
+            path(wingNear, rline(a, b, c, d, 0.2), STYLE.main);
+        });
+        path(wingNear, curve([[18, 4], [-20, 20], [-60, 38]], 0.3), STYLE.light);
         prop = null;
 
         shadow = el('ellipse', { id: 'planeShadow', cx: 0, cy: 712, rx: 46, ry: 5, fill: '#3b3a2c', opacity: 0, filter: 'url(#soft)' }, svg);
@@ -554,34 +570,40 @@ const Scene = (() => {
             });
         }
 
-        // the eagle: flies left to right, flapping in bursts and gliding between
+        // the eagle: screams in on a shallow dive, lets go, then pulls up hard and is gone
         const P = state.plane;
         if (P) {
-            const s = v.width < 900 ? 0.85 : 1.05;
-            const releaseX = HOUSE.x - 60 * s;
-            const speed = Math.max(110, (releaseX - (v.left - 140)) / (P.release - P.enter));
-            const x = releaseX + (t - P.release) * speed;
-            const after = Math.max(0, t - P.release);
-            const cyc = (t * 0.55) % 1, flapping = cyc < 0.6 || after > 0;
-            const rate = after > 0 ? 3.4 : 2.6;
-            P.phase = flapping ? (P.phase || 0) + dt * rate : (P.phase || 0);
-            const ph = P.phase * Math.PI * 2;
-            const k = flapping ? Math.cos(ph) : 0.75;                 // +1 wings up, -1 wings down
-            const y = 190 - after * after * 9 + (flapping ? Math.sin(ph) * 4 : Math.sin(t * 1.4) * 2);
-            P.x = x; P.y = y; P.s = s; P.speed = speed;
-            P.beat = flapping && Math.floor(P.phase) !== P.lastBeat;
-            P.lastBeat = Math.floor(P.phase);
+            const s = v.width < 900 ? 0.75 : 0.95;
+            const releaseX = HOUSE.x - 40 * s;
+            const speed = Math.max(220, (releaseX - (v.left - 200)) / (P.release - P.enter));
+            const x = releaseX + (t - P.release) * speed * (1 + Math.max(0, t - P.release) * 0.4);
+            const before = Math.max(0, P.release - t), after = Math.max(0, t - P.release);
+            const y = 178 - Math.min(1, before / 2.8) * 70 - after * after * 38 + Math.sin(t * 2.3) * 2;
+            const pitch = before > 0 ? 6 * Math.min(1, before / 2.8) : -Math.min(28, after * 30);
+            P.x = x; P.y = y; P.s = s; P.speed = speed; P.bx = 6; P.by = 27;
             plane.setAttribute('opacity', t > P.enter - 0.2 ? 1 : 0);
-            plane.setAttribute('transform', `translate(${f(x)} ${f(y)}) rotate(${f(-4 - after * 3 + Math.sin(t * 1.1) * 2)}) scale(${s})`);
-            wingNear.setAttribute('transform', `translate(8 -5) rotate(${f(-8 + k * 10)}) scale(1 ${f(k * 0.95 + (k > 0 ? 0.05 : -0.05))})`);
-            wingFar.setAttribute('transform', `translate(6 -6) rotate(${f(-14 + k * 10)}) scale(0.9 ${f(k * 0.85 + (k > 0 ? 0.05 : -0.05))})`);
+            plane.setAttribute('transform', `translate(${f(x)} ${f(y)}) rotate(${f(pitch)}) scale(${s})`);
+            // wings flex with the air rather than flap
+            const flex = Math.sin(t * 9) * 0.5 + Math.sin(t * 2.1);
+            wingNear.setAttribute('transform', `rotate(${f(flex * 1.5)} 20 4) scale(1 ${f(1 + flex * 0.04)})`);
+            wingFar.setAttribute('transform', `rotate(${f(-flex * 1.5)} 20 -6) scale(1 ${f(1 - flex * 0.05)})`);
+            const len = 120 + Math.min(260, (t - P.enter) * 160);
+            const tr = [...trails.children];
+            tr[0].setAttribute('d', `M-74 44 L${f(-74 - len)} ${f(44 + flex)}`);
+            tr[1].setAttribute('d', `M-60 -38 L${f(-60 - len * 0.8)} ${f(-38 - flex)}`);
+            for (let i = 2; i < 6; i++) {
+                const yy = -18 + (i - 2) * 12, ph = (t * 3 + i * 0.37) % 1;
+                tr[i].setAttribute('d', `M${f(-95 - ph * 60)} ${yy} L${f(-130 - ph * 90)} ${yy}`);
+                tr[i].setAttribute('stroke-opacity', f((1 - ph) * 0.5 * 10) / 10);
+            }
             shadow.setAttribute('cx', f(x + 10));
             shadow.setAttribute('opacity', 0.08);
             P.pan = Math.max(-1, Math.min(1, (x - (v.left + v.width / 2)) / (v.width / 2)));
             P.near = Math.max(0, 1 - Math.abs(x - (v.left + v.width / 2)) / (v.width * 0.9 + 300));
             if (!state.bomb) {
                 bomb.setAttribute('opacity', t > P.enter - 0.2 ? 1 : 0);
-                bomb.setAttribute('transform', `translate(${f(x + 1 * s)} ${f(y + 31 * s)}) scale(${f(s * 0.8)})`);
+                const cr = Math.cos(pitch * Math.PI / 180), sr = Math.sin(pitch * Math.PI / 180);
+                bomb.setAttribute('transform', `translate(${f(x + (P.bx * cr - P.by * sr) * s)} ${f(y + (P.bx * sr + P.by * cr) * s)}) rotate(${f(pitch)}) scale(${f(s * 0.8)})`);
             }
         }
 
@@ -590,10 +612,10 @@ const Scene = (() => {
         if (B) {
             const p = Math.min(1, (t - B.t0) / B.dur);
             // nice and easy: it eases down, swaying a little as it goes
-            const x = B.x0 + (HOUSE.x - B.x0) * (1 - Math.pow(1 - p, 1.5)) + Math.sin(p * 9) * 3 * (1 - p);
-            const y = B.y0 + (HOUSE.y - B.y0) * Math.pow(p, 1.35);
-            const vx = (HOUSE.x - B.x0) * 1.5 * Math.pow(1 - p, 0.5), vy = (HOUSE.y - B.y0) * 1.35 * Math.pow(p + 0.02, 0.35);
-            const ang = Math.atan2(vy, vx) * 180 / Math.PI + Math.sin(p * 11) * 4;
+            const x = B.x0 + (HOUSE.x - B.x0) * (1 - Math.pow(1 - p, 2));
+            const y = B.y0 + (HOUSE.y - B.y0) * Math.pow(p, 1.7);
+            const vx = (HOUSE.x - B.x0) * 2 * (1 - p), vy = (HOUSE.y - B.y0) * 1.7 * Math.pow(p + 0.02, 0.7);
+            const ang = Math.atan2(vy, vx) * 180 / Math.PI;
             bomb.setAttribute('opacity', p < 1 ? 1 : 0);
             bomb.setAttribute('transform', `translate(${f(x)} ${f(y)}) rotate(${f(ang * Math.min(1, p * 3))}) scale(${f(B.s * (1 - p * 0.55))})`);
         }
