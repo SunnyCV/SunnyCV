@@ -23,6 +23,13 @@
     const stage = $('#stage'), glCanvas = $('#gl'), loader = $('#loader'), menu = $('#menu');
     const standby = $('#standby'), skipBtn = $('#skip'), toast = $('#toast');
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // ?render: full-quality frames for the intro video (no controls, no adaptive resolution)
+    const RENDER = /[?&]render/.test(location.search);
+    // the intro plays as a pre-rendered film (two cuts + one soundtrack); ?live draws it in real time instead
+    const FILM = !RENDER && !/[?&]live/.test(location.search);
+    const FILM_END = 30.6;          // the film ends on the colour bars, this far after impact: u = 12.4
+    const FILM_U = 12.4;
+    const film = { el: $('#film'), wide: $('#filmWide'), tall: $('#filmTall'), sound: $('#filmSound'), ok: false, on: false };
 
     let svg, paper, snapshot = null;
     let phase = 'loading', t0 = 0, last = 0, clock = 0;
@@ -82,13 +89,14 @@
        run slow and back up when there is headroom. The canvas is scaled up smoothly by CSS. */
     const perf = { q: 1, acc: 0, n: 0, good: 0, hold: 0 };
     function pickGlScale() {
-        const dpr = Math.min(devicePixelRatio || 1, 1.5);
-        const budget = 1.4e6 * perf.q * perf.q, px = innerWidth * innerHeight * dpr * dpr;
+        const dpr = RENDER ? devicePixelRatio : Math.min(devicePixelRatio || 1, 1.5);
+        const budget = RENDER ? 1e9 : 1.4e6 * perf.q * perf.q, px = innerWidth * innerHeight * dpr * dpr;
         glScale = px > budget ? dpr * Math.sqrt(budget / px) : dpr;
         Screen.resize(glScale);
         Space.setQuality(perf.q);
     }
     function adapt(raw) {
+        if (RENDER) return;
         if (perf.hold > 0) { perf.hold -= raw; return; }     // ignore the spike right after a scene change
         perf.acc += raw; perf.n++;
         if (perf.acc < 0.5) return;
@@ -348,7 +356,7 @@
         cue(T.release + 0.1, () => Sound.cry(state.plane ? state.plane.pan : 0, 1));
         cue(drawEnd + 0.8, async () => {
             try {
-                snapshot = await Scene.snapshot(paper, Math.min(glScale, 1), true);
+                snapshot = await Scene.snapshot(paper, RENDER ? glScale : Math.min(glScale, 1), true);
                 Screen.setScene(snapshot);
             } catch (e) { snapshot = null; }
         });
@@ -391,6 +399,7 @@
 
     /* where are we, for sound that starts late (browsers keep audio silent until the first tap or key) */
     function soundCatchUp() {
+        if (film.ok && (phase === 'loading' || phase === 'film')) return;   // the film carries its own sound
         const u = clock - impactAt;
         if (clock < T.impact - 0.5) Sound.nature();
         else if (u < A.bars) Sound.staticRush();
@@ -411,7 +420,9 @@
             cues.forEach(c => { if (!c.done && clock >= c.at) { c.done = true; c.fn(); } });
         }
 
-        if (phase === 'intro' && clock < T.impact) {
+        if (phase === 'film') syncFilm();
+
+        if (phase === 'intro' && clock < T.impact && svg) {
             Scene.tick(clock, dt, state);
             const P = state.plane;
             if (P && P.beat) Sound.wingbeat(P.pan, P.near);
@@ -433,7 +444,7 @@
             if (osd.classList.contains('on') && o.rew != null) osd.querySelector('.osd-time').textContent = tape(o.rew);
         }
 
-        if (clock >= T.impact || phase === 'home' || phase === 'space') adapt(raw);
+        if ((clock >= T.impact || phase === 'home' || phase === 'space') && phase !== 'film') adapt(raw);
 
         if (returning) {
             const R = returning, c = R.cued;
@@ -444,7 +455,7 @@
             if (R.u >= A.rooms && !roomsOn) revealRooms(R.u);
         }
 
-        if ((clock >= T.impact || phase === 'home' || phase === 'space') && !swallowed) {
+        if ((clock >= T.impact || phase === 'home' || phase === 'space') && phase !== 'film' && !swallowed) {
             const u = returning ? returning.u : clock - impactAt;
             shaderT += dt * homeRate;
             mouse[0] += (pointer[0] - mouse[0]) * 0.08;
@@ -494,24 +505,111 @@
         return `${p(s / 3600)}:${p((s / 60) % 60)}:${p(s % 60)}`;
     }
 
+    /* ---------- the intro film ---------- */
+    // download both cuts and the soundtrack in full during the loading bar, so turning a phone never waits
+    function fetchWithProgress(url, onBytes) {
+        return fetch(url).then(res => {
+            if (!res.ok) throw new Error(url + ' ' + res.status);
+            const total = +res.headers.get('content-length') || 0;
+            if (!res.body || !res.body.getReader) return res.blob().then(b => { onBytes(b.size, b.size); return b; });
+            const reader = res.body.getReader(), parts = [];
+            let got = 0;
+            const pump = () => reader.read().then(({ done, value }) => {
+                if (done) return new Blob(parts, { type: res.headers.get('content-type') || '' });
+                parts.push(value); got += value.length; onBytes(got, total);
+                return pump();
+            });
+            return pump();
+        });
+    }
+
+    function loadFilm(progress) {
+        const files = [['media/intro-wide.mp4', film.wide], ['media/intro-tall.mp4', film.tall], ['media/intro.m4a', film.sound]];
+        const got = files.map(() => 0), tot = files.map(() => 0);
+        const report = () => { const T = tot.reduce((a, b) => a + b, 0); progress(T ? got.reduce((a, b) => a + b, 0) / T : 0); };
+        return Promise.all(files.map(([url, el], i) => fetchWithProgress(url, (g, t) => { got[i] = g; tot[i] = t || g; report(); })
+            .then(blob => new Promise((res, rej) => {
+                el.src = URL.createObjectURL(blob);
+                el.addEventListener('canplaythrough', res, { once: true });
+                el.addEventListener('error', rej, { once: true });
+                el.load();
+            }))))
+            .then(() => { film.ok = true; });
+    }
+
+    // portrait screens get the tall cut; both keep playing so the swap is instant
+    function pickCut() {
+        film.el.classList.toggle('tall', innerHeight > innerWidth);
+    }
+
+    function playFilm() {
+        film.on = true;
+        pickCut();
+        film.el.classList.add('on');
+        film.sound.currentTime = 0;
+        [film.wide, film.tall].forEach(v => { v.currentTime = 0; v.play().catch(() => {}); });
+        film.sound.play().catch(() => {});
+    }
+
+    // the soundtrack is the clock: keep both pictures locked to it
+    function syncFilm() {
+        const t = film.sound.currentTime;
+        [film.wide, film.tall].forEach(v => {
+            if (v.paused && !film.sound.paused) v.play().catch(() => {});
+            if (Math.abs(v.currentTime - t) > 0.12) v.currentTime = t;
+        });
+        if (t >= FILM_END || film.sound.ended) filmToHome();
+    }
+
+    function stopFilm() {
+        film.on = false;
+        [film.wide, film.tall, film.sound].forEach(m => m.pause());
+        film.el.classList.remove('on');
+    }
+
+    // the film's last frame is the colour bars; the live screen picks up from exactly there
+    function filmToHome() {
+        stopFilm();
+        phase = 'intro';
+        impactAt = clock - FILM_U;
+        body.classList.add('tv');
+        if (Screen.ok) glCanvas.classList.add('on'); else body.classList.add('no-gl');
+        Sound.tuneIn();
+        cues = [];
+        cue(clock + A.standby - FILM_U, () => standby.classList.add('on'));
+        cue(clock + A.melt - FILM_U, () => { Sound.melt(8); standby.classList.remove('on'); });
+        cue(clock + A.title - FILM_U, () => { Sound.glitch(9, 1.8); if (!Screen.ok) body.classList.add('show-title'); });
+        cue(clock + A.rooms - FILM_U, () => revealRooms());
+        cue(clock + A.done - FILM_U, () => arrive());
+        perf.hold = 1;
+    }
+
     /* ---------- loading, then straight into it ---------- */
     function load() {
         const bar = loader.querySelector('.ld-fill'), pct = loader.querySelector('.ld-pct');
         const start = performance.now(), minTime = 2600;
-        let ready = false;
+        let ready = false, filmDone = 0;
+        const intro = FILM
+            ? loadFilm(k => { filmDone = k; }).catch(e => {
+                console.warn('Chaos Matters: intro film unavailable, drawing it live', e);
+                svg = Scene.build(stage);
+                return Scene.prepare();
+            })
+            : (svg = Scene.build(stage), Scene.prepare());
         Promise.all([
             document.fonts.load('800 220px Syne').catch(() => {}),
             document.fonts.ready,
             new Promise(r => setTimeout(r, 50)),
-            Scene.prepare().catch(() => {}),
+            intro.catch(() => {}),
             Screen.ready.then(() => Screen.warm()),
             Space.ready.then(() => Space.warm()),
         ]).then(() => { makeTitle(); pickGlScale(); ready = true; });
         // the bar stutters forward like something being pulled off a slow disk
         let shown = 0;
         const tick = () => {
+            // the bar follows the real download when there is one, never faster than the minimum time
             const k = Math.min(1, (performance.now() - start) / minTime);
-            const target = ready ? k : Math.min(k, 0.9);
+            const target = ready ? k : Math.min(k, FILM ? Math.min(0.97, filmDone) : 0.9);
             if (Math.random() < 0.35) shown += (target - shown) * (0.25 + Math.random() * 0.5);
             if (k >= 1 && ready) shown = 1;
             bar.style.transform = `scaleX(${shown.toFixed(3)})`;
@@ -541,16 +639,22 @@
     function begin() {
         loader.classList.add('gone');
         body.classList.add('playing');
-        skipBtn.hidden = false;
+        skipBtn.hidden = RENDER;
         if (reduced) { jumpHome(); return; }
-        phase = 'intro';
         t0 = performance.now();
         state = {}; impactAt = Infinity; zoom = 1; snapshot = null;
+        if (film.ok) {
+            phase = 'film';
+            playFilm();
+            return;
+        }
+        phase = 'intro';
         const drawEnd = Scene.startDrawing(T.draw, T.slow);
         score(drawEnd);
     }
 
     function jumpHome() {
+        if (film.on) stopFilm();
         Sound.stopAll();
         Sound.pad(1.5);
         t0 = performance.now();
@@ -570,7 +674,6 @@
     function setup() {
         paper = makePaper();
         makeStatic();
-        svg = Scene.build(stage);
         Screen.init(glCanvas);
         Sound.init();
         pickGlScale();
@@ -606,7 +709,7 @@
         });
         addEventListener('pointerup', () => { if (title.drag) { title.drag = false; body.style.cursor = ''; } });
         addEventListener('pointercancel', () => { title.drag = false; });
-        addEventListener('resize', () => { pickGlScale(); sizeTitle(); measureRooms(); });
+        addEventListener('resize', () => { pickGlScale(); sizeTitle(); measureRooms(); if (film.on) pickCut(); });
 
         window.__chaosTitle = title;   // read by the test scripts
         requestAnimationFrame(t => { last = t; frame(t); });

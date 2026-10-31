@@ -6,7 +6,7 @@
    ========================================================== */
 
 const Sound = (() => {
-    let ctx, master, noiseBuf, natureBus, fxBus, echoIn;
+    let ctx, master, comp, noiseBuf, natureBus, fxBus, echoIn;
     let muted = false;
     let birdTimer = null;
     let live = new Set();          // everything that is playing, so it can all be stopped
@@ -17,7 +17,7 @@ const Sound = (() => {
         const AC = window.AudioContext || window.webkitAudioContext;
         if (!AC) return;
         ctx = new AC();
-        const comp = ctx.createDynamicsCompressor();
+        comp = ctx.createDynamicsCompressor();
         comp.threshold.value = -10;
         comp.ratio.value = 6;
         master = ctx.createGain();
@@ -66,6 +66,13 @@ const Sound = (() => {
         return s;
     }
     // nothing is scheduled while the browser is holding the audio back
+    /* a copy of everything we play, for recording the soundtrack */
+    function tap() {
+        const d = ctx.createMediaStreamDestination();
+        comp.connect(d);
+        return d.stream;
+    }
+
     function ok() { return !!ctx && ctx.state === 'running'; }
 
     /* call from a tap/click/key: lets the sound out; true if it was being held back */
@@ -581,5 +588,5 @@ const Sound = (() => {
         if (ok()) master.gain.setTargetAtTime(m ? 0 : 0.9, now(), 0.05);
     }
 
-    return { init, calm, hole, pulse, bang, spaceMusic, spaceStop, rewind, unlock, whenRunning, signalLoss, glitch, nature, cry, swoop, wingbeat, whistle, hush, boom, staticRush, tuneIn, melt, pad, hover, select, stopAll, setMuted, get muted() { return muted; } };
+    return { init, tap, calm, hole, pulse, bang, spaceMusic, spaceStop, rewind, unlock, whenRunning, signalLoss, glitch, nature, cry, swoop, wingbeat, whistle, hush, boom, staticRush, tuneIn, melt, pad, hover, select, stopAll, setMuted, get muted() { return muted; } };
 })();

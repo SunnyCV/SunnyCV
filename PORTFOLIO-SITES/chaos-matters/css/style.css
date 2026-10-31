@@ -369,3 +369,20 @@ body.exploring #rewind { cursor: pointer; }
 #osd.on { display: flex; animation: osdJitter 0.1s steps(2) infinite; }
 @keyframes osdJitter { 50% { transform: translate(2px, 1px); } }
 .osd-time { font-size: 0.7em; opacity: 0.85; }
+
+/* ---------- the intro film ---------- */
+#film {
+    position: fixed; inset: 0;
+    z-index: 3;
+    display: none;
+    background: #f3efe6;
+}
+#film.on { display: block; }
+#film video {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+}
+/* both cuts keep playing; only the one that fits the screen is shown */
+#filmTall, #film.tall #filmWide { visibility: hidden; }
+#film.tall #filmTall { visibility: visible; }

@@ -19,6 +19,13 @@
 <canvas id="gl" aria-hidden="true"></canvas>
 <canvas id="space" aria-hidden="true"></canvas>
 
+<!-- the intro film: a wide and a tall cut kept in sync with one soundtrack -->
+<div id="film" aria-hidden="true">
+    <video id="filmWide" muted playsinline preload="auto" disablepictureinpicture></video>
+    <video id="filmTall" muted playsinline preload="auto" disablepictureinpicture></video>
+</div>
+<audio id="filmSound" preload="auto"></audio>
+
 <div id="loader" role="progressbar" aria-label="Loading">
     <div class="ld-bar"><div class="ld-fill"></div></div>
     <div class="ld-pct">000</div>
