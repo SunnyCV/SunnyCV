@@ -182,12 +182,12 @@ vec4 nebula(vec3 ro, vec3 rd, float maxT, float expand) {
         vec3 p = ro + rd * t;
         vec3 q = p * 0.03 / expand + uSeed * 10.0;
         float n = fbm3(q);
-        float d = smoothstep(0.56, 0.84, n);
+        float d = smoothstep(0.53, 0.82, n);
         float stepLen = t * 0.3;
         if (d > 0.001) {
             float w = fbm3(q * 3.1 + 7.0);
             float dust = smoothstep(0.55, 0.72, fbm3(q * 1.7 + 11.0));
-            float dens = d * (0.3 + 0.9 * w) * stepLen * 0.011;
+            float dens = d * (0.3 + 0.9 * w) * stepLen * 0.015;
             float k = fract(noise3(q * 0.45 + 3.0) * 1.6 + uSeed.x * 0.37);
             vec3 c = nebulaColor(k, w) * (0.3 + 1.4 * w * w);
             acc += T * c * dens * 2.6 * (1.0 - dust * 0.9);
@@ -258,7 +258,7 @@ vec3 universe(vec3 ro, vec3 rd, vec2 uv, vec2 A) {
                     vec3 alb = planetSurface(N, h, kind);
                     vec3 atm = mix(vec3(0.35, 0.6, 1.0), vec3(1.0, 0.55, 0.35), h.z);
                     float rim = pow(1.0 - max(dot(N, -rd), 0.0), 3.0);
-                    vec3 pc = alb * (diff * 1.25 + 0.015) + atm * rim * (0.15 + diff * 0.9);
+                    vec3 pc = alb * (diff * 1.25 + 0.05) + atm * rim * (0.25 + diff * 0.9);   // a little starlight on the night side
                     float fade = (1.0 - smoothstep(55.0, 85.0, t)) * near;
                     tHit = t; hitCol = pc * fade + col * (1.0 - fade);
                 }
