@@ -17,6 +17,7 @@
 <div class="paper" aria-hidden="true"></div>
 <div id="stage" aria-hidden="true"></div>
 <canvas id="gl" aria-hidden="true"></canvas>
+<canvas id="space" aria-hidden="true"></canvas>
 
 <div id="loader" role="progressbar" aria-label="Loading">
     <div class="ld-bar"><div class="ld-fill"></div></div>
@@ -38,11 +39,19 @@
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5v13l8.5-6.5zM12.5 5.5v13l8.5-6.5z"/></svg>
 </button>
 
+<button type="button" id="rewind" aria-label="Rewind to the menu" title="Rewind" hidden>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11.5 5.5v13L3 12zM21 5.5v13L12.5 12z"/></svg>
+    <span>REW</span>
+</button>
+
+<div id="osd" aria-hidden="true"><span class="osd-rew">&#9664;&#9664; REW</span><span class="osd-time">01:23:20</span></div>
+
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script src="js/audio.js"></script>
 <script src="js/scene.js"></script>
 <script src="js/screen.js"></script>
+<script src="js/space.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

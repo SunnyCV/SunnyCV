@@ -7,7 +7,7 @@
 
 (() => {
     const ROOMS = [
-        'Velvet Gravity', 'Teeth of the Moon', 'Static Lullaby', 'Inside the Inkwell',
+        'Space', 'Teeth of the Moon', 'Static Lullaby', 'Inside the Inkwell',
         'Seventeen Suns', 'The Weight of Feathers', 'Echoes for Rent', 'Paper Thunder'
     ];
 
@@ -31,6 +31,10 @@
     let pointerActive = false, ripple = [0.5, 0.5, 99];
     let glScale = 1, roomsOn = false, hot = -1, hotAmt = 0;
     const hotPos = [0.5, 0.5];
+
+    // SPACE: the home page winds down (homeRate → 0) while the black hole takes it
+    let homeRate = 1, shaderT = 0, returning = null, spaceMusicOn = false;
+    const rewindBtn = $('#rewind'), osd = $('#osd'), spaceCanvas = $('#space');
 
     const title = { pos: [0.5, 0.5], vel: [0, 0], size: [0.5, 0.2], aspect: 0.5, drag: false, grab: [0, 0], hist: [] };
     const rooms = [];   // { li, a, label, x, y, w, h }
@@ -120,10 +124,10 @@
 
     function moveTitle(u) {
         const target = title.drag ? [pointer[0] - title.grab[0], pointer[1] - title.grab[1]] : wander(u - A.title);
-        const k = title.drag ? 0.22 : 0.0022, damp = title.drag ? 0.62 : 0.975;
+        const k = (title.drag ? 0.22 : 0.0022) * homeRate, damp = title.drag ? 0.62 : 0.975;
         for (let i = 0; i < 2; i++) {
             title.vel[i] = (title.vel[i] + (target[i] - title.pos[i]) * k) * damp;
-            title.pos[i] += title.vel[i];
+            title.pos[i] += title.vel[i] * homeRate;
             const half = title.size[i] / 2, lo = Math.min(0.5, half - 0.04), hi = Math.max(0.5, 1 - half + 0.04);
             if (title.pos[i] < lo) { title.pos[i] = lo; title.vel[i] *= -0.5; }
             if (title.pos[i] > hi) { title.pos[i] = hi; title.vel[i] *= -0.5; }
@@ -171,6 +175,7 @@
             a.addEventListener('blur', () => heat(false));
             a.addEventListener('click', e => {
                 e.preventDefault();
+                if (i === 0) { enterSpace(room); return; }
                 Sound.select();
                 ripple = [room.x / innerWidth, 1 - room.y / innerHeight, 0];
                 showToast(`Room ${String(i + 1).padStart(2, '0')} · “${name}” is still being dreamed up.`);
@@ -186,7 +191,7 @@
         const W = innerWidth, H = innerHeight;
         const cx = title.pos[0] * W, cy = (1 - title.pos[1]) * H;
         const tw = title.size[0] * W, th = title.size[1] * H;
-        const spin = u * 0.035;
+        const spin = shaderT * 0.035;
         rooms.forEach((r, i) => {
             if (!r.shown && u >= roomsAt + 0.12 + i * 0.12) {
                 r.shown = true;
@@ -206,8 +211,8 @@
                 ty = cy + (up ? -1 : 1) * (th * 0.5 + 56 + (up ? 1 - row : row - 2) * 58);
             }
             // each room trails the title a little differently, so the group moves like one loose body
-            tx += Math.sin(u * 0.7 + i * 1.7) * 6;
-            ty += Math.cos(u * 0.9 + i * 2.3) * 6;
+            tx += Math.sin(shaderT * 0.7 + i * 1.7) * 6;
+            ty += Math.cos(shaderT * 0.9 + i * 2.3) * 6;
             tx = Math.max(r.w / 2 + 8, Math.min(W - r.w / 2 - 8, tx));
             ty = Math.max(r.h / 2 + 8, Math.min(H - r.h / 2 - 40, ty));
             const k = Math.min(1, dt * (2.2 + i * 0.35));
@@ -219,13 +224,87 @@
     }
 
     let roomsAt = 0;
-    function revealRooms() {
+    function revealRooms(uNow = clock - impactAt) {
         roomsOn = true;
-        roomsAt = clock - impactAt;
+        roomsAt = uNow;
         menu.classList.add('on');
         measureRooms();
         rooms.forEach(r => { r.x = title.pos[0] * innerWidth; r.y = (1 - title.pos[1]) * innerHeight; r.shown = false; });  // burst out from the title
         Sound.glitch(6, 1.2);
+    }
+
+    /* ---------- SPACE: black hole → big bang → a universe to drift through ---------- */
+    function enterSpace(room) {
+        if (phase !== 'home' || !Space.ok) {
+            if (!Space.ok) showToast('Space needs WebGL, which this browser has turned off.');
+            return;
+        }
+        phase = 'space';
+        hot = -1;
+        rooms.forEach(r => r.li.classList.remove('hot'));
+        body.classList.add('space-on');
+        body.style.cursor = '';
+        Sound.select();
+        Sound.calm(Space.K.calm);
+        spaceMusicOn = false;
+        Space.start({
+            hole: [room.x / innerWidth, 1 - room.y / innerHeight],
+            frameSource: glCanvas,
+            onSwallow() {
+                Sound.hole(Space.K.bang - Space.K.form);
+                rooms.forEach(r => { r.sx = r.x; r.sy = r.y; });
+            },
+            onConsumed() { menu.classList.remove('on'); },
+            onPulse: k => Sound.pulse(k),
+            onBang() { Sound.bang(); body.classList.add('cosmos'); },
+            onReturn: returnHome,
+        });
+    }
+
+    // the rooms spiral into the hole one by one, stretched and dimmed as they fall
+    function suckRooms(o) {
+        const hx = o.hole[0] * innerWidth, hy = (1 - o.hole[1]) * innerHeight;
+        rooms.forEach((r, i) => {
+            const ts = Space.K.form + 0.4 + i * 0.42;
+            const p = smooth(ts, ts + 2.6, o.t);
+            const dx = r.sx - hx, dy = r.sy - hy;
+            const rad = Math.hypot(dx, dy) * Math.pow(1 - p, 1.6);
+            const ang = Math.atan2(dy, dx) + p * p * 5;
+            const x = hx + Math.cos(ang) * rad, y = hy + Math.sin(ang) * rad;
+            r.li.style.transform = `translate3d(${(x - r.w / 2).toFixed(1)}px, ${(y - r.h / 2).toFixed(1)}px, 0) rotate(${(ang * 57.3 + 90 * p).toFixed(1)}deg) scale(${(1 + p * 1.6).toFixed(3)}, ${Math.max(0.02, 1 - p).toFixed(3)})`;
+            r.li.style.opacity = (1 - Math.pow(p, 3)).toFixed(3);
+            r.li.style.filter = p > 0 ? `blur(${(p * 3).toFixed(1)}px)` : '';
+        });
+    }
+
+    function rewindSpace() {
+        if (phase !== 'space') return;
+        rewindBtn.hidden = true;
+        osd.classList.add('on');
+        Sound.rewind();
+        Sound.spaceStop(0.4);
+        Space.rewind();
+    }
+
+    // the tape drops back to the broadcast: static, the colour bars, then the menu builds itself again
+    function returnHome() {
+        Space.stop();
+        Sound.spaceStop(0.1);
+        osd.classList.remove('on');
+        body.classList.remove('space-on', 'cosmos', 'exploring');
+        rewindBtn.hidden = true;
+        phase = 'home';
+        homeRate = 1;
+        title.pos = [0.5, 0.5]; title.vel = [0, 0]; title.hist = [];
+        roomsOn = false;
+        menu.classList.remove('on');
+        rooms.forEach(r => {
+            r.li.classList.remove('in');
+            r.li.style.opacity = r.li.style.filter = '';
+            r.shown = false;
+        });
+        returning = { u: A.bars - 0.9, cued: {} };
+        Sound.staticRush();
     }
 
     let toastTimer;
@@ -322,8 +401,29 @@
             }
         }
 
-        if (clock >= T.impact || phase === 'home') {
-            const u = clock - impactAt;
+        let swallowed = false;
+        if (Space.active) {
+            const o = Space.step(dt);
+            homeRate = 1 - o.calm;
+            swallowed = o.t >= Space.K.form;
+            if (swallowed && !o.consumed) suckRooms(o);
+            if (o.t > Space.K.bang + 2.2 && !spaceMusicOn) { spaceMusicOn = true; Sound.spaceMusic(); }
+            if (o.explore && rewindBtn.hidden && !osd.classList.contains('on')) { rewindBtn.hidden = false; body.classList.add('exploring'); }
+            if (osd.classList.contains('on')) osd.querySelector('.osd-time').textContent = tape(o.t);
+        }
+
+        if (returning) {
+            const R = returning, c = R.cued;
+            R.u += dt * (R.u < A.bars + 1.4 ? 1 : R.u < A.done ? 3 : 1);
+            if (R.u >= A.bars && !c.bars) { c.bars = true; Sound.tuneIn(); }
+            if (R.u >= A.bars + 1.4 && !c.melt) { c.melt = true; Sound.melt(2.8); }
+            if (R.u >= A.title && !c.title) { c.title = true; Sound.glitch(9, 1.2); }
+            if (R.u >= A.rooms && !roomsOn) revealRooms(R.u);
+        }
+
+        if ((clock >= T.impact || phase === 'home' || phase === 'space') && !swallowed) {
+            const u = returning ? returning.u : clock - impactAt;
+            shaderT += dt * homeRate;
             mouse[0] += (pointer[0] - mouse[0]) * 0.08;
             mouse[1] += (pointer[1] - mouse[1]) * 0.08;
             ripple[2] += dt;
@@ -333,11 +433,11 @@
             const psy = Math.pow(smooth(A.melt, A.done, u), 1.5);
             const tAmt = smooth(A.title, A.title + 2.2, u);
             if (tAmt > 0) moveTitle(u);
-            if (roomsOn) placeRooms(dt, u);
+            if (roomsOn && !Space.active) placeRooms(dt, u);
 
             // stir the oil: the pointer pushes and tints it, the drifting title drags it along
             let field = null;
-            if (psy > 0) {
+            if (psy > 0 && homeRate > 0.05) {
                 const dx = pointer[0] - lastPointer[0], dy = pointer[1] - lastPointer[1];
                 const moving = Math.abs(dx) + Math.abs(dy) > 0.0004;
                 const cl = v => Math.max(-1, Math.min(1, v));
@@ -353,7 +453,7 @@
             // afterimages from about 0.12s and 0.3s ago, whatever the frame rate
             const h = title.hist, ago = d => h.find(p => u - p[2] <= d) || title.pos;
             Screen.render({
-                time: reduced ? clock * 0.25 : clock,
+                time: reduced ? shaderT * 0.25 : shaderT,
                 T: u, center, zoom,
                 static: smooth(8.8, 9.5, u) * (u < A.bars + 0.6 ? 1 : 0),
                 bars, roll: k * k * (u - A.bars) * 1.7, psy, dim: 0, field,
@@ -362,6 +462,13 @@
             });
         }
         requestAnimationFrame(frame);
+    }
+
+    // a VHS tape counter running backwards
+    function tape(t) {
+        const s = Math.max(0, 5000 - t * 900);
+        const p = n => String(Math.floor(n)).padStart(2, '0');
+        return `${p(s / 3600)}:${p((s / 60) % 60)}:${p(s % 60)}`;
     }
 
     /* ---------- loading, then straight into it ---------- */
@@ -444,6 +551,8 @@
         buildMenu();
 
         skipBtn.addEventListener('click', jumpHome);
+        rewindBtn.addEventListener('click', rewindSpace);
+        Space.init(spaceCanvas);
 
         // the enter click turns the sound on; this is a fallback if the browser still held it back
         const unlock = () => { if (Sound.unlock()) Sound.whenRunning(soundCatchUp); };
@@ -453,7 +562,7 @@
         addEventListener('pointermove', e => {
             [pointer[0], pointer[1]] = toUv(e);
             pointerActive = true;
-            if (phase === 'home') body.style.cursor = title.drag ? 'grabbing' : overTitle(pointer) ? 'grab' : '';
+            if (phase === 'home' && !returning) body.style.cursor = title.drag ? 'grabbing' : overTitle(pointer) ? 'grab' : '';
         });
         addEventListener('pointerdown', e => {
             if (phase !== 'home' || e.target.closest('a,button')) return;

@@ -391,6 +391,182 @@ const Sound = (() => {
         o.connect(og); o.start(t); o.stop(t + 0.85);
     }
 
+    /* ---------- SPACE ---------- */
+    /* everything winds down: the dream drone sinks and fades */
+    function calm(dur) {
+        if (!ok()) return;
+        const t = now();
+        if (N.pad) {
+            N.pad.gain.cancelScheduledValues(t);
+            N.pad.gain.setValueAtTime(N.pad.gain.value, t);
+            N.pad.gain.linearRampToValueAtTime(0, t + dur * 1.6);
+            delete N.pad;
+        }
+        // a tape-stop groan as the world slows
+        const o = osc('sawtooth', 160), lp = filter('lowpass', 900), g = gain(0, fxBus);
+        o.frequency.setValueAtTime(160, t);
+        o.frequency.exponentialRampToValueAtTime(30, t + dur);
+        lp.frequency.exponentialRampToValueAtTime(120, t + dur);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.06, t + 0.3);
+        g.gain.linearRampToValueAtTime(0, t + dur);
+        o.connect(lp).connect(g); o.start(t); o.stop(t + dur + 0.1);
+    }
+
+    /* the black hole: a sub rumble that climbs in pitch and weight */
+    function hole(dur) {
+        if (!ok()) return;
+        const t = now();
+        const g = gain(0, fxBus);
+        const n = noise(), lp = filter('lowpass', 70, 1.5);
+        lp.frequency.setValueAtTime(70, t);
+        lp.frequency.exponentialRampToValueAtTime(600, t + dur);
+        const sub = osc('sine', 28), sg = gain(0.6);
+        sub.frequency.setValueAtTime(28, t);
+        sub.frequency.exponentialRampToValueAtTime(90, t + dur);
+        const wob = gain(1);
+        const l = lfo(0.6, 0.4, wob.gain);
+        l.frequency.setValueAtTime(0.6, t);
+        l.frequency.exponentialRampToValueAtTime(9, t + dur);
+        n.connect(lp).connect(wob); sub.connect(sg).connect(wob); wob.connect(g);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.9, t + dur);
+        n.start(t); sub.start(t);
+        N.hole = { g, n, sub, l };
+    }
+
+    /* one beat of the collapsing seed */
+    function pulse(k) {
+        if (!ok()) return;
+        const t = now();
+        const o = osc('sine', 90 + 700 * k * k), g = gain(0, fxBus);
+        g.gain.setValueAtTime(0.35, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+        o.connect(g); o.start(t); o.stop(t + 0.1);
+        const c = noise(), hp = filter('highpass', 3000), cg = gain(0.15 + 0.2 * k, fxBus);
+        cg.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
+        c.connect(hp).connect(cg); c.start(t); c.stop(t + 0.04);
+    }
+
+    /* the big bang */
+    function bang() {
+        if (!ok()) return;
+        const t = now();
+        if (N.hole) {
+            const H = N.hole;
+            H.g.gain.cancelScheduledValues(t);
+            H.g.gain.setValueAtTime(0, t);
+            [H.n, H.sub, H.l].forEach(s => { try { s.stop(t + 0.05); } catch (e) { /* already stopped */ } });
+            delete N.hole;
+        }
+        const n = noise(), lp = filter('lowpass', 12000), sh = shaper(2.5), g = gain(1.2, fxBus);
+        lp.frequency.setValueAtTime(12000, t);
+        lp.frequency.exponentialRampToValueAtTime(50, t + 5);
+        g.gain.setValueAtTime(1.2, t);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 6);
+        n.connect(lp).connect(sh).connect(g);
+        g.connect(echoIn);
+        n.start(t); n.stop(t + 6.2);
+        const o = osc('sine', 120), og = gain(1.3, fxBus);
+        o.frequency.setValueAtTime(120, t);
+        o.frequency.exponentialRampToValueAtTime(22, t + 3);
+        og.gain.exponentialRampToValueAtTime(0.001, t + 3.5);
+        o.connect(og); o.start(t); o.stop(t + 3.6);
+        // a shimmer of new light rising out of it
+        const s1 = osc('triangle', 300), s1g = gain(0);
+        s1.frequency.setValueAtTime(300, t + 0.3);
+        s1.frequency.exponentialRampToValueAtTime(2400, t + 5);
+        s1g.gain.setValueAtTime(0, t + 0.3);
+        s1g.gain.linearRampToValueAtTime(0.05, t + 1.5);
+        s1g.gain.linearRampToValueAtTime(0, t + 5);
+        s1.connect(s1g).connect(echoIn); s1.start(t); s1.stop(t + 5.1);
+    }
+
+    /* drifting through space: a deep drone and slow, cool jazz chords on an electric piano */
+    const CHORDS = [
+        [146.8, 185.0, 220.0, 277.2, 329.6],   // Dmaj9
+        [123.5, 146.8, 185.0, 220.0, 277.2],   // Bm9
+        [98.0, 123.5, 146.8, 185.0, 277.2],    // Gmaj7#11-ish
+        [110.0, 146.8, 196.0, 246.9, 370.0],   // A13sus
+    ];
+    function keys(freqs, at) {
+        freqs.forEach((fq, i) => {
+            const st = at + i * 0.045 + Math.random() * 0.02;
+            const o = osc('sine', fq), b = osc('sine', fq * 2.01), g = gain(0), bg = gain(0.25);
+            g.connect(echoIn); g.connect(fxBus);
+            g.gain.setValueAtTime(0, st);
+            g.gain.linearRampToValueAtTime(0.045, st + 0.02);
+            g.gain.exponentialRampToValueAtTime(0.012, st + 1.5);
+            g.gain.exponentialRampToValueAtTime(0.0005, st + 6.5);
+            bg.gain.setValueAtTime(0.25, st);
+            bg.gain.exponentialRampToValueAtTime(0.001, st + 0.6);
+            const trem = lfo(4.5, 0.012, g.gain);
+            o.connect(g); b.connect(bg).connect(g);
+            o.start(st); b.start(st); o.stop(st + 6.6); b.stop(st + 6.6); trem.stop(st + 6.6);
+        });
+    }
+    function brush(at, loud) {
+        const n = noise(), hp = filter('bandpass', 7000, 0.7), g = gain(0, fxBus);
+        g.gain.setValueAtTime(0, at);
+        g.gain.linearRampToValueAtTime(0.025 * loud, at + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0005, at + 0.18);
+        n.connect(hp).connect(g); n.start(at); n.stop(at + 0.2);
+    }
+    function spaceMusic() {
+        if (!ok() || N.space) return;
+        const t = now();
+        const g = gain(0, fxBus), lp = filter('lowpass', 400);
+        [55, 82.4, 110].forEach((fq, i) => {
+            const o = osc(i ? 'sine' : 'triangle', fq);
+            lfo(0.05 + i * 0.02, fq * 0.003, o.frequency);
+            o.connect(lp); o.start(t);
+        });
+        lp.connect(g);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.12, t + 6);
+        let bar = 0;
+        const play = () => {
+            const at = now() + 0.05;
+            keys(CHORDS[bar % CHORDS.length], at);
+            // brushed ride in a lazy swing, coming and going
+            if (bar > 1) for (let b = 0; b < 4; b++) { brush(at + b * 1.75, 0.7); brush(at + b * 1.75 + 1.17, 0.4); }
+            bar++;
+        };
+        play();
+        N.space = { g, timer: setInterval(play, 7000) };
+    }
+    function spaceStop(fade = 0.6) {
+        if (!N.space) return;
+        clearInterval(N.space.timer);
+        if (ok()) N.space.g.gain.setTargetAtTime(0, now(), fade / 3);
+        delete N.space;
+    }
+
+    /* the VHS rewind: the motor whines up, the tape slips, then drops */
+    function rewind() {
+        if (!ok()) return;
+        const t = now();
+        const o = osc('sawtooth', 180), lp = filter('lowpass', 2400), g = gain(0, fxBus);
+        o.frequency.setValueAtTime(180, t);
+        o.frequency.exponentialRampToValueAtTime(1300, t + 1.2);
+        o.frequency.exponentialRampToValueAtTime(90, t + 1.45);
+        lfo(13, 25, o.frequency);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.09, t + 0.15);
+        g.gain.setValueAtTime(0.09, t + 1.2);
+        g.gain.linearRampToValueAtTime(0, t + 1.45);
+        o.connect(lp).connect(g); o.start(t); o.stop(t + 1.5);
+        const n = noise(), hp = filter('highpass', 2500), ng = gain(0, fxBus);
+        ng.gain.linearRampToValueAtTime(0.08, t + 0.2);
+        ng.gain.linearRampToValueAtTime(0, t + 1.45);
+        n.connect(hp).connect(ng); n.start(t); n.stop(t + 1.5);
+        // the clunk of the tape dropping
+        const c = osc('sine', 85), cg = gain(0, fxBus);
+        cg.gain.setValueAtTime(0.7, t + 1.42);
+        cg.gain.exponentialRampToValueAtTime(0.001, t + 1.7);
+        c.connect(cg); c.start(t + 1.42); c.stop(t + 1.75);
+    }
+
     /* ---------- control ---------- */
     function stopAll() {
         if (!ok()) return;
@@ -405,5 +581,5 @@ const Sound = (() => {
         if (ok()) master.gain.setTargetAtTime(m ? 0 : 0.9, now(), 0.05);
     }
 
-    return { init, unlock, whenRunning, signalLoss, glitch, nature, cry, swoop, wingbeat, whistle, hush, boom, staticRush, tuneIn, melt, pad, hover, select, stopAll, setMuted, get muted() { return muted; } };
+    return { init, calm, hole, pulse, bang, spaceMusic, spaceStop, rewind, unlock, whenRunning, signalLoss, glitch, nature, cry, swoop, wingbeat, whistle, hush, boom, staticRush, tuneIn, melt, pad, hover, select, stopAll, setMuted, get muted() { return muted; } };
 })();
