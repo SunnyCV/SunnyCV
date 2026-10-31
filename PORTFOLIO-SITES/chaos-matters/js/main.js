@@ -88,7 +88,8 @@
 
     /* Resolution follows the device: start from a pixel budget, then step down while frames
        run slow and back up when there is headroom. The canvas is scaled up smoothly by CSS. */
-    const perf = { q: 1, acc: 0, n: 0, good: 0, hold: 0 };
+    const pinQ = (location.search.match(/[?&]q=([\d.]+)/) || [])[1];
+    const perf = { q: pinQ ? +pinQ : 1, acc: 0, n: 0, good: 0, hold: 0 };
     function pickGlScale() {
         const dpr = RENDER ? devicePixelRatio : Math.min(devicePixelRatio || 1, 1.5);
         const budget = RENDER ? 1e9 : 4.2e6 * perf.q * perf.q, px = innerWidth * innerHeight * dpr * dpr;
@@ -97,7 +98,7 @@
         Space.setQuality(perf.q);
     }
     function adapt(raw) {
-        if (RENDER) return;
+        if (RENDER || pinQ) return;
         if (perf.hold > 0) { perf.hold -= raw; return; }     // ignore the spike right after a scene change
         perf.acc += raw; perf.n++;
         if (perf.acc < 0.5) return;
@@ -135,7 +136,7 @@
     function buildTitle() {
         const words = '<span>Chaos</span><span>Matters</span>';
         const box = $('#title');
-        box.innerHTML = ['t-shadow', 't-red', 't-blue', 't-main', 't-slice', 't-slice', 't-slice']
+        box.innerHTML = ['t-shadow', 't-red', 't-blue', 't-main', 't-slice', 't-slice', 't-slice', 't-slice', 't-slice']
             .map(c => `<div class="t-layer ${c}">${words}</div>`).join('');
         titleEls.box = box;
         titleEls.slices = [...box.querySelectorAll('.t-slice')];
@@ -170,12 +171,15 @@
             titleEls.lastGlitch = shaderT;
             const on = amt >= 1 || Math.random() < amt;
             titleEls.box.style.opacity = titleEls.g1.style.opacity = titleEls.g2.style.opacity = on ? '' : '0';
-            const p = 0.3 + 0.45 * (1 - amt);
+            const p = 0.32 + 0.45 * (1 - amt);
+            const w = title.size[0] * innerWidth;
             titleEls.slices.forEach(sl => {
                 if (Math.random() < p) {
-                    const top = Math.random() * 90, h = 2 + Math.random() * 9;
+                    // a torn band of the picture, pushed sideways; some carry a colour cast
+                    const top = Math.random() * 92, h = 1.5 + Math.random() * 8;
                     sl.style.clipPath = `inset(${top.toFixed(1)}% 0 ${(100 - top - h).toFixed(1)}% 0)`;
-                    sl.style.transform = `translateX(${((Math.random() - 0.5) * 0.06 * title.size[0] * innerWidth * 4).toFixed(1)}px)`;
+                    sl.style.transform = `translateX(${((Math.random() - 0.5) * 0.32 * w).toFixed(1)}px)`;
+                    sl.className = 't-layer t-slice' + (Math.random() < 0.35 ? (Math.random() < 0.5 ? ' warm' : ' cold') : '');
                     sl.style.opacity = '1';
                 } else sl.style.opacity = '0';
             });
