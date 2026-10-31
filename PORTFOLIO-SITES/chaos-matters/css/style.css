@@ -408,21 +408,21 @@ body.swallow .t-ghost, body.space-on .t-ghost { display: none; }
         var(--sx) var(--sy) 0 rgba(0,0,0,0.45);
 }
 /* the colour fringes of a misaligned picture tube */
-.t-red  { color: #ff1a1a; transform: translateX(var(--fx)); mix-blend-mode: screen; }
-.t-blue { color: #1a3cff; transform: translateX(calc(var(--fx) * -1)); mix-blend-mode: screen; }
+.t-red  { color: #ff2a1a; transform: translateX(var(--fx)); text-shadow: calc(var(--fx) * -0.5) 0 0 #ffe01a; }
+.t-blue { color: #1a46ff; transform: translateX(calc(var(--fx) * -1)); text-shadow: calc(var(--fx) * 0.5) 0 0 #1ae8ff; }
 /* the letters themselves are made of moving static and scanlines */
 .t-main, .t-slice {
     color: transparent;
     background:
-        repeating-linear-gradient(0deg, rgba(0,0,0,0.13) 0 1px, transparent 1px 3px),
-        linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)),
+        repeating-linear-gradient(0deg, rgba(0,0,0,0.16) 0 1px, transparent 1px 3px),
+        linear-gradient(rgba(255,255,255,0.42), rgba(255,255,255,0.42)),
         var(--static);
-    background-size: auto, auto, 96px 96px;
+    background-size: auto, auto, 48px 48px;
     -webkit-background-clip: text;
     background-clip: text;
     animation: tStatic 0.14s steps(3) infinite;
 }
-@keyframes tStatic { to { background-position: 0 3px, 0 0, 96px 41px; } }
+@keyframes tStatic { to { background-position: 0 3px, 0 0, 48px 21px; } }
 .t-slice { opacity: 0; }
 /* afterimages: where the title was a moment ago, glowing and shifting hue */
 .t-ghost .t-layer { mix-blend-mode: screen; }

@@ -170,7 +170,7 @@
             titleEls.lastGlitch = shaderT;
             const on = amt >= 1 || Math.random() < amt;
             titleEls.box.style.opacity = titleEls.g1.style.opacity = titleEls.g2.style.opacity = on ? '' : '0';
-            const p = 0.12 + 0.45 * (1 - amt);
+            const p = 0.3 + 0.45 * (1 - amt);
             titleEls.slices.forEach(sl => {
                 if (Math.random() < p) {
                     const top = Math.random() * 90, h = 2 + Math.random() * 9;
