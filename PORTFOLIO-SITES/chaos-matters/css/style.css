@@ -248,20 +248,6 @@ body.tv .paper { display: none; }
 }
 body.home #hint { opacity: 1; }
 
-/* without WebGL the title is plain HTML */
-.fallback-title {
-    position: fixed; left: 50%; top: 50%;
-    z-index: 3;
-    transform: translate(-50%, -50%);
-    font-family: var(--font-display); font-weight: 800;
-    font-size: clamp(44px, 9vw, 130px); line-height: 0.86;
-    text-transform: uppercase; text-align: center;
-    color: #fff;
-    text-shadow: -3px 0 var(--magenta), 3px 0 var(--cyan), 0 8px 40px rgba(0,0,0,0.4);
-    display: none;
-    pointer-events: none;
-}
-body.show-title .fallback-title { display: block; }
 
 /* ---------- the only control: skip ---------- */
 #skip {
@@ -386,3 +372,84 @@ body.exploring #rewind { cursor: pointer; }
 /* both cuts keep playing; only the one that fits the screen is shown */
 #filmTall, #film.tall #filmWide { visibility: hidden; }
 #film.tall #filmTall { visibility: visible; }
+
+/* ---------- the title: live text, glitched like a failing broadcast ---------- */
+#title, .t-ghost {
+    position: fixed; left: 0; top: 0;
+    z-index: 3;
+    width: var(--tw); height: var(--th);
+    pointer-events: none;
+    display: none;
+    will-change: transform;
+}
+body.titled #title, body.titled .t-ghost { display: block; }
+body.swallow .t-ghost, body.space-on .t-ghost { display: none; }
+.t-layer {
+    position: absolute; inset: 0;
+    padding-top: var(--pad);
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--fs);
+    line-height: 0.86;
+    letter-spacing: var(--ls);
+    text-transform: uppercase;
+    text-align: center;
+    white-space: nowrap;
+}
+.t-layer span { display: block; }
+/* a dark rim around the letters and a soft shadow keep it readable on any colour */
+.t-shadow {
+    color: rgba(0,0,0,0.72);
+    text-shadow:
+        var(--rim) 0 0 rgba(0,0,0,0.72), calc(var(--rim) * -1) 0 0 rgba(0,0,0,0.72),
+        0 var(--rim) 0 rgba(0,0,0,0.72), 0 calc(var(--rim) * -1) 0 rgba(0,0,0,0.72),
+        var(--rim) var(--rim) 0 rgba(0,0,0,0.72), calc(var(--rim) * -1) var(--rim) 0 rgba(0,0,0,0.72),
+        var(--rim) calc(var(--rim) * -1) 0 rgba(0,0,0,0.72), calc(var(--rim) * -1) calc(var(--rim) * -1) 0 rgba(0,0,0,0.72),
+        var(--sx) var(--sy) 0 rgba(0,0,0,0.45);
+}
+/* the colour fringes of a misaligned picture tube */
+.t-red  { color: #ff1a1a; transform: translateX(var(--fx)); mix-blend-mode: screen; }
+.t-blue { color: #1a3cff; transform: translateX(calc(var(--fx) * -1)); mix-blend-mode: screen; }
+/* the letters themselves are made of moving static and scanlines */
+.t-main, .t-slice {
+    color: transparent;
+    background:
+        repeating-linear-gradient(0deg, rgba(0,0,0,0.13) 0 1px, transparent 1px 3px),
+        linear-gradient(rgba(255,255,255,0.7), rgba(255,255,255,0.7)),
+        var(--static);
+    background-size: auto, auto, 96px 96px;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: tStatic 0.14s steps(3) infinite;
+}
+@keyframes tStatic { to { background-position: 0 3px, 0 0, 96px 41px; } }
+.t-slice { opacity: 0; }
+/* afterimages: where the title was a moment ago, glowing and shifting hue */
+.t-ghost .t-layer { mix-blend-mode: screen; }
+#tg1 .t-layer { color: rgba(255,51,191,0.24); animation: tHue 6s linear infinite; }
+#tg2 .t-layer { color: rgba(51,230,255,0.15); animation: tHue 4.6s linear infinite reverse; }
+@keyframes tHue { to { filter: hue-rotate(360deg); } }
+
+/* fine film grain over the dream, at full resolution whatever the backdrop's resolution */
+#grain {
+    position: fixed; inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    opacity: 0;
+    background: var(--static) 0 0 / 96px 96px;
+    mix-blend-mode: overlay;
+    animation: grainMove 0.2s steps(4) infinite;
+}
+@keyframes grainMove { to { background-position: 96px 57px; } }
+
+#fps {
+    position: fixed; left: 10px; top: 10px;
+    z-index: 30;
+    display: none;
+    padding: 4px 8px;
+    background: rgba(0,0,0,0.7);
+    color: #7dff9a;
+    font: 600 11px var(--font-mono);
+    pointer-events: none;
+}
+#fps:not(:empty) { display: block; }

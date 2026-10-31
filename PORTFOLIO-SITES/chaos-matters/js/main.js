@@ -41,7 +41,8 @@
 
     // SPACE: the home page winds down (homeRate → 0) while the black hole takes it
     let homeRate = 1, shaderT = 0, returning = null, spaceMusicOn = false;
-    const rewindBtn = $('#rewind'), osd = $('#osd'), spaceCanvas = $('#space');
+    const rewindBtn = $('#rewind'), osd = $('#osd'), spaceCanvas = $('#space'), grainEl = $('#grain');
+    const fpsEl = /[?&]fps/.test(location.search) ? $('#fps') : null;   // ?fps shows a live frame counter
 
     const title = { pos: [0.5, 0.5], vel: [0, 0], size: [0.5, 0.2], aspect: 0.5, drag: false, grab: [0, 0], hist: [] };
     const rooms = [];   // { li, a, label, x, y, w, h }
@@ -90,7 +91,7 @@
     const perf = { q: 1, acc: 0, n: 0, good: 0, hold: 0 };
     function pickGlScale() {
         const dpr = RENDER ? devicePixelRatio : Math.min(devicePixelRatio || 1, 1.5);
-        const budget = RENDER ? 1e9 : 1.4e6 * perf.q * perf.q, px = innerWidth * innerHeight * dpr * dpr;
+        const budget = RENDER ? 1e9 : 4.2e6 * perf.q * perf.q, px = innerWidth * innerHeight * dpr * dpr;
         glScale = px > budget ? dpr * Math.sqrt(budget / px) : dpr;
         Screen.resize(glScale);
         Space.setQuality(perf.q);
@@ -102,9 +103,9 @@
         if (perf.acc < 0.5) return;
         const avg = perf.acc / perf.n;
         perf.acc = perf.n = 0;
-        if (avg > 1 / 45 && perf.q > 0.35) {
+        if (avg > 1 / 40 && perf.q > 0.35) {
             perf.q = Math.max(0.35, perf.q * 0.8); perf.good = 0; perf.hold = 0.4; pickGlScale();
-        } else if (avg < 1 / 57 && perf.q < 1) {
+        } else if (avg < 1 / 55 && perf.q < 1) {
             if (++perf.good >= 4) { perf.q = Math.min(1, perf.q * 1.12); perf.good = 0; perf.hold = 0.4; pickGlScale(); }
         } else perf.good = 0;
     }
@@ -121,14 +122,64 @@
         c.height = Math.ceil(lh * 2 + pad * 2);
         x.font = font;
         if ('letterSpacing' in x) x.letterSpacing = '-4px';
-        x.fillStyle = '#fff';
-        x.textAlign = 'center';
-        x.textBaseline = 'middle';
-        x.fillText('CHAOS', c.width / 2, pad + lh * 0.5 + 8);
-        x.fillText('MATTERS', c.width / 2, pad + lh * 1.5 + 4);
         title.aspect = c.height / c.width;
-        Screen.setTitle(c);
+        title.canvasW = c.width;
+        buildTitle();
         sizeTitle();
+    }
+
+    /* ---------- the title as live text: always sharp, glitched with CSS ----------
+       Layers (back to front): shadow + dark rim, red and blue fringes, the static-filled
+       letters and a few displaced slices. Two afterimages trail behind where it has been. */
+    const titleEls = {};
+    function buildTitle() {
+        const words = '<span>Chaos</span><span>Matters</span>';
+        const box = $('#title');
+        box.innerHTML = ['t-shadow', 't-red', 't-blue', 't-main', 't-slice', 't-slice', 't-slice']
+            .map(c => `<div class="t-layer ${c}">${words}</div>`).join('');
+        titleEls.box = box;
+        titleEls.slices = [...box.querySelectorAll('.t-slice')];
+        titleEls.g1 = $('#tg1'); titleEls.g2 = $('#tg2');
+        titleEls.g1.innerHTML = titleEls.g2.innerHTML = `<div class="t-layer">${words}</div>`;
+        titleEls.lastGlitch = 0;
+        titleEls.size = 0;
+    }
+
+    function styleTitle() {
+        const wPx = title.size[0] * innerWidth, k = wPx / title.canvasW;
+        const css = `--tw:${wPx.toFixed(1)}px;--th:${(wPx * title.aspect).toFixed(1)}px;--fs:${(220 * k).toFixed(2)}px;--pad:${(40 * k).toFixed(2)}px;--ls:${(-4 * k).toFixed(2)}px;--fx:${(0.005 * innerWidth).toFixed(1)}px;--rim:${Math.max(1.5, 0.0035 * innerWidth).toFixed(1)}px;--sx:${(0.004 * innerWidth).toFixed(1)}px;--sy:${(0.009 * innerHeight).toFixed(1)}px`;
+        [titleEls.box, titleEls.g1, titleEls.g2].forEach(e => e.style.cssText = css);
+        titleEls.size = wPx;
+    }
+
+    const place = (e, p) => {
+        const x = p[0] * innerWidth, y = (1 - p[1]) * innerHeight;
+        e.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) translate(-50%, -50%)`;
+    };
+    function drawTitle(amt, g1, g2) {
+        if (!titleEls.box) return;
+        if (Math.abs(titleEls.size - title.size[0] * innerWidth) > 0.5) styleTitle();
+        const show = amt > 0;
+        body.classList.toggle('titled', show);
+        if (!show || Space.active) return;     // inside SPACE the black hole moves it
+        place(titleEls.box, title.pos);
+        place(titleEls.g1, g1);
+        place(titleEls.g2, g2);
+        // glitch at 14 frames a second, like the shader did: it flickers on, and slices of it jump sideways
+        if (shaderT - titleEls.lastGlitch > 1 / 14) {
+            titleEls.lastGlitch = shaderT;
+            const on = amt >= 1 || Math.random() < amt;
+            titleEls.box.style.opacity = titleEls.g1.style.opacity = titleEls.g2.style.opacity = on ? '' : '0';
+            const p = 0.12 + 0.45 * (1 - amt);
+            titleEls.slices.forEach(sl => {
+                if (Math.random() < p) {
+                    const top = Math.random() * 90, h = 2 + Math.random() * 9;
+                    sl.style.clipPath = `inset(${top.toFixed(1)}% 0 ${(100 - top - h).toFixed(1)}% 0)`;
+                    sl.style.transform = `translateX(${((Math.random() - 0.5) * 0.06 * title.size[0] * innerWidth * 4).toFixed(1)}px)`;
+                    sl.style.opacity = '1';
+                } else sl.style.opacity = '0';
+            });
+        }
     }
 
     const wide = () => innerWidth > 760;
@@ -278,6 +329,8 @@
             onSwallow() {
                 Sound.hole(Space.K.bang - Space.K.form);
                 rooms.forEach(r => { r.sx = r.x; r.sy = r.y; });
+                title.sx = title.pos[0] * innerWidth; title.sy = (1 - title.pos[1]) * innerHeight;
+                body.classList.add('swallow');
             },
             onConsumed() { menu.classList.remove('on'); },
             onPulse: k => Sound.pulse(k),
@@ -289,6 +342,14 @@
     // the rooms spiral into the hole one by one, stretched and dimmed as they fall
     function suckRooms(o) {
         const hx = o.hole[0] * innerWidth, hy = (1 - o.hole[1]) * innerHeight;
+        if (titleEls.box) {
+            const p = smooth(Space.K.form + 0.2, Space.K.form + 3.4, o.t);
+            const dx = title.sx - hx, dy = title.sy - hy;
+            const rad = Math.hypot(dx, dy) * Math.pow(1 - p, 1.5), ang = Math.atan2(dy, dx) + p * p * 4;
+            titleEls.box.style.transform = `translate3d(${(hx + Math.cos(ang) * rad).toFixed(1)}px, ${(hy + Math.sin(ang) * rad).toFixed(1)}px, 0) translate(-50%, -50%) rotate(${(ang * 57.3 * p).toFixed(1)}deg) scale(${(1 - p * 0.95).toFixed(3)})`;
+            titleEls.box.style.opacity = (1 - Math.pow(p, 3)).toFixed(3);
+            titleEls.box.style.filter = p > 0 ? `blur(${(p * 4).toFixed(1)}px)` : '';
+        }
         rooms.forEach((r, i) => {
             const ts = Space.K.form + 0.4 + i * 0.42;
             const p = smooth(ts, ts + 2.6, o.t);
@@ -321,6 +382,8 @@
         phase = 'home';
         homeRate = 1;
         title.pos = [0.5, 0.5]; title.vel = [0, 0]; title.hist = [];
+        body.classList.remove('swallow');
+        if (titleEls.box) titleEls.box.style.filter = '';
         roomsOn = false;
         menu.classList.remove('on');
         rooms.forEach(r => {
@@ -386,7 +449,7 @@
         cue(T.impact + A.bars, () => Sound.tuneIn());
         cue(T.impact + A.standby, () => standby.classList.add('on'));
         cue(T.impact + A.melt, () => { Sound.melt(8); standby.classList.remove('on'); });
-        cue(T.impact + A.title, () => { Sound.glitch(9, 1.8); if (!Screen.ok) body.classList.add('show-title'); });
+        cue(T.impact + A.title, () => { Sound.glitch(9, 1.8); });
         cue(T.impact + A.rooms, () => revealRooms());
         cue(T.impact + A.done, () => arrive());
     }
@@ -410,8 +473,13 @@
     /* ---------- frame loop ---------- */
     const smooth = (a, b, x) => { const k = Math.min(1, Math.max(0, (x - a) / (b - a))); return k * k * (3 - 2 * k); };
 
+    let fpsN = 0, fpsT = 0;
     function frame(now) {
         const raw = (now - last) / 1000 || 0;
+        if (fpsEl && (fpsN++, (fpsT += raw) >= 0.5)) {
+            fpsEl.textContent = `${Math.round(fpsN / fpsT)} fps · quality ${Math.round(perf.q * 100)}%`;
+            fpsN = 0; fpsT = 0;
+        }
         const dt = Math.min(0.05, raw);
         last = now;
         clock = (now - t0) / 1000;
@@ -492,8 +560,11 @@
                 static: smooth(8.8, 9.5, u) * (u < A.bars + 0.6 ? 1 : 0),
                 bars, roll: k * k * (u - A.bars) * 1.7, psy, dim: 0, field,
                 mouse, ripple, hot: [hotPos[0], hotPos[1], hotAmt],
-                title: { pos: title.pos, size: title.size, amt: tAmt, fade: 1, g1: ago(0.12), g2: ago(0.3) }
+                title: { pos: title.pos, size: title.size, amt: 0, fade: 1, g1: title.pos, g2: title.pos },
+                grain: 1 - psy
             });
+            drawTitle(tAmt, ago(0.12), ago(0.3));
+            grainEl.style.opacity = (psy * 0.07).toFixed(3);
         }
         requestAnimationFrame(frame);
     }
@@ -578,7 +649,7 @@
         cues = [];
         cue(clock + A.standby - FILM_U, () => standby.classList.add('on'));
         cue(clock + A.melt - FILM_U, () => { Sound.melt(8); standby.classList.remove('on'); });
-        cue(clock + A.title - FILM_U, () => { Sound.glitch(9, 1.8); if (!Screen.ok) body.classList.add('show-title'); });
+        cue(clock + A.title - FILM_U, () => { Sound.glitch(9, 1.8); });
         cue(clock + A.rooms - FILM_U, () => revealRooms());
         cue(clock + A.done - FILM_U, () => arrive());
         perf.hold = 1;
@@ -664,7 +735,7 @@
         stage.style.visibility = 'hidden';
         standby.classList.remove('on');
         body.classList.add('tv', 'playing');
-        if (Screen.ok) glCanvas.classList.add('on'); else body.classList.add('no-gl', 'show-title');
+        if (Screen.ok) glCanvas.classList.add('on'); else body.classList.add('no-gl');
         loader.classList.add('gone');
         if (!roomsOn) revealRooms();
         arrive();

@@ -73,6 +73,8 @@ uniform vec2  uTP;       // title centre (uv)
 uniform vec2  uTS;       // title size (uv)
 uniform float uTA;       // title presence 0..1 (flickers in)
 uniform float uTF;       // title fade (when the doors are open)
+uniform sampler2D uBarsTex;
+uniform float uGrain;    // fine grain in the shader (the menu gets it from a full-resolution layer instead)
 uniform vec2  uG1;       // title ghosts (where it was)
 uniform vec2  uG2;
 
@@ -150,37 +152,8 @@ vec4 marchCloud(vec2 w, float s, float jit) {
     return vec4(acc, T);
 }
 
-vec3 bars(vec2 uv) {
-    float x = fract(uv.x), y = 1.0 - fract(uv.y);
-    float i = floor(x * 7.0);
-    if (y < 0.67) {
-        if (i < 0.5) return vec3(0.75);
-        if (i < 1.5) return vec3(0.75, 0.75, 0.0);
-        if (i < 2.5) return vec3(0.0, 0.75, 0.75);
-        if (i < 3.5) return vec3(0.0, 0.75, 0.0);
-        if (i < 4.5) return vec3(0.75, 0.0, 0.75);
-        if (i < 5.5) return vec3(0.75, 0.0, 0.0);
-        return vec3(0.0, 0.0, 0.75);
-    }
-    if (y < 0.75) {
-        if (i < 0.5) return vec3(0.0, 0.0, 0.75);
-        if (i < 1.5) return vec3(0.075);
-        if (i < 2.5) return vec3(0.75, 0.0, 0.75);
-        if (i < 3.5) return vec3(0.075);
-        if (i < 4.5) return vec3(0.0, 0.75, 0.75);
-        if (i < 5.5) return vec3(0.075);
-        return vec3(0.75);
-    }
-    float b = x * 7.0;
-    if (b < 1.25) return vec3(0.0, 0.13, 0.3);
-    if (b < 2.5)  return vec3(1.0);
-    if (b < 3.75) return vec3(0.2, 0.0, 0.42);
-    if (b < 5.0)  return vec3(0.075);
-    if (b < 5.333) return vec3(0.03);
-    if (b < 5.667) return vec3(0.075);
-    if (b < 6.0)  return vec3(0.11);
-    return vec3(0.075);
-}
+// SMPTE colour bars, read from a pre-drawn image (same colours and edges as computing them)
+vec3 bars(vec2 uv) { return texture2D(uBarsTex, fract(uv)).rgb; }
 
 vec3 hueShift(vec3 c, float a) {
     const vec3 k = vec3(0.57735);
@@ -394,12 +367,12 @@ void main() {
         col = mix(col, tc, max(aR, max(aG, aB)) * on);
     }
 
-    col += (grain - 0.5) * 0.04;
+    col += (grain - 0.5) * 0.04 * uGrain;
     gl_FragColor = vec4(col, 1.0);
 }`;
 
     let ready = Promise.resolve(false);
-    let gl, prog, fprog, tex, titleTex, noiseTex, canvas, U = {}, FU = {}, ok = false;
+    let gl, prog, fprog, tex, titleTex, barsTex, noiseTex, canvas, U = {}, FU = {}, ok = false;
     let fieldTex = [], fieldFb = [], fw = 0, fh = 0, ping = 0;
 
     /* Shaders compile in the background (KHR_parallel_shader_compile where the browser has it),
@@ -466,13 +439,14 @@ void main() {
 
     function locate() {
         ['uScene', 'uField', 'uTitle', 'uNoise', 'uRes', 'uTime', 'uT', 'uCenter', 'uZoom', 'uStatic', 'uBars', 'uRoll', 'uPsy', 'uDim',
-         'uMouse', 'uRipple', 'uHot', 'uTP', 'uTS', 'uTA', 'uTF', 'uG1', 'uG2'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
+         'uMouse', 'uRipple', 'uHot', 'uTP', 'uTS', 'uTA', 'uTF', 'uG1', 'uG2', 'uBarsTex', 'uGrain'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
         ['uPrev', 'uTexel', 'uAsp', 'uP1', 'uV1', 'uP2', 'uV2'].forEach(n => FU[n] = gl.getUniformLocation(fprog, n));
     }
 
     function setup() {
         tex = makeTex(1, 1, new Uint8Array([243, 239, 230, 255]));
         titleTex = makeTex(1, 1, new Uint8Array([0, 0, 0, 0]));
+        barsTex = makeBars();
         // value noise; G holds R shifted by (37,17) so one fetch gives two z-slices
         const nz = new Uint8Array(256 * 256 * 4), R = new Uint8Array(256 * 256);
         for (let i = 0; i < R.length; i++) R[i] = Math.random() * 256;
@@ -498,6 +472,30 @@ void main() {
         gl.bindTexture(gl.TEXTURE_2D, tex);
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
+    }
+
+    /* the colour bars as an image: 7 columns of 256px; bands at 67% and 75% of the height */
+    function makeBars() {
+        const W = 1792, H = 400, c = document.createElement('canvas');
+        c.width = W; c.height = H;
+        const x = c.getContext('2d');
+        const rgb = (r, g, b) => `rgb(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(b * 255)})`;
+        const top = [[.75, .75, .75], [.75, .75, 0], [0, .75, .75], [0, .75, 0], [.75, 0, .75], [.75, 0, 0], [0, 0, .75]];
+        const mid = [[0, 0, .75], [.075, .075, .075], [.75, 0, .75], [.075, .075, .075], [0, .75, .75], [.075, .075, .075], [.75, .75, .75]];
+        top.forEach((c3, i) => { x.fillStyle = rgb(...c3); x.fillRect(i * 256, 0, 256, 268); });
+        mid.forEach((c3, i) => { x.fillStyle = rgb(...c3); x.fillRect(i * 256, 268, 256, 32); });
+        [[0, 1.25, [0, .13, .3]], [1.25, 2.5, [1, 1, 1]], [2.5, 3.75, [.2, 0, .42]], [3.75, 5, [.075, .075, .075]],
+         [5, 5.333, [.03, .03, .03]], [5.333, 5.667, [.075, .075, .075]], [5.667, 6, [.11, .11, .11]], [6, 7, [.075, .075, .075]]]
+            .forEach(([a, b, c3]) => { x.fillStyle = rgb(...c3); x.fillRect(Math.round(a * 256), 300, Math.round(b * 256) - Math.round(a * 256), 100); });
+        const t = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, t);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, c);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        return t;
     }
 
     function setTitle(source) {
@@ -561,11 +559,14 @@ void main() {
         gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, fieldTex[ping]);
         gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, titleTex);
         gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, noiseTex);
+        gl.activeTexture(gl.TEXTURE4); gl.bindTexture(gl.TEXTURE_2D, barsTex);
         gl.activeTexture(gl.TEXTURE0);
         gl.uniform1i(U.uScene, 0);
         gl.uniform1i(U.uField, 1);
         gl.uniform1i(U.uTitle, 2);
         gl.uniform1i(U.uNoise, 3);
+        gl.uniform1i(U.uBarsTex, 4);
+        gl.uniform1f(U.uGrain, u.grain == null ? 1 : u.grain);
         gl.uniform2f(U.uRes, canvas.width, canvas.height);
         gl.uniform1f(U.uTime, u.time);
         gl.uniform1f(U.uT, u.T);
