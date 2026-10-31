@@ -32,6 +32,7 @@ uniform float uBang;          // seconds since the big bang (< 0 before)
 uniform vec3  uCam;
 uniform mat3  uRot;
 uniform vec3  uSeed;
+uniform vec3  uSpawn;         // the visitor starts in a clear patch of sky
 uniform vec3  uAura;          // xy = pointer, z = strength
 uniform float uVhs;           // rewind: tape distortion
 uniform float uRoll;          // rewind: vertical roll
@@ -70,6 +71,7 @@ vec3 blackHole(vec2 uv, vec2 A) {
         bg = vec3(texture2D(uFrame, sp + vec2(ca, 0.0)).r, texture2D(uFrame, sp).g, texture2D(uFrame, sp - vec2(ca, 0.0)).b);
         // light climbing out of the well is reddened and dimmed
         float well = smoothstep(Rs * 1.0, Rs * 3.5, r);
+        bg *= smoothstep(0.0, 0.06, min(sp.x, 1.0 - sp.x)) * smoothstep(0.0, 0.06, min(sp.y, 1.0 - sp.y));
         bg *= mix(vec3(0.9, 0.35, 0.15), vec3(1.0), well) * (0.25 + 0.75 * well);
     }
     vec3 col = bg;
@@ -131,10 +133,10 @@ vec3 starField(vec3 rd) {
         vec3 h = hash33(id);
         vec3 o = (h - 0.5) * 0.7;
         float d = length(f - o);
-        float on = step(0.86 - float(i) * 0.04, h.x);
+        float on = step(0.8 - float(i) * 0.05, h.x);
         float tw = 0.75 + 0.25 * sin(uTime * (1.0 + h.z * 3.0) + h.y * 40.0);
         vec3 c = mix(vec3(0.65, 0.78, 1.0), vec3(1.0, 0.82, 0.6), h.y);
-        col += c * on * tw * exp(-d * d * (180.0 + float(i) * 160.0)) * (1.6 - float(i) * 0.4);
+        col += c * on * tw * (exp(-d * d * (260.0 + float(i) * 200.0)) * (3.0 - float(i) * 0.7) + exp(-d * d * 40.0) * 0.08);
     }
     return col;
 }
@@ -180,15 +182,15 @@ vec4 nebula(vec3 ro, vec3 rd, float maxT, float expand) {
         vec3 p = ro + rd * t;
         vec3 q = p * 0.03 / expand + uSeed * 10.0;
         float n = fbm3(q);
-        float d = smoothstep(0.5, 0.78, n);
+        float d = smoothstep(0.56, 0.84, n);
         float stepLen = t * 0.3;
         if (d > 0.001) {
             float w = fbm3(q * 3.1 + 7.0);
             float dust = smoothstep(0.55, 0.72, fbm3(q * 1.7 + 11.0));
-            float dens = d * (0.35 + 0.9 * w) * stepLen * 0.02;
+            float dens = d * (0.3 + 0.9 * w) * stepLen * 0.011;
             float k = fract(noise3(q * 0.45 + 3.0) * 1.6 + uSeed.x * 0.37);
             vec3 c = nebulaColor(k, w) * (0.3 + 1.4 * w * w);
-            acc += T * c * dens * 2.2 * (1.0 - dust * 0.85);
+            acc += T * c * dens * 2.6 * (1.0 - dust * 0.9);
             T *= 1.0 - clamp(dens * (0.6 + dust * 2.5), 0.0, 1.0);
         }
         t *= 1.3;
@@ -241,8 +243,12 @@ vec3 universe(vec3 ro, vec3 rd, vec2 uv, vec2 A) {
         vec3 id = cc + vec3(float(x), float(y), float(z));
         vec3 h = hash33(id + uSeed * 17.0);
         vec3 c = (id + 0.25 + 0.5 * hash33(id + 3.1 + uSeed)) * C;
+        if (length(c - uSpawn) < 70.0) continue;
         if (h.x < 0.3) {
             float R = 2.5 + 7.5 * h.y * h.y;
+            // drift right up to a world and it thins away rather than filling the screen
+            float near = smoothstep(R * 1.6, R * 3.2, length(ro - c));
+            if (near < 0.01) continue;
             float kind = hash33(id + 9.9).x;
             if (length(ro - c) > R * 1.2) {
                 float t = sphereHit(ro, rd, c, R);
@@ -253,7 +259,7 @@ vec3 universe(vec3 ro, vec3 rd, vec2 uv, vec2 A) {
                     vec3 atm = mix(vec3(0.35, 0.6, 1.0), vec3(1.0, 0.55, 0.35), h.z);
                     float rim = pow(1.0 - max(dot(N, -rd), 0.0), 3.0);
                     vec3 pc = alb * (diff * 1.25 + 0.015) + atm * rim * (0.15 + diff * 0.9);
-                    float fade = 1.0 - smoothstep(55.0, 85.0, t);
+                    float fade = (1.0 - smoothstep(55.0, 85.0, t)) * near;
                     tHit = t; hitCol = pc * fade + col * (1.0 - fade);
                 }
                 // atmosphere glow just outside the limb
@@ -276,7 +282,7 @@ vec3 universe(vec3 ro, vec3 rd, vec2 uv, vec2 A) {
                             float bands = 0.5 + 0.5 * sin(rr * 40.0 + hr.y * 9.0) * sin(rr * 13.0);
                             float a = (0.25 + 0.6 * bands) * smoothstep(1.35, 1.45, rr) * (1.0 - smoothstep(2.25, 2.4, rr));
                             vec3 rc = mix(vec3(0.85, 0.75, 0.6), vec3(0.6, 0.65, 0.8), hr.z) * (0.35 + 0.9 * max(dot(n, L) * sign(-dn), 0.15));
-                            ringT = tp; ringCol = vec4(rc, a * (1.0 - smoothstep(55.0, 85.0, tp)));
+                            ringT = tp; ringCol = vec4(rc, a * (1.0 - smoothstep(55.0, 85.0, tp)) * near);
                         }
                     }
                 }
@@ -290,7 +296,7 @@ vec3 universe(vec3 ro, vec3 rd, vec2 uv, vec2 A) {
                 if (t > 0.0 && t < tHit) {
                     vec3 N = normalize(ro + rd * t - mc);
                     tHit = t;
-                    hitCol = planetSurface(N, h.zxy, 0.9) * (smoothstep(-0.05, 0.4, dot(N, L)) * 1.2 + 0.01) * (1.0 - smoothstep(55.0, 85.0, t));
+                    hitCol = mix(col, planetSurface(N, h.zxy, 0.9) * (smoothstep(-0.05, 0.4, dot(N, L)) * 1.2 + 0.01), (1.0 - smoothstep(55.0, 85.0, t)) * smoothstep(mr * 2.0, mr * 5.0, t));
                 }
             }
         } else if (h.x > 0.95) {
@@ -483,7 +489,7 @@ void main() {
         gl.enableVertexAttribArray(0);
         gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
         ['uNoise', 'uFrame', 'uRes', 'uTime', 'uMode', 'uHole', 'uRs', 'uPull', 'uSwirl', 'uDisk', 'uBall', 'uStrobe', 'uBang',
-         'uCam', 'uRot', 'uSeed', 'uAura', 'uVhs', 'uRoll', 'uStatic'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
+         'uCam', 'uRot', 'uSeed', 'uSpawn', 'uAura', 'uVhs', 'uRoll', 'uStatic'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
         const nz = new Uint8Array(256 * 256 * 4), R = new Uint8Array(256 * 256);
         for (let i = 0; i < R.length; i++) R[i] = Math.random() * 256;
         for (let y = 0; y < 256; y++) for (let x = 0; x < 256; x++) {
@@ -518,6 +524,7 @@ void main() {
         S = { t: 0, opts, hole0: opts.hole, strobePh: 0, lastPulse: 0, mode: 0, consumed: false, banged: false,
               rewind: null, roll: 0, seed: [Math.random(), Math.random(), Math.random()], captured: false };
         cam.pos = [Math.random() * 400 - 200, Math.random() * 60 - 30, Math.random() * 400 - 200];
+        S.spawn = cam.pos.slice();
         cam.yaw = Math.random() * Math.PI * 2; cam.pitch = 0; cam.yawV = cam.pitchV = 0; cam.boost = 0;
         aim.on = false;
     }
@@ -634,6 +641,7 @@ void main() {
         const up = [f[1] * right[2] - f[2] * right[1], f[2] * right[0] - f[0] * right[2], f[0] * right[1] - f[1] * right[0]];
         gl.uniformMatrix3fv(U.uRot, false, [right[0], right[1], right[2], up[0], up[1], up[2], f[0], f[1], f[2]]);
         gl.uniform3f(U.uSeed, S.seed[0], S.seed[1], S.seed[2]);
+        gl.uniform3f(U.uSpawn, S.spawn[0], S.spawn[1], S.spawn[2]);
         const auraOn = S.mode === 1 ? smooth(1.5, 3.5, u.bang) : 0;
         gl.uniform3f(U.uAura, aim.x, aim.y, aim.on ? auraOn : 0);
         gl.uniform1f(U.uVhs, u.vhs);
