@@ -84,6 +84,17 @@
         }
         x.putImageData(img, 0, 0);
         document.documentElement.style.setProperty('--static', `url(${c.toDataURL()})`);
+        // film grain for the dream: centred on mid-grey so the overlay blend only adds grit, never tints
+        const g = document.createElement('canvas');
+        g.width = g.height = 128;
+        const gx = g.getContext('2d'), gi = gx.createImageData(128, 128);
+        for (let i = 0; i < gi.data.length; i += 4) {
+            const v = 128 + (Math.random() + Math.random() - 1) * 127;
+            gi.data[i] = gi.data[i + 1] = gi.data[i + 2] = v;
+            gi.data[i + 3] = 255;
+        }
+        gx.putImageData(gi, 0, 0);
+        document.documentElement.style.setProperty('--filmgrain', `url(${g.toDataURL()})`);
     }
 
     /* Resolution follows the device: start from a pixel budget, then step down while frames
@@ -568,7 +579,7 @@
                 grain: 1 - psy
             });
             drawTitle(tAmt, ago(0.12), ago(0.3));
-            grainEl.style.opacity = (psy * 0.07).toFixed(3);
+            grainEl.style.opacity = (psy * 0.3).toFixed(3);
         }
         requestAnimationFrame(frame);
     }

@@ -438,11 +438,11 @@ body.swallow .t-ghost, body.space-on .t-ghost { display: none; }
     z-index: 3;
     pointer-events: none;
     opacity: 0;
-    background: var(--static) 0 0 / 96px 96px;
+    background: var(--filmgrain) 0 0 / 128px 128px;
     mix-blend-mode: overlay;
-    animation: grainMove 0.2s steps(4) infinite;
+    animation: grainMove 0.24s steps(4) infinite;
 }
-@keyframes grainMove { to { background-position: 96px 57px; } }
+@keyframes grainMove { to { background-position: 77px 51px; } }
 
 #fps {
     position: fixed; left: 10px; top: 10px;
