@@ -30,16 +30,24 @@ button { font: inherit; }
     background-color: var(--paper);
     background-image: radial-gradient(ellipse at center, rgba(80,60,30,0) 50%, rgba(80,60,30,0.2) 100%), var(--grain);
 }
-#stage { position: fixed; inset: 0; }
-#scene {
+#stage {
+    position: fixed; inset: 0;
+    will-change: transform;          /* the camera push scales one cached layer instead of repainting */
+}
+#stage canvas.washes {
     position: absolute; inset: 0;
     width: 100%; height: 100%;
-    will-change: transform;
+    opacity: 0;
+    transition: opacity 2.4s ease;
 }
-#washes { opacity: 0; transition: opacity 2.4s ease; }
-#scene.washed #washes { opacity: 1; }
-#scene .cfill { transition: opacity 2.4s ease; }
-#scene.washed .cfill { opacity: 0.85; }
+#stage canvas.washes.on { opacity: 1; }
+#stage svg.layer {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    will-change: transform;          /* each layer is cached on its own */
+}
+#stage .cfill { transition: opacity 2.4s ease; }
+#stage.washed .cfill { opacity: 0.85; }
 .tuft {
     transform-box: fill-box;
     transform-origin: 50% 100%;

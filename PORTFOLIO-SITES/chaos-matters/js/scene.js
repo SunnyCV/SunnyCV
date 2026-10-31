@@ -11,7 +11,7 @@ const Scene = (() => {
     const HOUSE = { x: 820, y: 560 };   // ground zero
     const INK = '#34322d';
 
-    let svg, land, washes, sunG, smoke, flutters, wingNear, wingFar, trails, ruins, grassG, sunRays, blades, clouds, birds, plane, prop, bomb, shadow;
+    let svg, fxSvg, fgSvg, washCanvas, ruinCanvas, boilEls = [], land, washes, sunG, smoke, flutters, wingNear, wingFar, trails, ruins, grassG, sunRays, blades, clouds, birds, plane, prop, bomb, shadow;
     let batches = [];
     let rand;
 
@@ -122,10 +122,41 @@ const Scene = (() => {
     };
 
     function path(parent, d, s) {
-        return el('path', {
+        const e = el('path', {
             d, fill: 'none', stroke: INK, 'stroke-width': s.w, 'stroke-opacity': s.o,
             'stroke-linecap': 'round', 'stroke-linejoin': 'round'
         }, parent);
+        if (d) boilEls.push(e);
+        return e;
+    }
+
+    /* "Line boil" the cheap way: each stroke is pushed around by a smooth noise field,
+       three times over, and the drawing flips between those takes a few times a second.
+       (A live SVG turbulence filter does the same but costs the browser far too much.) */
+    function vnoise(x, y, k) {
+        const h = (i, j) => { const s = Math.sin(i * 127.1 + j * 311.7 + k * 74.7) * 43758.5453; return s - Math.floor(s); };
+        const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+        const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+        const a = h(xi, yi), b = h(xi + 1, yi), c = h(xi, yi + 1), dd = h(xi + 1, yi + 1);
+        return a + (b - a) * u + (c - a) * v + (a - b - c + dd) * u * v;
+    }
+    function prepareBoil() {
+        boilEls.forEach(e => {
+            const d0 = e.getAttribute('d');
+            const amp = e.closest('#plane, #bomb') ? 1.4 : 3.2;
+            e._takes = [d0, wobbleD(d0, 1, amp), wobbleD(d0, 2, amp)];
+        });
+    }
+    // rewrite every "x y" coordinate pair of an absolute path (M, L, C, Q, Z only)
+    function wobbleD(d, k, amp) {
+        const nums = d.match(/-?\d*\.?\d+/g) || [];
+        const out = [];
+        for (let i = 0; i + 1 < nums.length; i += 2) {
+            const x = +nums[i], y = +nums[i + 1], fx = 0.035;
+            out.push(f(x + (vnoise(x * fx, y * fx, k) - 0.5) * amp), f(y + (vnoise(x * fx + 9.2, y * fx + 3.7, k) - 0.5) * amp));
+        }
+        let j = 0;
+        return d.replace(/-?\d*\.?\d+/g, () => out[j++] ?? '0');
     }
 
     /* draw(): queue strokes to be drawn one after another inside [t0, t0 + dur] */
@@ -137,11 +168,6 @@ const Scene = (() => {
     /* ---------- build ---------- */
     function defs() {
         const d = el('defs', {}, svg);
-        // the "line boil": a displacement whose noise seed flips a few times a second
-        const boil = el('filter', { id: 'boil', x: '-5%', y: '-5%', width: '110%', height: '110%' }, d);
-        el('feTurbulence', { id: 'boilNoise', type: 'fractalNoise', baseFrequency: '0.035', numOctaves: '2', seed: '1', result: 'n' }, boil);
-        el('feDisplacementMap', { in: 'SourceGraphic', in2: 'n', scale: '3.2', xChannelSelector: 'R', yChannelSelector: 'G' }, boil);
-
         // watercolour: wobbly bleeding edges and a soft blur
         const wash = el('filter', { id: 'wash', x: '-10%', y: '-10%', width: '120%', height: '120%' }, d);
         el('feTurbulence', { type: 'fractalNoise', baseFrequency: '0.012', numOctaves: '3', seed: '4', result: 'n' }, wash);
@@ -155,6 +181,10 @@ const Scene = (() => {
         el('rect', { x: 844, y: 489, width: 13, height: 24, fill: '#000' }, occ);
         el('ellipse', { cx: 936, cy: 512, rx: 44, ry: 40, fill: '#000' }, occ);
         el('rect', { x: 928, y: 538, width: 15, height: 54, fill: '#000' }, occ);
+
+        const sh = el('radialGradient', { id: 'shadowG' }, d);
+        el('stop', { offset: '0', 'stop-color': '#3b3a2c', 'stop-opacity': '1' }, sh);
+        el('stop', { offset: '1', 'stop-color': '#3b3a2c', 'stop-opacity': '0' }, sh);
 
         const soft = el('filter', { id: 'soft', x: '-50%', y: '-200%', width: '200%', height: '500%' }, d);
         el('feGaussianBlur', { stdDeviation: '5' }, soft);
@@ -176,7 +206,7 @@ const Scene = (() => {
     }
 
     function buildWashes() {
-        washes = el('g', { id: 'washes', filter: 'url(#wash)' }, svg);
+        washes = el('g', { id: 'washes', filter: 'url(#wash)', display: 'none' }, svg);
         el('rect', { id: 'skyWash', x: -100, y: -100, width: 1800, height: 640, fill: 'url(#skyG)', opacity: 0.5 }, washes);
         el('path', { id: 'fieldWash', d: 'M-100 520 C 300 500 640 492 900 510 S 1400 490 1700 500 L1700 1000 L-100 1000 Z', fill: 'url(#fieldG)', opacity: 0.5 }, washes);
         el('path', { id: 'hillWash', mask: 'url(#behindHouse)', d: 'M-100 520 C200 500 420 512 640 494 C 900 512 1150 488 1400 506 L1700 498 L1700 560 L-100 562 Z', fill: '#8fb08a', opacity: 0.42 }, washes);
@@ -192,7 +222,7 @@ const Scene = (() => {
     }
 
     function buildLand() {
-        land = el('g', { id: 'land', filter: 'url(#boil)' }, svg);
+        land = el('g', { id: 'land' }, svg);
 
         // rolling ridges on the horizon (behind the house)
         const far = el('g', { id: 'far', mask: 'url(#behindHouse)' }, land);
@@ -273,7 +303,7 @@ const Scene = (() => {
         draw(land, marks, 3.8, 1.0, STYLE.faint);
 
         // the sun and its rays — in their own group so the sun stays in view on narrow screens
-        sunG = el('g', { id: 'sun', filter: 'url(#boil)' }, svg);
+        sunG = el('g', { id: 'sun' }, fxSvg);
         el('circle', { class: 'cfill', cx: 1270, cy: 190, r: 140, fill: 'url(#sunG)', opacity: 0 }, sunG);
         draw(sunG, [curve(Array.from({ length: 21 }, (_, i) => [1270 + Math.cos(i / 20 * 6.4) * 44, 190 + Math.sin(i / 20 * 6.4) * 44]), 1.2)], 4.3, 0.8, STYLE.main);
         sunRays = el('g', { id: 'sunRays' }, sunG);
@@ -285,7 +315,7 @@ const Scene = (() => {
         draw(sunRays, rays, 4.7, 0.7, STYLE.light);
 
         // windmill blades live in their own group so they can turn
-        blades = el('g', { id: 'blades', filter: 'url(#boil)' }, svg);
+        blades = el('g', { id: 'blades' }, fxSvg);
         const bl = [];
         for (let i = 0; i < 12; i++) {
             const a = i / 12 * Math.PI * 2;
@@ -299,7 +329,7 @@ const Scene = (() => {
 
     /* what is left afterwards: wall stumps, a fallen roof, planks, a stripped tree */
     function buildRuins() {
-        ruins = el('g', { id: 'ruins', filter: 'url(#boil)', style: 'display:none' }, svg);
+        ruins = el('g', { id: 'ruins', style: 'display:none' }, svg);
         el('ellipse', { cx: 820, cy: 594, rx: 150, ry: 16, fill: '#140c08', opacity: 0.55 }, ruins);
         const st = [
             ...poly([[770, 588], [770, 566], [776, 573], [781, 559], [786, 571], [791, 588]], 0.5, false),
@@ -321,7 +351,7 @@ const Scene = (() => {
     function buildClouds() {
         clouds = [];
         [[320, 210, 270, 4.6], [1000, 140, 200, 4.9], [1480, 280, 230, 5.2]].forEach(([cx, cy, w, t]) => {
-            const g = el('g', { class: 'cloud', filter: 'url(#boil)' }, svg);
+            const g = el('g', { class: 'cloud' }, fxSvg);
             const pts = cloudPts(cx, cy, w);
             el('path', { class: 'cfill', d: curve(pts, 0) + 'Z', fill: '#fbf9f3', opacity: 0 }, g);
             draw(g, curve(pts, 1.5), t, 1.0, STYLE.light);
@@ -331,7 +361,7 @@ const Scene = (() => {
     }
 
     function buildGrass() {
-        grassG = el('g', { id: 'grass' }, svg);
+        grassG = el('g', { id: 'grass' }, fgSvg);
         for (let i = 0; i < 30; i++) {
             const bx = -40 + i * 57 + r(-18, 18), by = 905;
             if (bx > 640 && bx < 1000 && rand() < 0.7) continue;  // keep the path mostly clear
@@ -351,13 +381,13 @@ const Scene = (() => {
     }
 
     function buildBirds() {
-        birds = el('g', { id: 'birds', opacity: 0 }, svg);
+        birds = el('g', { id: 'birds', opacity: 0 }, fxSvg);
         for (let i = 0; i < 6; i++) path(birds, '', STYLE.main);
     }
 
     /* chimney smoke: little pencil curls that rise, swell and fade */
     function buildSmoke() {
-        smoke = el('g', { id: 'smoke', opacity: 0 }, svg);
+        smoke = el('g', { id: 'smoke', opacity: 0 }, fxSvg);
         for (let i = 0; i < 6; i++) {
             const pts = Array.from({ length: 14 }, (_, k) => {
                 const a = k / 13 * Math.PI * 2.6, rr = 3 + k * 0.45;
@@ -369,7 +399,7 @@ const Scene = (() => {
 
     /* two butterflies over the grass */
     function buildFlutters() {
-        flutters = el('g', { id: 'flutters', opacity: 0 }, svg);
+        flutters = el('g', { id: 'flutters', opacity: 0 }, fxSvg);
         for (let i = 0; i < 2; i++) {
             const g = el('g', {}, flutters);
             const w = el('g', {}, g);
@@ -382,11 +412,11 @@ const Scene = (() => {
     /* a war eagle built like a Concorde: needle body, drooping hooked beak,
        swept delta wings, the bomb clamped in its talons */
     function buildPlane() {
-        plane = el('g', { id: 'plane', opacity: 0 }, svg);
+        plane = el('g', { id: 'plane', opacity: 0 }, fxSvg);
         // contrails and speed lines are redrawn every frame behind the bird
         trails = el('g', {}, plane);
         for (let i = 0; i < 6; i++) path(trails, '', i < 2 ? STYLE.light : STYLE.faint);
-        const body = el('g', { filter: 'url(#boil)' }, plane);
+        const body = el('g', {}, plane);
 
         const farWing = [[22, -6], [0, -13], [-28, -25], [-60, -38], [-74, -32], [-80, -18], [-82, -6]];
         const nearWing = [[24, 3], [4, 8], [-22, 17], [-50, 31], [-74, 44], [-86, 33], [-84, 18], [-86, 6]];
@@ -441,10 +471,10 @@ const Scene = (() => {
         path(wingNear, curve([[18, 4], [-20, 20], [-60, 38]], 0.3), STYLE.light);
         prop = null;
 
-        shadow = el('ellipse', { id: 'planeShadow', cx: 0, cy: 712, rx: 46, ry: 5, fill: '#3b3a2c', opacity: 0, filter: 'url(#soft)' }, svg);
+        shadow = el('ellipse', { id: 'planeShadow', cx: 0, cy: 712, rx: 52, ry: 7, fill: 'url(#shadowG)', opacity: 0 }, fxSvg);
 
-        bomb = el('g', { id: 'bomb', opacity: 0 }, svg);
-        const bb = el('g', { filter: 'url(#boil)' }, bomb);
+        bomb = el('g', { id: 'bomb', opacity: 0 }, fxSvg);
+        const bb = el('g', {}, bomb);
         // a fat, rounded bomb with a box tail
         const egg = Array.from({ length: 25 }, (_, i) => {
             const a = i / 24 * Math.PI * 2;
@@ -459,10 +489,15 @@ const Scene = (() => {
     function build(host) {
         rand = seeded(7);
         batches = [];
-        svg = el('svg', {
-            id: 'scene', viewBox: `0 0 ${VB_W} ${VB_H}`, preserveAspectRatio: 'xMidYMid slice',
+        // three stacked layers, so whatever moves only repaints itself:
+        // the landscape, the things in the air, and the grass in front
+        const layer = id => el('svg', {
+            id, class: 'layer', viewBox: `0 0 ${VB_W} ${VB_H}`, preserveAspectRatio: 'xMidYMid slice',
             xmlns: NS, 'aria-hidden': 'true'
         });
+        svg = layer('scene');
+        fxSvg = layer('sceneFx');
+        fgSvg = layer('sceneFg');
         defs();
         buildWashes();
         buildClouds();
@@ -473,16 +508,54 @@ const Scene = (() => {
         buildFlutters();
         buildGrass();
         host.appendChild(svg);
+        host.appendChild(fxSvg);
+        host.appendChild(fgSvg);
 
-        // every queued stroke starts hidden behind its own dash
+        // every queued stroke starts hidden behind its own dash; pathLength=1 keeps the dash
+        // right whichever wobbled take of the line is showing
         batches.forEach(b => {
             b.lens = b.els.map(e => e.getTotalLength() || 1);
-            b.els.forEach((e, i) => {
-                e.style.strokeDasharray = `${b.lens[i] + 1} ${b.lens[i] + 1}`;
-                e.style.strokeDashoffset = b.lens[i] + 1;
+            b.els.forEach(e => {
+                e.setAttribute('pathLength', '1');
+                e.style.strokeDasharray = '1.01 1.01';
+                e.style.strokeDashoffset = '1.01';
             });
         });
+        prepareBoil();
+
+        washCanvas = document.createElement('canvas');
+        washCanvas.className = 'washes';
+        host.insertBefore(washCanvas, svg);
         return svg;
+    }
+
+    /* Paint the watercolour once into canvases (the day and the burnt aftermath), so the
+       expensive wash filter never runs while anything is moving. */
+    async function rasterWashes(ruined) {
+        const k = Math.min(devicePixelRatio || 1, 1.5) * 0.6;          // soft paint needs few pixels
+        const W = Math.max(2, Math.round(innerWidth * k)), H = Math.max(2, Math.round(innerHeight * k));
+        const s = svg.cloneNode(false);
+        s.setAttribute('width', W);
+        s.setAttribute('height', H);
+        s.appendChild(svg.querySelector('defs').cloneNode(true));
+        const w = washes.cloneNode(true);
+        w.removeAttribute('display');
+        s.appendChild(w);
+        if (ruined) ruin(s, true);
+        const img = new Image();
+        img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(s));
+        await img.decode();
+        const c = document.createElement('canvas');
+        c.width = W; c.height = H;
+        c.getContext('2d').drawImage(img, 0, 0, W, H);
+        return c;
+    }
+
+    async function prepare() {
+        const day = await rasterWashes(false);
+        washCanvas.width = day.width; washCanvas.height = day.height;
+        washCanvas.getContext('2d').drawImage(day, 0, 0);
+        ruinCanvas = await rasterWashes(true);
     }
 
     /* Animate every stroke in. Returns the time (s) the last stroke finishes. */
@@ -497,7 +570,7 @@ const Scene = (() => {
                 const dur = Math.max(0.12, bd * (b.lens[i] / total) * 1.5);
                 cum += b.lens[i];
                 e.animate(
-                    [{ strokeDashoffset: b.lens[i] + 1 }, { strokeDashoffset: 0 }],
+                    [{ strokeDashoffset: 1.01 }, { strokeDashoffset: 0 }],
                     { duration: dur * 1000, delay: (offset + start) * 1000, easing: 'cubic-bezier(.45,.05,.55,.95)', fill: 'forwards' }
                 );
                 end = Math.max(end, offset + start + dur);
@@ -516,7 +589,8 @@ const Scene = (() => {
     }
 
     function paint() {
-        svg.classList.add('washed');
+        svg.parentNode.classList.add('washed');
+        washCanvas.classList.add('on');
     }
 
     /* ---------- per-frame life ---------- */
@@ -532,8 +606,8 @@ const Scene = (() => {
         seedClock += dt;
         if (seedClock > 0.14) {
             seedClock = 0;
-            seed = seed % 5 + 1;
-            svg.querySelector('#boilNoise').setAttribute('seed', seed);
+            seed = (seed + 1) % 3;
+            for (let i = 0; i < boilEls.length; i++) { const e = boilEls[i]; if (e._takes) e.setAttribute('d', e._takes[seed]); }
         }
         blades.setAttribute('transform', `rotate(${f(t * 40)} 701 472)`);
         sunRays.setAttribute('transform', `rotate(${f(t * 3)} 1270 190)`);
@@ -648,11 +722,11 @@ const Scene = (() => {
     async function snapshot(paperCanvas, scale, ruined = false) {
         const W = Math.round(innerWidth * scale), H = Math.round(innerHeight * scale);
         const clone = svg.cloneNode(true);
-        ['#plane', '#bomb', '#planeShadow', '#birds', '#smoke', '#flutters'].forEach(q => clone.querySelector(q)?.remove());
+        [fxSvg, fgSvg].forEach(l => [...l.childNodes].forEach(n => clone.appendChild(n.cloneNode(true))));
+        ['#plane', '#bomb', '#planeShadow', '#birds', '#smoke', '#flutters', '#washes'].forEach(q => clone.querySelector(q)?.remove());
         clone.removeAttribute('style');
         clone.setAttribute('width', W);
         clone.setAttribute('height', H);
-        clone.querySelector('#washes').setAttribute('opacity', '1');
         clone.querySelectorAll('.cfill').forEach(c => c.setAttribute('opacity', '0.85'));
         if (ruined) ruin(clone);
         const src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(clone));
@@ -664,6 +738,8 @@ const Scene = (() => {
         const x = c.getContext('2d');
         x.fillStyle = x.createPattern(paperCanvas, 'repeat');
         x.fillRect(0, 0, W, H);
+        const wc = ruined ? ruinCanvas : washCanvas;
+        if (wc && wc.width > 2) x.drawImage(wc, 0, 0, W, H);
         x.drawImage(img, 0, 0, W, H);
         if (ruined) {
             // everything burns: darken through a red-brown filter, then light it from ground zero
@@ -690,22 +766,28 @@ const Scene = (() => {
     }
 
     /* turn a clone of the lovely day into its aftermath */
-    function ruin(c) {
+    function ruin(c, washesOnly) {
+        const set = (q, fill, op) => { const n = c.querySelector(q); n.setAttribute('fill', fill); n.setAttribute('opacity', op); };
+        if (washesOnly) {
+            ['#houseWash', '#treeWash'].forEach(q => c.querySelector(q)?.remove());
+            c.querySelector('#hillWash').removeAttribute('mask');
+            set('#skyWash', 'url(#apoSky)', 1);
+            set('#fieldWash', '#6b5038', 0.7);
+            set('#hillWash', '#3a2418', 0.8);
+            set('#pathWash', '#8a6a48', 0.7);
+            return;
+        }
         ['#house', '#houseWash', '#treeTop', '#treeWash', '#blades', '#sun', '#smoke'].forEach(q => c.querySelector(q)?.remove());
         c.querySelectorAll('.cloud').forEach(n => n.remove());
         c.querySelector('#ruins').removeAttribute('style');
         // with the house gone, the hills behind it show again
-        ['#far', '#hillWash'].forEach(q => c.querySelector(q).removeAttribute('mask'));
+        ['#far', '#hillWash'].forEach(q => c.querySelector(q)?.removeAttribute('mask'));
         c.querySelector('#windmill').setAttribute('transform', 'rotate(-17 700 592)');
         c.querySelector('#fence').setAttribute('transform', 'translate(0 860) skewX(-9) translate(0 -860)');
         c.querySelector('#grass').setAttribute('transform', 'translate(0 905) skewX(-16) translate(0 -905)');
         c.querySelectorAll('.tuft').forEach(n => n.removeAttribute('style'));
-        const set = (q, fill, op) => { const n = c.querySelector(q); n.setAttribute('fill', fill); n.setAttribute('opacity', op); };
-        set('#skyWash', 'url(#apoSky)', 1);
-        set('#fieldWash', '#6b5038', 0.7);
-        set('#hillWash', '#3a2418', 0.8);
-        set('#pathWash', '#8a6a48', 0.7);
+        c.querySelector('#ruins').removeAttribute('filter');
     }
 
-    return { build, startDrawing, finishDrawing, paint, tick, groundZero, snapshot, visible, HOUSE, get plane() { return plane; } };
+    return { build, prepare, startDrawing, finishDrawing, paint, tick, groundZero, snapshot, visible, HOUSE, get plane() { return plane; } };
 })();

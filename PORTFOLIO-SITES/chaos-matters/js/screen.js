@@ -120,7 +120,7 @@ float cloudSDF(vec3 p) {
 vec4 marchCloud(vec2 w, float s, float jit) {
     float zr = cRt + cRr + 0.04;
     if (abs(w.x) > max(zr, cRb + cRbr) + 0.06 || w.y < -0.06 || w.y > cH + cRr + cRt * 0.6 + 0.1) return vec4(0.0, 0.0, 0.0, 1.0);
-    const int STEPS = 30;
+    const int STEPS = 22;
     float dz = 2.0 * zr / float(STEPS);
     vec3 acc = vec3(0.0);
     float T = 1.0;
@@ -398,24 +398,38 @@ void main() {
     gl_FragColor = vec4(col, 1.0);
 }`;
 
+    let ready = Promise.resolve(false);
     let gl, prog, fprog, tex, titleTex, noiseTex, canvas, U = {}, FU = {}, ok = false;
     let fieldTex = [], fieldFb = [], fw = 0, fh = 0, ping = 0;
 
+    /* Shaders compile in the background (KHR_parallel_shader_compile where the browser has it),
+       so a big shader never freezes the page; we only ask for the result once it is done. */
     function compile(vs, fs) {
-        const sh = (type, src) => {
-            const s = gl.createShader(type);
-            gl.shaderSource(s, src);
-            gl.compileShader(s);
-            if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
-            return s;
-        };
+        const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
         const p = gl.createProgram();
-        gl.attachShader(p, sh(gl.VERTEX_SHADER, vs));
-        gl.attachShader(p, sh(gl.FRAGMENT_SHADER, fs));
+        p._sh = [sh(gl.VERTEX_SHADER, vs), sh(gl.FRAGMENT_SHADER, fs)];
+        p._sh.forEach(s => gl.attachShader(p, s));
         gl.bindAttribLocation(p, 0, 'aPos');
         gl.linkProgram(p);
-        if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
         return p;
+    }
+    function whenLinked(p) {
+        const ext = gl.getExtension('KHR_parallel_shader_compile');
+        return new Promise(res => {
+            const poll = () => { if (!ext || gl.getProgramParameter(p, ext.COMPLETION_STATUS_KHR)) res(); else setTimeout(poll, 25); };
+            poll();
+        });
+    }
+    function checkLinked(p) {
+        if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p) + ' ' + p._sh.map(s => gl.getShaderInfoLog(s)).join(' '));
+    }
+    /* draw one throwaway pixel so the driver finishes everything before the show needs it */
+    function warmProgram(p, w, h) {
+        gl.useProgram(p);
+        gl.viewport(0, 0, 1, 1);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
+        gl.viewport(0, 0, w, h);
     }
 
     function makeTex(w, h, data) {
@@ -433,22 +447,30 @@ void main() {
         canvas = c;
         gl = c.getContext('webgl', { antialias: false, preserveDrawingBuffer: true }) || c.getContext('experimental-webgl');
         if (!gl) return false;
-        try {
-            prog = compile(VERT, FRAG);
-            fprog = compile(VERT, FIELD);
-        } catch (e) {
-            console.warn('Chaos Matters: shader failed', e);
-            return false;
-        }
+        prog = compile(VERT, FRAG);
+        fprog = compile(VERT, FIELD);
+        setup();
         const buf = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, buf);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
         gl.enableVertexAttribArray(0);
         gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+        ready = Promise.all([whenLinked(prog), whenLinked(fprog)]).then(() => {
+            try { checkLinked(prog); checkLinked(fprog); } catch (e) { console.warn('Chaos Matters: shader failed', e); return false; }
+            locate();
+            ok = true;
+            return true;
+        });
+        return true;
+    }
+
+    function locate() {
         ['uScene', 'uField', 'uTitle', 'uNoise', 'uRes', 'uTime', 'uT', 'uCenter', 'uZoom', 'uStatic', 'uBars', 'uRoll', 'uPsy', 'uDim',
          'uMouse', 'uRipple', 'uHot', 'uTP', 'uTS', 'uTA', 'uTF', 'uG1', 'uG2'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
         ['uPrev', 'uTexel', 'uAsp', 'uP1', 'uV1', 'uP2', 'uV2'].forEach(n => FU[n] = gl.getUniformLocation(fprog, n));
+    }
 
+    function setup() {
         tex = makeTex(1, 1, new Uint8Array([243, 239, 230, 255]));
         titleTex = makeTex(1, 1, new Uint8Array([0, 0, 0, 0]));
         // value noise; G holds R shifted by (37,17) so one fetch gives two z-slices
@@ -463,8 +485,12 @@ void main() {
         noiseTex = makeTex(256, 256, nz);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-        ok = true;
-        return true;
+    }
+
+    function warm() {
+        if (!ok) return;
+        warmProgram(prog, canvas.width, canvas.height);
+        warmProgram(fprog, canvas.width, canvas.height);
     }
 
     function setScene(source) {
@@ -562,5 +588,5 @@ void main() {
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     }
 
-    return { init, setScene, setTitle, resize, render, get ok() { return ok; } };
+    return { init, warm, get ready() { return ready; }, setScene, setTitle, resize, render, get ok() { return ok; } };
 })();

@@ -78,11 +78,27 @@
         document.documentElement.style.setProperty('--static', `url(${c.toDataURL()})`);
     }
 
+    /* Resolution follows the device: start from a pixel budget, then step down while frames
+       run slow and back up when there is headroom. The canvas is scaled up smoothly by CSS. */
+    const perf = { q: 1, acc: 0, n: 0, good: 0, hold: 0 };
     function pickGlScale() {
         const dpr = Math.min(devicePixelRatio || 1, 1.5);
-        const budget = 2.4e6, px = innerWidth * innerHeight * dpr * dpr;
+        const budget = 1.4e6 * perf.q * perf.q, px = innerWidth * innerHeight * dpr * dpr;
         glScale = px > budget ? dpr * Math.sqrt(budget / px) : dpr;
         Screen.resize(glScale);
+        Space.setQuality(perf.q);
+    }
+    function adapt(raw) {
+        if (perf.hold > 0) { perf.hold -= raw; return; }     // ignore the spike right after a scene change
+        perf.acc += raw; perf.n++;
+        if (perf.acc < 0.5) return;
+        const avg = perf.acc / perf.n;
+        perf.acc = perf.n = 0;
+        if (avg > 1 / 45 && perf.q > 0.35) {
+            perf.q = Math.max(0.35, perf.q * 0.8); perf.good = 0; perf.hold = 0.4; pickGlScale();
+        } else if (avg < 1 / 57 && perf.q < 1) {
+            if (++perf.good >= 4) { perf.q = Math.min(1, perf.q * 1.12); perf.good = 0; perf.hold = 0.4; pickGlScale(); }
+        } else perf.good = 0;
     }
 
     /* ---------- the title, painted into a texture for the shader ---------- */
@@ -246,6 +262,7 @@
         body.style.cursor = '';
         Sound.select();
         Sound.calm(Space.K.calm);
+        perf.hold = 1;
         spaceMusicOn = false;
         Space.start({
             hole: [room.x / innerWidth, 1 - room.y / innerHeight],
@@ -256,7 +273,7 @@
             },
             onConsumed() { menu.classList.remove('on'); },
             onPulse: k => Sound.pulse(k),
-            onBang() { Sound.bang(); body.classList.add('cosmos'); },
+            onBang() { Sound.bang(); body.classList.add('cosmos'); perf.hold = 1; },
             onReturn: returnHome,
         });
     }
@@ -329,25 +346,28 @@
         cue(T.eagle, () => { state.plane = { enter: T.enter, release: T.release }; });
         cue(T.enter + 0.2, () => { Sound.cry(-0.8, 0.8); Sound.swoop(T.release - T.enter + 1.4); });
         cue(T.release + 0.1, () => Sound.cry(state.plane ? state.plane.pan : 0, 1));
-        cue(T.release - 2.0, async () => {
-            try { snapshot = await Scene.snapshot(paper, glScale, true); } catch (e) { snapshot = null; }
+        cue(drawEnd + 0.8, async () => {
+            try {
+                snapshot = await Scene.snapshot(paper, Math.min(glScale, 1), true);
+                Screen.setScene(snapshot);
+            } catch (e) { snapshot = null; }
         });
         cue(T.release, () => {
             const P = state.plane;
             state.bomb = { t0: clock, dur: T.fall, x0: P.x + P.bx * P.s, y0: P.y + P.by * P.s, s: P.s * 0.8 };
             Sound.whistle(T.fall);
             const gz = Scene.groundZero();
-            svg.style.transformOrigin = `${gz.x}px ${gz.y}px`;
+            stage.style.transformOrigin = `${gz.x}px ${gz.y}px`;
             center = [gz.x / innerWidth, 1 - gz.y / innerHeight];
         });
         cue(T.impact - 0.45, () => Sound.hush(0.4));
         cue(T.impact, () => {
             impactAt = clock;
+            perf.hold = 1;
             Sound.boom();
-            if (snapshot) Screen.setScene(snapshot);
             if (Screen.ok) {
                 glCanvas.classList.add('on');
-                svg.style.visibility = 'hidden';
+                stage.style.visibility = 'hidden';
             } else {
                 body.classList.add('no-gl');
             }
@@ -382,7 +402,8 @@
     const smooth = (a, b, x) => { const k = Math.min(1, Math.max(0, (x - a) / (b - a))); return k * k * (3 - 2 * k); };
 
     function frame(now) {
-        const dt = Math.min(0.05, (now - last) / 1000 || 0);
+        const raw = (now - last) / 1000 || 0;
+        const dt = Math.min(0.05, raw);
         last = now;
         clock = (now - t0) / 1000;
 
@@ -397,7 +418,7 @@
             if (state.bomb) {
                 const p = smooth(T.release, T.impact, clock);
                 zoom = 1 + 0.16 * p * p;
-                svg.style.transform = `scale(${zoom.toFixed(4)})`;
+                stage.style.transform = `scale(${zoom.toFixed(4)})`;
             }
         }
 
@@ -411,6 +432,8 @@
             if (o.explore && Space.active && rewindBtn.hidden && !osd.classList.contains('on')) { rewindBtn.hidden = false; body.classList.add('exploring'); }
             if (osd.classList.contains('on') && o.rew != null) osd.querySelector('.osd-time').textContent = tape(o.rew);
         }
+
+        if (clock >= T.impact || phase === 'home' || phase === 'space') adapt(raw);
 
         if (returning) {
             const R = returning, c = R.cued;
@@ -480,7 +503,10 @@
             document.fonts.load('800 220px Syne').catch(() => {}),
             document.fonts.ready,
             new Promise(r => setTimeout(r, 50)),
-        ]).then(() => { makeTitle(); ready = true; });
+            Scene.prepare().catch(() => {}),
+            Screen.ready.then(() => Screen.warm()),
+            Space.ready.then(() => Space.warm()),
+        ]).then(() => { makeTitle(); pickGlScale(); ready = true; });
         // the bar stutters forward like something being pulled off a slow disk
         let shown = 0;
         const tick = () => {
@@ -531,7 +557,7 @@
         clock = 0;
         impactAt = -A.done;           // as if the bomb fell long ago
         cues = [];
-        if (svg) svg.style.visibility = 'hidden';
+        stage.style.visibility = 'hidden';
         standby.classList.remove('on');
         body.classList.add('tv', 'playing');
         if (Screen.ok) glCanvas.classList.add('on'); else body.classList.add('no-gl', 'show-title');

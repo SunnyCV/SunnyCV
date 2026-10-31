@@ -33,6 +33,15 @@ uniform vec3  uCam;
 uniform mat3  uRot;
 uniform vec3  uSeed;
 uniform vec3  uSpawn;         // the visitor starts in a clear patch of sky
+// the bodies near the visitor, found once per frame in JavaScript instead of per pixel
+uniform vec4  uPl[6];         // planet: centre, radius (0 = none)
+uniform vec4  uPq[6];         // planet: hash x, y, z, kind
+uniform vec4  uRing[6];       // ring normal, on/off
+uniform vec4  uRingB[6];      // ring tint/phase
+uniform vec4  uMoon[6];       // moon: centre, radius (0 = none)
+uniform vec4  uSun[2];        // sun: centre, radius (0 = none)
+uniform vec4  uSunC[2];       // sun: tint
+uniform vec4  uRock[8];       // asteroid: centre, radius (0 = none)
 uniform vec3  uAura;          // xy = pointer, z = strength
 uniform float uVhs;           // rewind: tape distortion
 uniform float uRoll;          // rewind: vertical roll
@@ -48,6 +57,7 @@ float noise3(vec3 x) {
     vec2 rg = texture2D(uNoise, (uv + 0.5) / 256.0).yx;
     return mix(rg.x, rg.y, f.z);
 }
+float fbm2o(vec3 p) { return (0.5 * noise3(p) + 0.25 * noise3(p * 2.03 + 1.7)) / 0.75; }
 float fbm3(vec3 p) { return (0.5 * noise3(p) + 0.25 * noise3(p * 2.03 + 1.7) + 0.125 * noise3(p * 4.01 + 3.1)) / 0.875; }
 vec3 hueShift(vec3 c, float a) { const vec3 k = vec3(0.57735); float ca = cos(a); return c * ca + cross(k, c) * sin(a) + k * dot(k, c) * (1.0 - ca); }
 mat2 rot(float a) { float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
@@ -145,9 +155,10 @@ vec3 milkyWay(vec3 rd) {
     vec3 n = normalize(vec3(0.25, 1.0, 0.35) + (uSeed - 0.5) * 0.6);
     float b = dot(rd, n);
     float lane = exp(-b * b * 14.0);
-    float f = fbm3(rd * 3.0 + uSeed * 9.0), g = fbm3(rd * 9.0 + 4.0);
+    if (lane < 0.02) return vec3(0.0);
+    float f = fbm3(rd * 3.0 + uSeed * 9.0), g = fbm2o(rd * 9.0 + 4.0);
     vec3 c = mix(vec3(0.25, 0.22, 0.45), vec3(0.75, 0.5, 0.35), f) * lane * (0.12 + 0.25 * g);
-    c *= 1.0 - smoothstep(0.5, 0.7, fbm3(rd * 6.0 + 8.0)) * exp(-b * b * 60.0) * 0.8;   // dark rift
+    c *= 1.0 - smoothstep(0.5, 0.7, fbm2o(rd * 6.0 + 8.0)) * exp(-b * b * 60.0) * 0.8;   // dark rift
     return c;
 }
 
@@ -177,23 +188,23 @@ vec3 galaxies(vec3 rd) {
 vec4 nebula(vec3 ro, vec3 rd, float maxT, float expand) {
     vec3 acc = vec3(0.0);
     float T = 1.0, t = 2.0;
-    for (int i = 0; i < 13; i++) {
+    for (int i = 0; i < 9; i++) {
         if (t > maxT) break;
         vec3 p = ro + rd * t;
         vec3 q = p * 0.03 / expand + uSeed * 10.0;
         float n = fbm3(q);
         float d = smoothstep(0.53, 0.82, n);
-        float stepLen = t * 0.3;
+        float stepLen = t * 0.45;
         if (d > 0.001) {
-            float w = fbm3(q * 3.1 + 7.0);
-            float dust = smoothstep(0.55, 0.72, fbm3(q * 1.7 + 11.0));
+            float w = fbm2o(q * 3.1 + 7.0);
+            float dust = smoothstep(0.55, 0.72, fbm2o(q * 1.7 + 11.0));
             float dens = d * (0.3 + 0.9 * w) * stepLen * 0.015;
             float k = fract(noise3(q * 0.45 + 3.0) * 1.6 + uSeed.x * 0.37);
             vec3 c = nebulaColor(k, w) * (0.3 + 1.4 * w * w);
             acc += T * c * dens * 2.6 * (1.0 - dust * 0.9);
             T *= 1.0 - clamp(dens * (0.6 + dust * 2.5), 0.0, 1.0);
         }
-        t *= 1.3;
+        t *= 1.45;
     }
     return vec4(acc, T);
 }
@@ -231,123 +242,108 @@ vec3 universe(vec3 ro, vec3 rd, vec2 uv, vec2 A) {
     vec3 col = vec3(0.004, 0.006, 0.014) + vec3(0.01, 0.0, 0.02) * (rd.y * 0.5 + 0.5);
     col += milkyWay(rd) + starField(rd) + galaxies(rd);
 
-    // planets, moons and suns live in cells around us
-    const float C = 46.0;
-    vec3 cc = floor(ro / C);
-    float tHit = 1e9; vec3 hitCol = vec3(0.0);
+    // planets, moons, suns and asteroids near us (listed by the page each frame).
+    // The loops only find the nearest hit; the costly surface is shaded once afterwards.
+    float tHit = 1e9, hitKind = 0.0, hitR = 1.0, hitFade = 1.0, hitType = 0.0;
+    vec3 hitC = vec3(0.0), hitH = vec3(0.0);
     float ringT = 1e9; vec4 ringCol = vec4(0.0);
     vec3 glow = vec3(0.0);
-    for (int x = -1; x <= 1; x++)
-    for (int y = -1; y <= 1; y++)
-    for (int z = -1; z <= 1; z++) {
-        vec3 id = cc + vec3(float(x), float(y), float(z));
-        vec3 h = hash33(id + uSeed * 17.0);
-        vec3 c = (id + 0.25 + 0.5 * hash33(id + 3.1 + uSeed)) * C;
-        if (length(c - uSpawn) < 70.0) continue;
-        if (h.x < 0.3) {
-            float R = 2.5 + 7.5 * h.y * h.y;
-            // drift right up to a world and it thins away rather than filling the screen
-            float near = smoothstep(R * 1.6, R * 3.2, length(ro - c));
-            if (near < 0.01) continue;
-            float kind = hash33(id + 9.9).x;
-            if (length(ro - c) > R * 1.2) {
-                float t = sphereHit(ro, rd, c, R);
-                if (t > 0.0 && t < tHit) {
-                    vec3 N = normalize(ro + rd * t - c);
-                    float diff = smoothstep(-0.08, 0.5, dot(N, L));
-                    vec3 alb = planetSurface(N, h, kind);
-                    vec3 atm = mix(vec3(0.35, 0.6, 1.0), vec3(1.0, 0.55, 0.35), h.z);
-                    float rim = pow(1.0 - max(dot(N, -rd), 0.0), 3.0);
-                    vec3 pc = alb * (diff * 1.25 + 0.05) + atm * rim * (0.25 + diff * 0.9);   // a little starlight on the night side
-                    float fade = (1.0 - smoothstep(55.0, 85.0, t)) * near;
-                    tHit = t; hitCol = pc * fade + col * (1.0 - fade);
-                }
-                // atmosphere glow just outside the limb
-                vec3 oc = c - ro; float tc = dot(oc, rd);
-                if (tc > 0.0) {
-                    float dm = length(oc - rd * tc);
-                    glow += mix(vec3(0.35, 0.6, 1.0), vec3(1.0, 0.55, 0.35), h.z) * exp(-max(dm - R, 0.0) / (R * 0.08)) * step(R, dm) * 0.25 * (1.0 - smoothstep(55.0, 85.0, tc));
+    for (int i = 0; i < 6; i++) {
+        vec4 P = uPl[i];
+        if (P.w <= 0.0) continue;
+        vec3 c = P.xyz; float R = P.w; vec4 Q = uPq[i];
+        vec3 oc = c - ro;
+        float tc = dot(oc, rd);
+        // drift right up to a world and it thins away rather than filling the screen
+        float near = smoothstep(R * 1.6, R * 3.2, length(oc));
+        float t = sphereHit(ro, rd, c, R);
+        if (t > 0.0 && t < tHit) { tHit = t; hitKind = 1.0; hitC = c; hitR = R; hitH = Q.xyz; hitType = Q.w; hitFade = near; }
+        vec3 atm = mix(vec3(0.35, 0.6, 1.0), vec3(1.0, 0.55, 0.35), Q.z);
+        if (tc > 0.0) {
+            float dm = length(oc - rd * tc);
+            glow += atm * exp(-max(dm - R, 0.0) / (R * 0.08)) * step(R, dm) * 0.25 * (1.0 - smoothstep(55.0, 85.0, tc)) * near;
+        }
+        vec4 RG = uRing[i];
+        if (RG.w > 0.5) {
+            vec3 n = RG.xyz;
+            float dn = dot(rd, n);
+            float tp = dot(oc, n) / (abs(dn) > 1e-3 ? dn : 1e-3);
+            if (tp > 0.0 && tp < ringT) {
+                float rr = length(ro + rd * tp - c) / R;
+                if (rr > 1.35 && rr < 2.4) {
+                    vec4 RB = uRingB[i];
+                    float bands = 0.5 + 0.5 * sin(rr * 40.0 + RB.x * 9.0) * sin(rr * 13.0);
+                    float a = (0.25 + 0.6 * bands) * smoothstep(1.35, 1.45, rr) * (1.0 - smoothstep(2.25, 2.4, rr));
+                    vec3 rc = mix(vec3(0.85, 0.75, 0.6), vec3(0.6, 0.65, 0.8), RB.y) * (0.35 + 0.9 * max(dot(n, L) * sign(-dn), 0.15));
+                    ringT = tp; ringCol = vec4(rc, a * (1.0 - smoothstep(55.0, 85.0, tp)) * near);
                 }
             }
-            // rings on the giants
-            vec3 hr = hash33(id + 5.5);
-            if (kind < 0.45 && hr.x > 0.4) {
-                vec3 n = normalize(hr - 0.5 + vec3(0.0, 1.2, 0.0));
-                float dn = dot(rd, n);
-                if (abs(dn) > 1e-3) {
-                    float tp = dot(c - ro, n) / dn;
-                    if (tp > 0.0 && tp < ringT) {
-                        float rr = length(ro + rd * tp - c) / R;
-                        if (rr > 1.35 && rr < 2.4) {
-                            float bands = 0.5 + 0.5 * sin(rr * 40.0 + hr.y * 9.0) * sin(rr * 13.0);
-                            float a = (0.25 + 0.6 * bands) * smoothstep(1.35, 1.45, rr) * (1.0 - smoothstep(2.25, 2.4, rr));
-                            vec3 rc = mix(vec3(0.85, 0.75, 0.6), vec3(0.6, 0.65, 0.8), hr.z) * (0.35 + 0.9 * max(dot(n, L) * sign(-dn), 0.15));
-                            ringT = tp; ringCol = vec4(rc, a * (1.0 - smoothstep(55.0, 85.0, tp)) * near);
-                        }
-                    }
-                }
-            }
-            // moons
-            if (h.z > 0.4) {
-                float ang = uTime * 0.05 * (0.6 + h.y) + h.x * 40.0;
-                vec3 mc = c + vec3(cos(ang), sin(ang) * 0.25, sin(ang)) * R * 2.6;
-                float mr = R * 0.22;
-                float t = sphereHit(ro, rd, mc, mr);
-                if (t > 0.0 && t < tHit) {
-                    vec3 N = normalize(ro + rd * t - mc);
-                    tHit = t;
-                    hitCol = mix(col, planetSurface(N, h.zxy, 0.9) * (smoothstep(-0.05, 0.4, dot(N, L)) * 1.2 + 0.01), (1.0 - smoothstep(55.0, 85.0, t)) * smoothstep(mr * 2.0, mr * 5.0, t));
-                }
-            }
-        } else if (h.x > 0.95) {
-            // a sun
-            float R = 3.0 + 3.0 * h.y;
-            vec3 sc = mix(vec3(1.0, 0.8, 0.5), vec3(0.75, 0.85, 1.0), h.z);
-            vec3 oc = c - ro; float tc = dot(oc, rd);
-            if (tc > 0.0) {
-                float dm = length(oc - rd * tc);
-                glow += sc * (R * R / (dm * dm + R * 0.3)) * 0.12 * (1.0 - smoothstep(60.0, 90.0, tc));
-                float t = sphereHit(ro, rd, c, R);
-                if (t > 0.0 && t < tHit) {
-                    vec3 N = normalize(ro + rd * t - c);
-                    float gran = fbm3(N * 8.0 + uTime * 0.05);
-                    tHit = t; hitCol = sc * (2.2 + 1.2 * gran) * (0.6 + 0.4 * pow(max(dot(N, -rd), 0.0), 0.5));
-                }
-            }
+        }
+        vec4 M = uMoon[i];
+        if (M.w > 0.0) {
+            float tm = sphereHit(ro, rd, M.xyz, M.w);
+            if (tm > 0.0 && tm < tHit) { tHit = tm; hitKind = 2.0; hitC = M.xyz; hitR = M.w; hitH = Q.zxy; hitFade = smoothstep(M.w * 2.0, M.w * 5.0, tm); }
         }
     }
+    for (int i = 0; i < 2; i++) {
+        vec4 P = uSun[i];
+        if (P.w <= 0.0) continue;
+        vec3 oc = P.xyz - ro; float tc = dot(oc, rd);
+        if (tc > 0.0) {
+            float dm = length(oc - rd * tc);
+            glow += mix(vec3(1.0, 0.8, 0.5), vec3(0.75, 0.85, 1.0), uSunC[i].x) * (P.w * P.w / (dm * dm + P.w * 0.3)) * 0.12 * (1.0 - smoothstep(60.0, 90.0, tc));
+            float t = sphereHit(ro, rd, P.xyz, P.w);
+            if (t > 0.0 && t < tHit) { tHit = t; hitKind = 3.0; hitC = P.xyz; hitR = P.w; hitH = vec3(0.0, 0.0, uSunC[i].x); hitFade = 1.0; }
+        }
+    }
+    for (int i = 0; i < 8; i++) {
+        vec4 P = uRock[i];
+        if (P.w <= 0.0) continue;
+        float t = sphereHit(ro, rd, P.xyz, P.w);
+        if (t > 0.0 && t < tHit) { tHit = t; hitKind = 4.0; hitC = P.xyz; hitR = P.w; hitH = fract(P.xyz * 0.37); hitFade = 1.0 - smoothstep(10.0, 16.0, t); }
+    }
 
-    // asteroids and drifting stardust in a finer grid
+    // drifting stardust: parallax specks in a fine grid around us
     const float S = 7.0;
-    vec3 sc0 = floor(ro / S);
-    for (int x = -1; x <= 1; x++)
-    for (int y = -1; y <= 1; y++)
-    for (int z = -1; z <= 1; z++) {
+    vec3 sc0 = floor(ro / S - 0.5);       // the 8 cells closest to us
+    for (int x = 0; x <= 1; x++)
+    for (int y = 0; y <= 1; y++)
+    for (int z = 0; z <= 1; z++) {
         vec3 id = sc0 + vec3(float(x), float(y), float(z));
         vec3 h = hash33(id * 1.7 + uSeed * 5.0);
-        vec3 p = (id + 0.2 + 0.6 * h) * S;
-        // a point of dust: parallax as we drift
-        vec3 op = p - ro; float tp = dot(op, rd);
-        if (tp > 0.2) {
-            float dm = length(op - rd * tp);
-            glow += mix(vec3(0.7, 0.8, 1.0), vec3(1.0, 0.8, 0.6), h.y) * exp(-sq(dm / (0.012 * tp))) * 0.5 * (1.0 - smoothstep(8.0, 14.0, tp));
+        vec3 op = (id + 0.2 + 0.6 * h) * S - ro;
+        float tp = dot(op, rd);
+        float dm2 = dot(op, op) - tp * tp;
+        glow += mix(vec3(0.7, 0.8, 1.0), vec3(1.0, 0.8, 0.6), h.y) * exp(-dm2 / sq(0.012 * max(tp, 0.2))) * 0.5 * (1.0 - smoothstep(8.0, 14.0, tp)) * step(0.2, tp);
+    }
+
+    // shade whatever we hit, once
+    vec3 hitCol = col;
+    if (hitKind > 0.5) {
+        vec3 N = normalize(ro + rd * tHit - hitC);
+        vec3 sc;
+        if (hitKind < 1.5) {
+            float diff = smoothstep(-0.08, 0.5, dot(N, L));
+            vec3 atm = mix(vec3(0.35, 0.6, 1.0), vec3(1.0, 0.55, 0.35), hitH.z);
+            float rim = pow(1.0 - max(dot(N, -rd), 0.0), 3.0);
+            sc = planetSurface(N, hitH, hitType) * (diff * 1.25 + 0.05) + atm * rim * (0.25 + diff * 0.9);   // a little starlight on the night side
+            hitFade *= 1.0 - smoothstep(55.0, 85.0, tHit);
+        } else if (hitKind < 2.5) {
+            sc = planetSurface(N, hitH, 0.9) * (smoothstep(-0.05, 0.4, dot(N, L)) * 1.2 + 0.01);
+            hitFade *= 1.0 - smoothstep(55.0, 85.0, tHit);
+        } else if (hitKind < 3.5) {
+            vec3 suc = mix(vec3(1.0, 0.8, 0.5), vec3(0.75, 0.85, 1.0), hitH.z);
+            sc = suc * (2.2 + 1.2 * fbm3(N * 8.0 + uTime * 0.05)) * (0.6 + 0.4 * pow(max(dot(N, -rd), 0.0), 0.5));
+        } else {
+            N = normalize(N + (vec3(noise3(N * 6.0 + hitH * 9.0), noise3(N * 6.0 + 3.0), noise3(N * 6.0 + 7.0)) - 0.5) * 0.9);
+            sc = vec3(0.32, 0.28, 0.25) * (smoothstep(-0.1, 0.6, dot(N, L)) * 1.3 + 0.02);
         }
-        // rocks, only inside belts
-        if (noise3(id * 0.08 + uSeed * 3.0) > 0.6 && h.z > 0.45) {
-            float R = 0.15 + 0.6 * h.x * h.x;
-            float t = sphereHit(ro, rd, p + vec3(0.0, 1.5, 0.0), R);
-            if (t > 0.0 && t < tHit) {
-                vec3 N = normalize(ro + rd * t - p - vec3(0.0, 1.5, 0.0));
-                N = normalize(N + (vec3(noise3(N * 6.0 + h * 9.0), noise3(N * 6.0 + 3.0), noise3(N * 6.0 + 7.0)) - 0.5) * 0.9);
-                tHit = t;
-                hitCol = vec3(0.32, 0.28, 0.25) * (smoothstep(-0.1, 0.6, dot(N, L)) * 1.3 + 0.02) * (1.0 - smoothstep(10.0, 16.0, t));
-            }
-        }
+        hitCol = mix(col, sc, hitFade);
     }
 
     // gas: the nebulae, thinned by whatever stands in front
     vec4 neb = nebula(ro, rd, min(tHit, 80.0), expand);
-    if (tHit < 1e8) col = hitCol;
+    col = hitCol;
     col = col * neb.a + neb.rgb;
     if (ringT < tHit) col = mix(col, ringCol.rgb, ringCol.a);
     col += glow;
@@ -440,6 +436,7 @@ void main() {
     gl_FragColor = vec4(col, 1.0);
 }`;
 
+    let ready = Promise.resolve(false);
     let canvas, gl, prog, U = {}, frameTex, noiseTex, ok = false, scale = 1;
     let S = null;                       // the running show
     const cam = { pos: [0, 0, 0], yaw: 0, pitch: 0, yawV: 0, pitchV: 0, speed: 0, boost: 0 };
@@ -449,20 +446,14 @@ void main() {
     const smooth = (a, b, x) => { const k = Math.min(1, Math.max(0, (x - a) / (b - a))); return k * k * (3 - 2 * k); };
     const mix = (a, b, k) => a + (b - a) * k;
 
+    // compiled in the background during the loading bar (see screen.js for the same pattern)
     function compile(vs, fs) {
-        const sh = (type, src) => {
-            const s = gl.createShader(type);
-            gl.shaderSource(s, src);
-            gl.compileShader(s);
-            if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
-            return s;
-        };
+        const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
         const p = gl.createProgram();
-        gl.attachShader(p, sh(gl.VERTEX_SHADER, vs));
-        gl.attachShader(p, sh(gl.FRAGMENT_SHADER, fs));
+        p._sh = [sh(gl.VERTEX_SHADER, vs), sh(gl.FRAGMENT_SHADER, fs)];
+        p._sh.forEach(s => gl.attachShader(p, s));
         gl.bindAttribLocation(p, 0, 'aPos');
         gl.linkProgram(p);
-        if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
         return p;
     }
 
@@ -481,15 +472,37 @@ void main() {
         canvas = c;
         gl = c.getContext('webgl', { antialias: false }) || c.getContext('experimental-webgl');
         if (!gl) return false;
-        try { prog = compile(VERT, FRAG); } catch (e) { console.warn('Chaos Matters: space shader failed', e); return false; }
-        gl.useProgram(prog);
+        prog = compile(VERT, FRAG);
+        makeTextures();
         const buf = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, buf);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
         gl.enableVertexAttribArray(0);
         gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+        const ext = gl.getExtension('KHR_parallel_shader_compile');
+        ready = new Promise(res => {
+            const poll = () => { if (!ext || gl.getProgramParameter(prog, ext.COMPLETION_STATUS_KHR)) res(); else setTimeout(poll, 25); };
+            poll();
+        }).then(() => {
+            if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+                console.warn('Chaos Matters: space shader failed', gl.getProgramInfoLog(prog), prog._sh.map(s => gl.getShaderInfoLog(s)).join(' '));
+                return false;
+            }
+            gl.useProgram(prog);
+            locate();
+            ok = true;
+            return true;
+        });
+        wire();
+        return true;
+    }
+
+    function locate() {
         ['uNoise', 'uFrame', 'uRes', 'uTime', 'uMode', 'uHole', 'uRs', 'uPull', 'uSwirl', 'uDisk', 'uBall', 'uStrobe', 'uBang',
-         'uCam', 'uRot', 'uSeed', 'uSpawn', 'uAura', 'uVhs', 'uRoll', 'uStatic'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
+         'uCam', 'uRot', 'uSeed', 'uSpawn', 'uPl', 'uPq', 'uRing', 'uRingB', 'uMoon', 'uSun', 'uSunC', 'uRock', 'uAura', 'uVhs', 'uRoll', 'uStatic'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
+    }
+
+    function makeTextures() {
         const nz = new Uint8Array(256 * 256 * 4), R = new Uint8Array(256 * 256);
         for (let i = 0; i < R.length; i++) R[i] = Math.random() * 256;
         for (let y = 0; y < 256; y++) for (let x = 0; x < 256; x++) {
@@ -500,16 +513,25 @@ void main() {
         }
         noiseTex = tex(256, 256, nz, true);
         frameTex = tex(1, 1, new Uint8Array([0, 0, 0, 255]), false);
-        ok = true;
-        wire();
-        return true;
     }
+
+    /* draw one throwaway pixel so the driver has finished with the shader before the bang */
+    function warm() {
+        if (!ok) return;
+        gl.useProgram(prog);
+        gl.viewport(0, 0, 1, 1);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
+    }
+
+    let quality = 1;
+    function setQuality(q) { quality = q; if (S) resize(); }
 
     function resize() {
         if (!ok) return;
         // space is costly: render at a reduced size and let the browser scale it up smoothly
         const dpr = Math.min(devicePixelRatio || 1, 1.5);
-        const budget = 1.1e6, px = innerWidth * innerHeight * dpr * dpr;
+        const budget = 0.6e6 * quality * quality, px = innerWidth * innerHeight * dpr * dpr;
         scale = px > budget ? dpr * Math.sqrt(budget / px) : dpr;
         const w = Math.round(innerWidth * scale), h = Math.round(innerHeight * scale);
         if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
@@ -615,6 +637,66 @@ void main() {
         return out;
     }
 
+    /* The universe is laid out in 46-unit cells; each cell may hold a planet (with a ring
+       and a moon) or a sun. Every frame we list the ones around the camera for the shader. */
+    function h3(x, y, z, k) {
+        const f = v => { const s = Math.sin(v) * 43758.5453; return s - Math.floor(s); };
+        const a = x * 127.1 + y * 311.7 + z * 74.7 + k * 19.19 + S.seed[0] * 1000;
+        return [f(a), f(a + 51.3 + S.seed[1] * 400), f(a + 97.1 + S.seed[2] * 700)];
+    }
+    const bodies = {
+        pl: new Float32Array(24), pq: new Float32Array(24), ring: new Float32Array(24), ringB: new Float32Array(24),
+        moon: new Float32Array(24), sun: new Float32Array(8), sunC: new Float32Array(8), rock: new Float32Array(32)
+    };
+    function listBodies(t) {
+        const C = 46, cx = Math.floor(cam.pos[0] / C), cy = Math.floor(cam.pos[1] / C), cz = Math.floor(cam.pos[2] / C);
+        const planets = [], suns = [];
+        for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) for (let z = -1; z <= 1; z++) {
+            const ix = cx + x, iy = cy + y, iz = cz + z;
+            const h = h3(ix, iy, iz, 0);
+            if (h[0] >= 0.3 && h[0] <= 0.95) continue;
+            const o = h3(ix, iy, iz, 1);
+            const c = [(ix + 0.25 + 0.5 * o[0]) * C, (iy + 0.25 + 0.5 * o[1]) * C, (iz + 0.25 + 0.5 * o[2]) * C];
+            if (Math.hypot(c[0] - S.spawn[0], c[1] - S.spawn[1], c[2] - S.spawn[2]) < 70) continue;
+            const d = Math.hypot(c[0] - cam.pos[0], c[1] - cam.pos[1], c[2] - cam.pos[2]);
+            if (h[0] < 0.3) planets.push({ c, h, d, id: [ix, iy, iz] });
+            else suns.push({ c, h, d });
+        }
+        planets.sort((a, b) => a.d - b.d);
+        suns.sort((a, b) => a.d - b.d);
+        const B = bodies;
+        B.pl.fill(0); B.moon.fill(0); B.ring.fill(0); B.sun.fill(0);
+        planets.slice(0, 6).forEach((p, i) => {
+            const [hx, hy, hz] = p.h, R = 2.5 + 7.5 * hy * hy;
+            const kind = h3(...p.id, 2)[0], hr = h3(...p.id, 3);
+            B.pl.set([...p.c, R], i * 4);
+            B.pq.set([hx, hy, hz, kind], i * 4);
+            if (kind < 0.45 && hr[0] > 0.4) {
+                const n = [hr[0] - 0.5, hr[1] - 0.5 + 1.2, hr[2] - 0.5], l = Math.hypot(...n);
+                B.ring.set([n[0] / l, n[1] / l, n[2] / l, 1], i * 4);
+                B.ringB.set([hr[1], hr[2], 0, 0], i * 4);
+            }
+            if (hz > 0.4) {
+                const ang = t * 0.05 * (0.6 + hy) + hx * 40;
+                B.moon.set([p.c[0] + Math.cos(ang) * R * 2.6, p.c[1] + Math.sin(ang) * R * 0.65, p.c[2] + Math.sin(ang) * R * 2.6, R * 0.22], i * 4);
+            }
+        });
+        suns.slice(0, 2).forEach((s, i) => { B.sun.set([...s.c, 3 + 3 * s.h[1]], i * 4); B.sunC.set([s.h[2], 0, 0, 0], i * 4); });
+        // asteroid belts: some regions of space are full of rock
+        B.rock.fill(0);
+        const SR = 7, sx = Math.floor(cam.pos[0] / SR), sy = Math.floor(cam.pos[1] / SR), sz = Math.floor(cam.pos[2] / SR);
+        const belt = h3(Math.floor(sx / 12), Math.floor(sy / 12), Math.floor(sz / 12), 7)[0] > 0.55;
+        if (belt) {
+            let n = 0;
+            for (let x = -1; x <= 1 && n < 8; x++) for (let y = -1; y <= 1 && n < 8; y++) for (let z = -1; z <= 1 && n < 8; z++) {
+                const h = h3(sx + x, sy + y, sz + z, 9);
+                if (h[2] < 0.6) continue;
+                B.rock.set([(sx + x + 0.2 + 0.6 * h[0]) * SR, (sy + y + 0.2 + 0.6 * h[1]) * SR + 1.5, (sz + z + 0.2 + 0.6 * h[2]) * SR, 0.15 + 0.6 * h[0] * h[0]], n * 4);
+                n++;
+            }
+        }
+    }
+
     function forward() {
         const cp = Math.cos(cam.pitch);
         return [Math.sin(cam.yaw) * cp, Math.sin(cam.pitch), Math.cos(cam.yaw) * cp];
@@ -647,6 +729,12 @@ void main() {
         gl.uniformMatrix3fv(U.uRot, false, [right[0], right[1], right[2], up[0], up[1], up[2], f[0], f[1], f[2]]);
         gl.uniform3f(U.uSeed, S.seed[0], S.seed[1], S.seed[2]);
         gl.uniform3f(U.uSpawn, S.spawn[0], S.spawn[1], S.spawn[2]);
+        if (S.mode === 1) {
+            listBodies(u.t);
+            const B = bodies;
+            gl.uniform4fv(U.uPl, B.pl); gl.uniform4fv(U.uPq, B.pq); gl.uniform4fv(U.uRing, B.ring); gl.uniform4fv(U.uRingB, B.ringB);
+            gl.uniform4fv(U.uMoon, B.moon); gl.uniform4fv(U.uSun, B.sun); gl.uniform4fv(U.uSunC, B.sunC); gl.uniform4fv(U.uRock, B.rock);
+        }
         const auraOn = S.mode === 1 ? smooth(1.5, 3.5, u.bang) : 0;
         gl.uniform3f(U.uAura, aim.x, aim.y, aim.on ? auraOn : 0);
         gl.uniform1f(U.uVhs, u.vhs);
@@ -689,5 +777,5 @@ void main() {
         addEventListener('resize', () => { if (S) resize(); });
     }
 
-    return { init, start, step, rewind, stop, capture, K, get active() { return !!S; }, get ok() { return ok; } };
+    return { init, warm, setQuality, get ready() { return ready; }, start, step, rewind, stop, capture, K, get active() { return !!S; }, get ok() { return ok; } };
 })();
