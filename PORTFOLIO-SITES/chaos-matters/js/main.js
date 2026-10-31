@@ -408,7 +408,7 @@
             swallowed = o.t >= Space.K.form;
             if (swallowed && !o.consumed) suckRooms(o);
             if (o.t > Space.K.bang + 2.2 && !spaceMusicOn) { spaceMusicOn = true; Sound.spaceMusic(); }
-            if (o.explore && rewindBtn.hidden && !osd.classList.contains('on')) { rewindBtn.hidden = false; body.classList.add('exploring'); }
+            if (o.explore && Space.active && rewindBtn.hidden && !osd.classList.contains('on')) { rewindBtn.hidden = false; body.classList.add('exploring'); }
             if (osd.classList.contains('on') && o.rew != null) osd.querySelector('.osd-time').textContent = tape(o.rew);
         }
 
