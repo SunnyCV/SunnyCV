@@ -409,7 +409,7 @@
             if (swallowed && !o.consumed) suckRooms(o);
             if (o.t > Space.K.bang + 2.2 && !spaceMusicOn) { spaceMusicOn = true; Sound.spaceMusic(); }
             if (o.explore && rewindBtn.hidden && !osd.classList.contains('on')) { rewindBtn.hidden = false; body.classList.add('exploring'); }
-            if (osd.classList.contains('on')) osd.querySelector('.osd-time').textContent = tape(o.t);
+            if (osd.classList.contains('on') && o.rew != null) osd.querySelector('.osd-time').textContent = tape(o.rew);
         }
 
         if (returning) {
@@ -466,7 +466,7 @@
 
     // a VHS tape counter running backwards
     function tape(t) {
-        const s = Math.max(0, 5000 - t * 900);
+        const s = Math.max(0, 4997 - t * 1400);
         const p = n => String(Math.floor(n)).padStart(2, '0');
         return `${p(s / 3600)}:${p((s / 60) % 60)}:${p(s % 60)}`;
     }

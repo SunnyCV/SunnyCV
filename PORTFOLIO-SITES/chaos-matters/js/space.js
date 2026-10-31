@@ -603,7 +603,12 @@ void main() {
             vhs = smooth(0, 0.25, r);
             S.roll += dt * (0.35 + 7 * Math.pow(smooth(0.5, 1.5, r), 2));
             stat = smooth(1.35, 1.75, r);
-            if (r >= 1.85 && !S.returned) { S.returned = true; o.onReturn && o.onReturn(); }
+            out.rew = r;
+            if (r >= 1.85 && !S.returned) {
+                S.returned = true;
+                o.onReturn && o.onReturn();      // this stops the show
+                return out;
+            }
         }
 
         render({ t, rs, pull, swirl, disk, ball, strobe, bang: S.mode === 1 ? bang : -1, vhs, roll: S.roll, stat });
