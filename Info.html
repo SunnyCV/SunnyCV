@@ -75,7 +75,7 @@ nav:not(.panel-nav) { position: fixed; top: 0; left: 0; }
     flex-direction: column;
     align-items: flex-end;
     justify-content: center;
-    padding: 84px clamp(64px, 8vw, 150px) 72px 40px;
+    padding: 84px clamp(54px, 5.5vw, 104px) 72px 40px;
     position: relative;
 }
 .col {
@@ -99,6 +99,10 @@ nav:not(.panel-nav) { position: fixed; top: 0; left: 0; }
 .panel-label::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
 
 /* ── Panel 1 — Opening ── */
+/* On desktop the name sits at the head of the first panel instead of in the top bar */
+.hero-logo { display: block; margin: 0 0 34px -4px; }
+.hero-logo img { display: block; width: min(100%, 400px); height: auto; }
+@media (min-width: 769px) { #pfLogo { display: none !important; } }
 .hero-quote {
     font-family: var(--display);
     font-style: italic;
@@ -283,7 +287,7 @@ a.work-name:hover { color: var(--ink); }
 /* ── Panel arrows, under the text column ── */
 .panel-arrow {
     position: fixed;
-    right: clamp(64px, 8vw, 150px);
+    right: clamp(54px, 5.5vw, 104px);
     bottom: 26px;
     z-index: 100;
     background: rgba(244,239,227,0.7);
@@ -309,6 +313,7 @@ a.work-name:hover { color: var(--ink); }
 @media (max-width: 768px) {
     .panel { padding: 70px 34px 76px 22px; justify-content: flex-start; align-items: stretch; }
     .col { width: auto; }
+    .hero-logo { display: none; }
     .panel-label { font-size: 13px; margin-bottom: 14px; }
     .hero-quote { font-size: 27px; margin-top: 6vh; }
     .hero-sub { font-size: 14px; letter-spacing: 2px; }
@@ -366,6 +371,7 @@ a.work-name:hover { color: var(--ink); }
     <!-- Panel 1 — Opening -->
     <section class="panel">
         <div class="col">
+            <a class="hero-logo" href="Portfolio.html"><img src="PORTFOLIO/portfolio logo.png" alt="Charles Barrios"></a>
             <p class="hero-quote">"I create things that look exactly how they're supposed to feel, and I've been doing it long enough to know when something's right."</p>
             <p class="hero-sub"><span>Web Designer &amp; Developer</span><span>Graphic Designer</span><span>Creative Director</span></p>
             <a class="hero-email" href="mailto:barrioscharles97@gmail.com">barrioscharles97@gmail.com</a>
