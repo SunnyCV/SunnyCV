@@ -1134,6 +1134,18 @@ body.dark-room .dsgn-screen-scanlines { opacity: 1; }
     font-size: 8px;
 }
 
+/* ── Cable: drawn by script from the projector's HDMI port, down to the table and into the laptop ── */
+.dsgn-table-wrap { position: relative; }
+.dsgn-cable { visibility: hidden; }          /* the old straight bar; kept only as spacing */
+#dsgnCableSvg {
+    position: absolute; left: 0; top: 0;
+    width: 100%; height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 5;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.4));
+}
+
 /* (laptop table removed — both devices share the dsgn-table-wrap) */
 
 /* Subtle floor ground line */
@@ -1231,10 +1243,13 @@ body.dark-room .dsgn-floor-line {
     .dsgn-cable { width: 30px; }
 }
 @media (max-width: 700px) {
-    .dsgn-table-items-row { flex-direction: column; align-items: center; gap: 20px; padding: 0 10px; }
-    .dsgn-cable-wrap { transform: rotate(90deg); margin: 0; }
+    /* projector and laptop stay side by side on the table, drawn smaller to fit */
+    .dsgn-table-items-row { flex-direction: row; align-items: flex-end; gap: 0; padding: 0 4px; }
+    .dsgn-cable-wrap { margin: 0 0 20px; }
+    .dsgn-cable { width: 14px; }
+    .dsgn-laptop-wrap { zoom: 0.66; }
     .dsgn-beam-wrap { width: 280px; }
-    .proj-perspective { transform: scale(0.82); transform-origin: center top; }
+    .proj-perspective { zoom: 0.66; }
     .dsgn-table-top { width: 95%; }
     .dsgn-table-legs-row { width: 90%; }
 }
@@ -1456,6 +1471,7 @@ body.dark-room .dsgn-floor-line {
 
                 </div><!-- /dsgn-table-items-row -->
 
+                <svg id="dsgnCableSvg" aria-hidden="true"></svg>
                 <div class="dsgn-table-top"></div>
                 <div class="dsgn-table-legs-row">
                     <div class="dsgn-table-leg"></div>
@@ -1947,6 +1963,45 @@ function resetPresentation() {
 for (var i = 0; i < Math.min(8, designs.length); i++) {
     (new Image()).src = designs[i].src;
 }
+</script>
+<script>
+/* Draws the HDMI cable between the projector's port and the laptop, wherever the layout puts them */
+(function () {
+    var svg  = document.getElementById('dsgnCableSvg');
+    var wrap = document.querySelector('.dsgn-table-wrap');
+    var port = document.querySelector('.pj-hdmi-port');
+    var base = document.querySelector('.lp-base');
+    if (!svg || !wrap || !port || !base) return;
+
+    function place() {
+        var w = wrap.getBoundingClientRect(), p = port.getBoundingClientRect(), b = base.getBoundingClientRect();
+        if (!w.width || !p.width) return;                     // presentation view is hidden
+        var k  = Math.max(0.6, Math.min(1, p.width / 13));    // thinner cable when the scene is drawn small
+        var px = p.left + p.width / 2 - w.left;               // middle of the port
+        var py = p.top - w.top;
+        var ty = b.top + b.height / 2 - w.top;                // the cable rests at the height of the laptop's base
+        var lx = b.left - w.left;                             // left side of the laptop
+        var bend = Math.min(26 * k, Math.max(8, (lx - px) * 0.35));
+        var d = 'M' + px.toFixed(1) + ' ' + (py + p.height).toFixed(1) +
+                ' C' + px.toFixed(1) + ' ' + (ty + 1).toFixed(1) + ' ' + (px + bend * 0.3).toFixed(1) + ' ' + ty.toFixed(1) +
+                ' ' + (px + bend).toFixed(1) + ' ' + ty.toFixed(1) +
+                ' L' + (lx - 5 * k).toFixed(1) + ' ' + ty.toFixed(1);
+        var hw = p.width + 4 * k, hh = p.height + 7 * k;      // the plug that sits in the port
+        svg.innerHTML =
+            '<path d="' + d + '" fill="none" stroke="#1c1c1c" stroke-width="' + (4 * k).toFixed(1) + '" stroke-linecap="round"/>' +
+            '<path d="' + d + '" fill="none" stroke="#5a5a5a" stroke-width="' + (1.1 * k).toFixed(1) + '" stroke-linecap="round" transform="translate(0,' + (-1 * k).toFixed(1) + ')"/>' +
+            '<rect x="' + (px - hw / 2).toFixed(1) + '" y="' + (py - 1).toFixed(1) + '" width="' + hw.toFixed(1) + '" height="' + hh.toFixed(1) + '" rx="' + (2 * k).toFixed(1) + '" fill="#2b2b2b" stroke="#111" stroke-width="0.8"/>' +
+            '<rect x="' + (px - hw / 2 + 1.5).toFixed(1) + '" y="' + py.toFixed(1) + '" width="' + (hw - 3).toFixed(1) + '" height="' + (1.6 * k).toFixed(1) + '" rx="0.8" fill="#6a6a6a"/>' +
+            '<rect x="' + (lx - 9 * k).toFixed(1) + '" y="' + (ty - 3.5 * k).toFixed(1) + '" width="' + (10 * k).toFixed(1) + '" height="' + (7 * k).toFixed(1) + '" rx="' + (1.6 * k).toFixed(1) + '" fill="#2b2b2b" stroke="#111" stroke-width="0.8"/>';
+    }
+    function soon() { [0, 80, 400, 1200].forEach(function (t) { setTimeout(place, t); }); }
+
+    window.addEventListener('resize', place);
+    window.addEventListener('load', soon);
+    var enter = document.getElementById('enterPresentBtn');
+    if (enter) enter.addEventListener('click', soon);
+    soon();
+}());
 </script>
 <script src="PortfolioNav.js"></script>
 </body>
