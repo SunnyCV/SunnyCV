@@ -1,0 +1,173 @@
+@charset "utf-8";
+/* Shared top bar for the portfolio pages: centred logo, corner menu.
+   PortfolioNav.js builds the bar; this file styles it and retires the old navigation. */
+
+/* ── Retire the old navigation, keeping the room it took up ── */
+nav:not(.panel-nav) { visibility: hidden !important; pointer-events: none !important; }
+.mobile-header > * { visibility: hidden !important; }
+.mobile-header { pointer-events: none !important; }
+.mobile-nav-menu, .mobile-nav-overlay,
+.nav-hover-zone, .nav-hint { display: none !important; }
+
+/* ── The bar ── */
+#pfBar {
+    --pf-ink: #fff;                       /* logo and menu colour */
+    --pf-box: rgba(8,8,8,0.94);           /* menu box background */
+    --pf-line: rgba(255,255,255,0.16);
+    --pf-hover: rgba(255,255,255,0.08);
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 38px;
+    z-index: 1095;
+    pointer-events: none;                 /* only the logo and the menu take clicks */
+}
+#pfBar.pf-light {
+    --pf-ink: #1c1c1c;
+    --pf-box: rgba(240,238,234,0.96);
+    --pf-line: rgba(0,0,0,0.18);
+    --pf-hover: rgba(0,0,0,0.06);
+}
+body.dark-room #pfBar.pf-light {
+    --pf-ink: #ddd;
+    --pf-box: rgba(8,8,8,0.94);
+    --pf-line: rgba(255,255,255,0.16);
+    --pf-hover: rgba(255,255,255,0.08);
+}
+
+/* ── Centred logo, built from stacked copies so it can glitch ── */
+#pfLogo {
+    position: absolute;
+    left: 50%; top: 50%;
+    height: 24px;
+    aspect-ratio: 2100 / 308;
+    transform: translate(-50%, -50%);
+    pointer-events: auto;
+    display: block;
+}
+#pfLogo .lg {
+    position: absolute;
+    inset: 0;
+    -webkit-mask: url("PORTFOLIO/portfolio logo inv.png") center / contain no-repeat;
+            mask: url("PORTFOLIO/portfolio logo inv.png") center / contain no-repeat;
+}
+#pfLogo .lg-main  { background: var(--pf-ink); transition: background-color 1.4s ease; }
+#pfLogo .lg-red   { background: #ff2a4f; opacity: 0; }
+#pfLogo .lg-cyan  { background: #19e6ff; opacity: 0; }
+#pfLogo .lg-slice { background: var(--pf-ink); opacity: 0; }
+
+/* ── Menu button, top left ── */
+#pfBurger {
+    position: absolute;
+    left: 8px; top: 50%;
+    width: 38px; height: 32px;
+    transform: translateY(-50%);
+    background: none; border: 0; padding: 0;
+    cursor: pointer;
+    pointer-events: auto;
+    -webkit-tap-highlight-color: transparent;
+}
+#pfBurger span {
+    position: absolute;
+    left: 9px;
+    width: 20px; height: 2px;
+    background: var(--pf-ink);
+    transition: transform 0.22s ease, opacity 0.15s ease, width 0.22s ease, background-color 1.4s ease;
+}
+#pfBurger span:nth-child(1) { top: 9px; }
+#pfBurger span:nth-child(2) { top: 15px; width: 14px; }
+#pfBurger span:nth-child(3) { top: 21px; }
+#pfBurger:hover span:nth-child(2) { width: 20px; }
+#pfBar.open #pfBurger span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+#pfBar.open #pfBurger span:nth-child(2) { opacity: 0; }
+#pfBar.open #pfBurger span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+/* ── The little menu box ── */
+#pfMenu {
+    position: absolute;
+    left: 10px; top: 100%;
+    margin-top: 4px;
+    width: 172px;
+    padding: 8px 0;
+    background: var(--pf-box);
+    border: 1px solid var(--pf-line);
+    -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+    pointer-events: none;
+    visibility: hidden;
+    opacity: 0;
+}
+#pfBar.open #pfMenu {
+    pointer-events: auto;
+    visibility: visible;
+    opacity: 1;
+    animation: pfSnap 0.26s steps(1);
+}
+@keyframes pfSnap {
+    0%  { clip-path: inset(0 0 82% 0); transform: translateX(-7px); }
+    30% { clip-path: inset(0 0 45% 0); transform: translateX(5px); }
+    60% { clip-path: inset(0 0 12% 0); transform: translateX(-2px); }
+    85% { clip-path: inset(0);         transform: translateX(0); }
+}
+#pfMenu a {
+    position: relative;
+    display: block;
+    padding: 10px 18px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--pf-ink);
+    opacity: 0.62;
+    background: none;
+    transition: opacity 0.2s ease, letter-spacing 0.2s ease, background-color 0.2s ease;
+}
+#pfMenu a:hover { opacity: 1; letter-spacing: 5px; background: var(--pf-hover); }
+#pfMenu a.active { opacity: 1; }
+#pfMenu a.active::marker { content: none; }
+#pfMenu a.active { box-shadow: inset 2px 0 0 var(--pf-ink); }
+
+/* red and cyan copies of the word that flicker out of register on hover */
+#pfMenu a::before,
+#pfMenu a::after {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    padding: inherit;
+    opacity: 0;
+    pointer-events: none;
+}
+#pfMenu a::before { color: #ff2a4f; }
+#pfMenu a::after  { color: #19e6ff; }
+#pfMenu a:hover::before { animation: pfA 2.8s steps(1) infinite; }
+#pfMenu a:hover::after  { animation: pfB 2.8s steps(1) infinite; }
+@keyframes pfA {
+    0%   { opacity: 0.9; transform: translateX(-3px); clip-path: inset(0 0 55% 0); }
+    3%   { opacity: 0.9; transform: translateX(2px);  clip-path: inset(40% 0 0 0); }
+    6%   { opacity: 0.8; transform: translateX(-1px); clip-path: inset(0); }
+    9%   { opacity: 0; }
+    61%  { opacity: 0.7; transform: translateX(-2px); clip-path: inset(30% 0 30% 0); }
+    64%  { opacity: 0; }
+    100% { opacity: 0; }
+}
+@keyframes pfB {
+    0%   { opacity: 0.9; transform: translateX(3px);  clip-path: inset(45% 0 0 0); }
+    3%   { opacity: 0.9; transform: translateX(-2px); clip-path: inset(0 0 50% 0); }
+    6%   { opacity: 0.8; transform: translateX(1px);  clip-path: inset(0); }
+    9%   { opacity: 0; }
+    61%  { opacity: 0.7; transform: translateX(2px);  clip-path: inset(30% 0 30% 0); }
+    64%  { opacity: 0; }
+    100% { opacity: 0; }
+}
+
+/* ── Phones: the bar matches the old 48px header ── */
+@media (max-width: 768px) {
+    #pfBar  { height: 48px; }
+    #pfLogo { height: 26px; }
+    #pfMenu a { padding: 12px 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #pfBar.open #pfMenu, #pfMenu a:hover::before, #pfMenu a:hover::after { animation: none; }
+}
