@@ -1089,6 +1089,51 @@ body.dark-room .dsgn-screen-scanlines { opacity: 1; }
     pointer-events: none;
 }
 
+/* ── Laptop, front view: an upright rectangular screen on a thin base.
+      These rules replace the tilted lid above, which drew the screen as a wedge. ── */
+.lp-outer { perspective: none; }
+/* close the small gap the narrower screen left between the cable and the laptop */
+@media (min-width: 701px) { .dsgn-laptop-wrap { margin-left: -12px; } }
+.lp-body {
+    width: 214px;
+    transform: none;
+    display: flex; flex-direction: column; align-items: center;
+}
+.lp-lid, .lp-lid.open {
+    position: relative; left: auto; bottom: auto;
+    width: 192px; height: 120px;              /* a 16:10 screen */
+    transform: none;
+}
+.lp-lid-back { display: none; }
+.lp-lid-face {
+    border-radius: 7px 7px 0 0;
+    border: 2px solid #2e2c2a;
+    box-shadow: inset 0 0 0 5px #111, 0 0 0 1px rgba(0,0,0,0.25);
+}
+/* the base seen from the front: a slim slab with a thumb notch */
+.lp-base {
+    width: 214px; height: 9px;
+    background: linear-gradient(180deg, #dcdad8 0%, #c2c0be 55%, #a9a7a5 100%);
+    border-radius: 2px 2px 7px 7px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.55);
+}
+.lp-base::before {
+    top: 0; left: 50%; right: auto;
+    width: 34px; height: 3px;
+    transform: translateX(-50%);
+    background: #9a9896;
+    border-radius: 0 0 4px 4px;
+    box-shadow: none;
+}
+.lp-base::after { display: none; }
+.lp-key-rows, .lp-trackpad { display: none; }
+/* the hint now sits on the screen */
+.lp-hint {
+    top: -62px;
+    color: rgba(255,255,255,0.5);
+    font-size: 8px;
+}
+
 /* (laptop table removed — both devices share the dsgn-table-wrap) */
 
 /* Subtle floor ground line */
@@ -1148,17 +1193,30 @@ body.dark-room .dsgn-floor-line {
     transition: color 0.2s;
 }
 .lb-close:hover { color: #fff; }
+/* Arrows sit on a dark disc with a light ring, so they show on white pictures and dark ones alike */
 .lb-prev, .lb-next {
     position: fixed; top: 50%; transform: translateY(-50%);
-    background: none; border: none; font-size: 52px;
-    color: rgba(255,255,255,0.32); cursor: pointer;
-    z-index: 3001; padding: 8px 16px; line-height: 1;
-    user-select: none; transition: color 0.2s;
+    width: 46px; height: 46px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(12,12,12,0.72);
+    border: 1px solid rgba(255,255,255,0.55);
+    border-radius: 50%;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.45);
+    color: #fff; cursor: pointer;
+    z-index: 3001;
+    user-select: none; transition: background 0.2s, border-color 0.2s, opacity 0.2s;
+    -webkit-tap-highlight-color: transparent;
 }
-.lb-prev:hover, .lb-next:hover { color: rgba(255,255,255,0.8); }
-.lb-prev { left: 12px; }
-.lb-next { right: 12px; }
-.lb-prev:disabled, .lb-next:disabled { opacity: 0.15; cursor: default; }
+.lb-prev svg, .lb-next svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.lb-prev:hover, .lb-next:hover { background: rgba(0,0,0,0.92); border-color: #fff; }
+.lb-prev { left: 14px; }
+.lb-next { right: 14px; }
+.lb-prev:disabled, .lb-next:disabled { opacity: 0.25; cursor: default; }
+@media (max-width: 700px) {
+    .lb-prev, .lb-next { width: 40px; height: 40px; }
+    .lb-prev { left: 8px; }
+    .lb-next { right: 8px; }
+}
 .lb-counter {
     position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
     font-family: 'Courier New', monospace; font-size: 11px; letter-spacing: 3px;
@@ -1417,9 +1475,9 @@ body.dark-room .dsgn-floor-line {
 <!-- Lightbox -->
 <div class="dsgn-lightbox" id="dsgnLightbox">
     <button class="lb-close" id="lbClose">&times;</button>
-    <button class="lb-prev" id="lbPrev">&#8249;</button>
+    <button class="lb-prev" id="lbPrev" aria-label="Previous"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
     <img class="lb-img" id="lbImg" src="" alt="">
-    <button class="lb-next" id="lbNext">&#8250;</button>
+    <button class="lb-next" id="lbNext" aria-label="Next"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
     <div class="lb-counter" id="lbCounter"></div>
 </div>
 
