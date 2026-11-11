@@ -100,8 +100,9 @@ nav:not(.panel-nav) { position: fixed; top: 0; left: 0; }
 
 /* ── Panel 1 — Opening ── */
 /* On desktop the name sits at the head of the first panel instead of in the top bar */
-.hero-logo { display: block; margin: 0 0 34px -4px; }
-.hero-logo img { display: block; width: min(100%, 400px); height: auto; }
+/* the PNG has empty margins, so it is drawn a little wider to make the lettering itself span the column */
+.hero-logo { display: block; margin: 0 0 26px; }
+.hero-logo img { display: block; width: 105.69%; max-width: none; margin-left: -2.82%; height: auto; }
 @media (min-width: 769px) { #pfLogo { display: none !important; } }
 .hero-quote {
     font-family: var(--display);
