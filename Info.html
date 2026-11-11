@@ -1,86 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link rel="stylesheet" type="text/css" href="PortfolioGallery.css">
 <link rel="stylesheet" type="text/css" href="PortfolioNav.css">
-<title>Info — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<title>About | Charles Barrios</title>
 <style>
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --paper: #f4efe3;
+    --ink: #1f1b17;
+    --ink-soft: #5d554b;
+    --accent: #a8361c;                 /* a vermilion pigment */
+    --rule: rgba(31,27,23,0.22);
+    --display: 'Cormorant Garamond', 'Cormorant', Garamond, Georgia, serif;
+    --text: 'EB Garamond', Garamond, Georgia, serif;
+}
 
 html, body {
     height: 100%;
     overflow: hidden;
 }
+body { background: var(--paper) !important; color: var(--ink); padding-bottom: 0 !important; }
 
-/* ── Background video ── */
+/* ── The painting: the video is hidden and repainted live in watercolour on #paint ── */
 .bg-video {
     position: fixed;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    z-index: -2;
+    z-index: -3;
+    opacity: 0;
+    pointer-events: none;
 }
-
-/* ── Dark overlay ── */
-.bg-overlay {
+/* without the live filter, show the video itself as a pale tinted wash */
+body.no-paint .bg-video { opacity: 0.3; filter: sepia(0.5) contrast(1.1); z-index: -2; }
+#paint {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.45);
-    z-index: -1;
-}
-
-/* ── Nav — hidden until hover zone triggered ── */
-.nav-hover-zone {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 64px;
-    z-index: 200;
-}
-.nav-hover-zone:hover nav {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0);
-}
-
-nav {
-    position: relative;
-    opacity: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
     pointer-events: none;
-    transform: translateY(-100%);
-    transition: opacity 0.3s, transform 0.3s;
-    background: rgba(0,0,0,0.72) !important;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
 }
-nav img { left: 14px; top: 50%; transform: translateY(-50%); height: 30px; width: auto; }
-nav li a { color: #ccc !important; }
-nav li a:hover:not(.active) { background-color: rgba(255,255,255,0.1) !important; }
-nav .active { color: #fff !important; opacity: 1 !important; }
 
-.mobile-header {
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(-100%);
-    transition: opacity 0.3s, transform 0.3s;
-    background-color: rgba(0,0,0,0.75) !important;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-bottom: 1px solid rgba(255,255,255,0.08) !important;
-}
-.mobile-header-hamburger { color: #fff !important; }
-.mobile-nav-menu { background-color: rgba(10,10,10,0.95) !important; border-right: 1px solid #333 !important; }
-.mobile-nav-menu a { color: #ccc !important; border-bottom: 1px solid #222 !important; }
-.mobile-nav-overlay { background: rgba(0,0,0,0.5) !important; }
+/* the old bar is replaced by PortfolioNav; keep its pieces out of the way */
+nav:not(.panel-nav) { position: fixed; top: 0; left: 0; }
+.mobile-header { background-color: rgba(244,239,227,0.9) !important; border-bottom: 1px solid var(--rule) !important; }
 
 /* ── Panel container ── */
 .panels {
     height: 100vh;
+    height: 100dvh;
     overflow-y: scroll;
     scroll-snap-type: y mandatory;
     -webkit-overflow-scrolling: touch;
@@ -88,303 +66,229 @@ nav .active { color: #fff !important; opacity: 1 !important; }
 }
 .panels::-webkit-scrollbar { display: none; }
 
-/* ── Individual panel ── */
+/* ── Individual panel: one column of text, set to the right ── */
 .panel {
     height: 100vh;
+    height: 100dvh;
     scroll-snap-align: start;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
-    padding: 72px 40px 48px;
+    padding: 84px clamp(64px, 8vw, 150px) 72px 40px;
     position: relative;
-    text-align: center;
 }
-.panel.panel-left { align-items: flex-start; text-align: left; padding-left: clamp(40px, 10vw, 160px); padding-right: clamp(40px, 10vw, 160px); }
-
-/* ── Panel right — desktop only ── */
-@media (min-width: 769px) {
-    .panel.panel-right { align-items: flex-end; text-align: right; padding-left: clamp(160px, 28vw, 480px); padding-right: clamp(40px, 10vw, 160px); }
+.col {
+    width: min(44vw, 540px);
+    text-align: left;
 }
 
 /* ── Panel label ── */
 .panel-label {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 600;
     letter-spacing: 5px;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.35);
-    margin-bottom: 22px;
+    color: var(--accent);
+    margin-bottom: 26px;
 }
+.panel-label::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
 
-/* ── Panel 1 — Hero ── */
-.hero-content {
-    max-width: 820px;
-    text-align: center;
-}
-.hero-eyebrow {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: clamp(42px, 7vw, 80px);
-    font-weight: 900;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: white;
-    margin-bottom: 24px;
-    line-height: 1.1;
-}
+/* ── Panel 1 — Opening ── */
 .hero-quote {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: clamp(14px, 1.8vw, 20px);
-    font-weight: 600;
-    color: rgba(255,255,255,0.90);
-    line-height: 1.55;
-    margin-bottom: 28px;
+    font-family: var(--display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(28px, 3.1vw, 44px);
+    line-height: 1.22;
+    color: var(--ink);
+    margin-bottom: 30px;
+    text-wrap: balance;
 }
 .hero-sub {
-    font-family: Arial, sans-serif;
-    font-size: 13px;
-    color: rgba(255,255,255,0.65);
-    letter-spacing: 2.5px;
-    margin-bottom: 18px;
+    font-family: var(--display);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    line-height: 1.7;
+    margin-bottom: 26px;
 }
-.hero-email {
-    font-family: Arial, sans-serif;
-    font-size: 12px;
-    color: rgba(255,255,255,0.75);
-    letter-spacing: 2px;
+.hero-sub span { display: block; }
+.hero-email, .hero-brand {
+    font-family: var(--text);
+    font-size: 18px;
+    color: var(--ink);
     text-decoration: none;
-    border-bottom: 1px solid rgba(255,255,255,0.35);
+    border-bottom: 1px solid var(--rule);
     padding-bottom: 2px;
     transition: color 0.25s, border-color 0.25s;
     display: inline-block;
 }
-.hero-email:hover { color: #cc3300; border-color: rgba(204,51,0,0.5); }
-.hero-brand {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 11px;
-    color: rgba(255,255,255,0.55);
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    text-decoration: none;
-    display: block;
-    margin-top: 10px;
-    transition: color 0.25s;
-}
-.hero-brand:hover { color: #cc3300; }
+.hero-email:hover, .hero-brand:hover { color: var(--accent); border-color: var(--accent); }
+.hero-brand { display: table; margin-top: 12px; font-style: italic; }
 
 /* ── Panel 2 — Capabilities ── */
-.cap-wrap {
-    max-width: 720px;
-    width: 100%;
-}
 .cap-intro {
-    font-family: Arial, sans-serif;
-    font-size: clamp(14px, 1.4vw, 16px);
-    font-weight: 600;
-    color: rgba(255,255,255,0.88);
-    line-height: 1.8;
-    margin-bottom: 30px;
+    font-family: var(--text);
+    font-size: clamp(17px, 1.35vw, 19px);
+    color: var(--ink);
+    line-height: 1.6;
+    margin-bottom: 28px;
 }
 .cap-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px 36px;
+    gap: 20px 30px;
 }
 .cap-item {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    border-left: 2px solid rgba(204,51,0,0.4);
-    padding-left: 14px;
+    gap: 4px;
+    border-top: 1px solid var(--rule);
+    padding-top: 10px;
 }
 .cap-name {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 12px;
-    color: #cc3300;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
+    font-family: var(--display);
+    font-size: 19px;
+    font-weight: 700;
+    font-style: italic;
+    color: var(--accent);
+    line-height: 1.2;
 }
 .cap-detail {
-    font-family: Arial, sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.88);
-    line-height: 1.55;
+    font-family: var(--text);
+    font-size: 16.5px;
+    color: var(--ink);
+    line-height: 1.42;
 }
 
-/* ── Panel 3 — Work ── */
+/* ── Panels 3 and 4 — Work and sites ── */
 .work-list {
-    max-width: 720px;
-    width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 22px;
+    gap: 20px;
 }
 .work-item {
     display: flex;
-    gap: 24px;
-    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+    border-top: 1px solid var(--rule);
+    padding-top: 12px;
 }
 .work-name {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 13px;
-    color: #cc3300;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    flex-shrink: 0;
-    width: 110px;
-    padding-top: 3px;
-    line-height: 1.3;
+    font-family: var(--display);
+    font-size: 23px;
+    font-weight: 700;
+    font-style: italic;
+    color: var(--accent);
+    line-height: 1.15;
 }
+a.work-name { text-decoration: none; transition: color 0.25s; align-self: flex-start; }
+a.work-name::after { content: ' \2197'; font-family: Arial, sans-serif; font-style: normal; font-size: 14px; }
+a.work-name:hover { color: var(--ink); }
 .work-detail {
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.95);
-    line-height: 1.65;
-    border-left: 2px solid rgba(204,51,0,0.25);
-    padding-left: 18px;
-}
-@media (min-width: 769px) {
-    .panel-right .work-detail {
-        border-left: none;
-        border-right: 2px solid rgba(204,51,0,0.25);
-        padding-left: 0;
-        padding-right: 18px;
-        text-align: right;
-    }
-    .panel-right .work-item { flex-direction: row-reverse; }
-    .panel-right .work-name { text-align: right; }
-    .panel-right .panel-label { text-align: right; width: 100%; }
+    font-family: var(--text);
+    font-size: clamp(17px, 1.3vw, 18.5px);
+    color: var(--ink);
+    line-height: 1.5;
 }
 
-/* ── Panel 4 — Education ── */
-.edu-wrap {
-    max-width: 600px;
-    width: 100%;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-.edu-school {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: clamp(22px, 3vw, 34px);
-    font-weight: 900;
-    color: white;
-    line-height: 1.2;
+/* ── Panel 5 — Education ── */
+.edu-school, .hire-head {
+    font-family: var(--display);
+    font-size: clamp(30px, 3.2vw, 44px);
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.12;
 }
 .edu-degree {
-    font-family: Arial, sans-serif;
-    font-size: 12.5px;
-    color: rgba(255,255,255,0.60);
-    letter-spacing: 2px;
-    margin-bottom: 18px;
-}
-.edu-note {
-    font-family: Arial, sans-serif;
-    font-size: clamp(14px, 1.4vw, 16px);
+    font-family: var(--display);
+    font-size: 16px;
     font-weight: 600;
-    color: rgba(255,255,255,0.92);
-    line-height: 1.8;
-    font-style: italic;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 10px 0 22px;
 }
+.edu-note, .hire-note {
+    font-family: var(--text);
+    font-size: clamp(17px, 1.35vw, 19px);
+    color: var(--ink);
+    line-height: 1.6;
+}
+.edu-note { font-style: italic; }
 
-/* ── Sites list ── */
-a.work-name { text-decoration: none; transition: color 0.25s; }
-a.work-name::after { content: ' \2197'; font-family: Arial, sans-serif; }
-a.work-name:hover { color: #fff; }
-.site-list .work-name { width: 150px; }
-
-/* ── Work with me ── */
-.hire-wrap {
-    max-width: 600px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-}
-.hire-head {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: clamp(22px, 3vw, 34px);
-    font-weight: 900;
-    color: white;
-    line-height: 1.2;
-    margin: 0;
-}
-.hire-note {
-    font-family: Arial, sans-serif;
-    font-size: clamp(14px, 1.4vw, 16px);
-    font-weight: 600;
-    color: rgba(255,255,255,0.92);
-    line-height: 1.7;
-    margin: 0 0 8px;
-}
+/* ── Panel 6 — Work with me ── */
+.hire-note { margin: 14px 0 22px; }
 .hire-links {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
-    gap: 10px 14px;
-    margin-top: 18px;
+    gap: 10px 12px;
+    margin-top: 30px;
 }
 .hire-label {
     width: 100%;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 11px;
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 600;
     letter-spacing: 4px;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.55);
+    color: var(--ink-soft);
 }
 .hire-link {
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 12px;
+    font-family: var(--display);
+    font-size: 16px;
     font-weight: 700;
     letter-spacing: 3px;
     text-transform: uppercase;
     text-decoration: none;
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.3);
-    padding: 11px 20px;
-    transition: border-color 0.2s, background 0.2s;
+    color: var(--ink);
+    border: 1px solid var(--ink);
+    padding: 9px 20px;
+    transition: color 0.2s, background 0.2s;
 }
-.hire-link:hover { border-color: #cc3300; background: rgba(204,51,0,0.18); }
+.hire-link:hover { background: var(--ink); color: var(--paper); }
 
 /* ── Panel navigation dots ── */
 .panel-nav {
     position: fixed;
-    right: 32px;
+    right: 30px;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     z-index: 100;
 }
 .panel-dot {
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.25);
+    background: rgba(31,27,23,0.25);
     cursor: pointer;
     transition: background 0.2s, transform 0.2s;
 }
 .panel-dot.active {
-    background: #cc3300;
+    background: var(--accent);
     transform: scale(1.5);
 }
 
-/* ── Panel arrows ── */
+/* ── Panel arrows, under the text column ── */
 .panel-arrow {
     position: fixed;
-    left: 50%;
-    transform: translateX(-50%);
+    right: clamp(64px, 8vw, 150px);
+    bottom: 26px;
     z-index: 100;
-    background: none;
-    border: 1px solid rgba(255,255,255,0.2);
-    color: rgba(255,255,255,0.55);
+    background: rgba(244,239,227,0.7);
+    border: 1px solid var(--rule);
+    color: var(--ink);
     width: 38px;
     height: 38px;
     border-radius: 50%;
@@ -393,117 +297,54 @@ a.work-name:hover { color: #fff; }
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: border-color 0.2s, color 0.2s, background 0.2s;
+    transition: border-color 0.2s, color 0.2s, background 0.2s, opacity 0.2s;
     font-family: Arial, sans-serif;
     line-height: 1;
 }
-.panel-arrow:hover {
-    border-color: #cc3300;
-    color: #fff;
-    background: rgba(204,51,0,0.15);
-}
-.panel-arrow.up { bottom: 70px; }
-.panel-arrow.down { bottom: 24px; }
+.panel-arrow:hover { border-color: var(--accent); color: var(--paper); background: var(--accent); }
+.panel-arrow.up { margin-right: 48px; }
 .panel-arrow.hidden { opacity: 0; pointer-events: none; }
 
-/* ── Nav hint tooltip ── */
-.nav-hint {
-    position: fixed;
-    top: 14px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 190;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: 9px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.55);
-    background: rgba(0,0,0,0.45);
-    border: 1px solid rgba(255,255,255,0.12);
-    padding: 7px 16px;
-    border-radius: 20px;
-    pointer-events: none;
-    white-space: nowrap;
-    opacity: 1;
-    transition: opacity 1s ease;
-}
-.nav-hint.hidden { opacity: 0; }
-
-/* ── Mobile ── */
+/* ── Phones: the painting becomes a pale wash and the text takes the full width ── */
 @media (max-width: 768px) {
-    .panel { padding: 68px 24px 50px; justify-content: flex-start; padding-top: 100px; }
-    .panel.panel-left { padding-left: 24px; padding-right: 24px; }
-    .cap-grid { grid-template-columns: 1fr 1fr; gap: 12px 14px; }
-    .cap-intro { font-size: 13px; line-height: 1.6; margin-bottom: 18px; }
-    .cap-item { padding-left: 10px; }
-    .cap-name { font-size: 11px; }
-    .cap-detail { font-size: 11.5px; line-height: 1.45; }
-    .work-list { text-align: left; gap: 16px; }
-    .work-item { flex-direction: column; gap: 6px; }
-    .work-name, .site-list .work-name { width: auto; }
-    .work-detail { font-size: 13px; line-height: 1.5; }
-    .panel-label { margin-bottom: 16px; }
-    .panel { padding-top: 76px !important; }
-    .panel-nav { right: 14px; }
-    .panel-arrow.up { bottom: 24px; left: calc(50% - 30px); transform: translateX(-50%); }
-    .panel-arrow.down { bottom: 24px; left: calc(50% + 30px); transform: translateX(-50%); }
-    .hero-eyebrow { display: none; }
-    .mobile-header {
-        opacity: 1 !important;
-        pointer-events: auto !important;
-        transform: translateY(0) !important;
-    }
-    .nav-hint { display: none; }
+    .panel { padding: 70px 34px 76px 22px; justify-content: flex-start; align-items: stretch; }
+    .col { width: auto; }
+    .panel-label { font-size: 13px; margin-bottom: 14px; }
+    .hero-quote { font-size: 27px; margin-top: 6vh; }
+    .hero-sub { font-size: 14px; letter-spacing: 2px; }
+    .cap-intro { font-size: 15.5px; line-height: 1.45; margin-bottom: 14px; }
+    .cap-grid { gap: 10px 16px; }
+    .cap-item { padding-top: 6px; gap: 2px; }
+    .cap-name { font-size: 16px; }
+    .cap-detail { font-size: 13.5px; line-height: 1.35; }
+    .work-list { gap: 11px; }
+    .work-item { padding-top: 8px; gap: 2px; }
+    .work-name { font-size: 19px; }
+    .work-detail { font-size: 15px; line-height: 1.4; }
+    .edu-school, .hire-head { margin-top: 4vh; }
+    .panel-nav { right: 13px; }
+    .panel-arrow { right: 34px; bottom: 20px; }
 }
 
 </style>
 </head>
 <body>
 
-<!-- Nav hint -->
-<div class="nav-hint" id="navHint">&#9650;&nbsp; Hover for menu</div>
-
-<!-- Background video -->
-<video class="bg-video" autoplay muted loop playsinline>
+<!-- Source video for the painting (hidden; #paint shows it in watercolour) -->
+<video class="bg-video" id="bgVideo" autoplay muted loop playsinline>
     <source src="PORTFOLIO/Videos/info-bg.mp4" type="video/mp4">
 </video>
-<div class="bg-overlay"></div>
+<canvas id="paint" aria-hidden="true"></canvas>
 
-<!-- Mobile Header (outside hover zone so it has its own z-index) -->
+<!-- Old header pieces: PortfolioNav replaces them, and reads the logo here to pick its colours -->
 <div class="mobile-header" id="mobileHeader">
     <button class="mobile-header-hamburger" id="mobileHamburger" aria-label="Menu">&#9776;</button>
-    <a href="Portfolio.html" style="display:contents;"><img class="mobile-header-logo" src="PORTFOLIO/portfolio logo inv.png" alt="Portfolio"></a>
+    <a href="Portfolio.html" style="display:contents;"><img class="mobile-header-logo" src="PORTFOLIO/portfolio logo.png" alt="Portfolio"></a>
     <div class="mobile-header-spacer"></div>
 </div>
-
-<!-- Nav hover zone (desktop only) -->
-<div class="nav-hover-zone">
-
-    <!-- Desktop Nav -->
-    <nav>
-        <a href="Portfolio.html" style="display:contents;"><img src="PORTFOLIO/portfolio logo inv.png" alt=""></a>
-        <ul>
-            <li><a href="Videos.html">Videos</a></li>
-            <li><a href="Designs.html">Designs</a></li>
-            <li><a href="Photos.html">Photos</a></li>
-            <li><a href="Music.html">Music</a></li>
-            <li><a class="active" href="Info.html">About</a></li>
-            <li><a href="Portfolio.html">Home</a></li>
-        </ul>
-    </nav>
-
-</div>
-
-<!-- Mobile Nav -->
+<nav><img src="PORTFOLIO/portfolio logo.png" alt="" style="display:none;"></nav>
 <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
-<div class="mobile-nav-menu" id="mobileNavMenu">
-    <a href="Portfolio.html">HOME</a>
-    <a href="Videos.html">VIDEOS</a>
-    <a href="Designs.html">DESIGNS</a>
-    <a href="Photos.html">PHOTOS</a>
-    <a href="Music.html">MUSIC</a>
-    <a class="active" href="Info.html">ABOUT</a>
-</div>
+<div class="mobile-nav-menu" id="mobileNavMenu"></div>
 
 <!-- Side dots -->
 <nav class="panel-nav" id="panelNav">
@@ -515,118 +356,121 @@ a.work-name:hover { color: #fff; }
     <div class="panel-dot" data-index="5"></div>
 </nav>
 
-<!-- Bottom arrows -->
-<button class="panel-arrow up hidden" id="arrowUp">&#8593;</button>
-<button class="panel-arrow down" id="arrowDown">&#8595;</button>
+<!-- Arrows -->
+<button class="panel-arrow up hidden" id="arrowUp" aria-label="Previous">&#8593;</button>
+<button class="panel-arrow down" id="arrowDown" aria-label="Next">&#8595;</button>
 
 <!-- ── Panels ── -->
 <div class="panels" id="panelsContainer">
 
-    <!-- Panel 1 — Hero -->
+    <!-- Panel 1 — Opening -->
     <section class="panel">
-        <div class="hero-content">
-            <p class="hero-eyebrow">Charles Barrios</p>
-            <p class="hero-quote">"I create things that look exactly how they're supposed to feel — and I've been doing it long enough to know when something's right."</p>
-            <p class="hero-sub">Web Designer &amp; Developer &nbsp;&middot;&nbsp; Graphic Designer &nbsp;&middot;&nbsp; Creative Director</p>
+        <div class="col">
+            <p class="hero-quote">"I create things that look exactly how they're supposed to feel, and I've been doing it long enough to know when something's right."</p>
+            <p class="hero-sub"><span>Web Designer &amp; Developer</span><span>Graphic Designer</span><span>Creative Director</span></p>
             <a class="hero-email" href="mailto:barrioscharles97@gmail.com">barrioscharles97@gmail.com</a>
-            <a class="hero-brand" href="https://madewith-luv.com" target="_blank" rel="noopener">My Clothing Website</a>
+            <a class="hero-brand" href="https://madewith-luv.com" target="_blank" rel="noopener">My clothing website</a>
         </div>
     </section>
 
     <!-- Panel 2 — Capabilities -->
-    <section class="panel panel-left">
-        <p class="panel-label">What I Can Do</p>
-        <div class="cap-wrap">
-            <p class="cap-intro">I design brands and build the websites they live on. I can take a business from nothing, with its logo, identity, website, online store and content, and make it feel alive. I work across web, print, apparel, photography, video and sound, from the first concept to the final file or the live site.</p>
+    <section class="panel">
+        <div class="col">
+            <p class="panel-label">What I Can Do</p>
+            <p class="cap-intro">I design brands and build the websites they live on. I can take a business from nothing, with its logo, identity, website, online store and content, and make it feel alive.</p>
             <div class="cap-grid">
                 <div class="cap-item">
                     <span class="cap-name">Web Design &amp; Development</span>
-                    <span class="cap-detail">UI/UX design, responsive custom-coded sites in HTML, CSS and JavaScript, motion and interactive pages</span>
+                    <span class="cap-detail">UI/UX design, responsive custom-coded sites, motion and interactive pages</span>
                 </div>
                 <div class="cap-item">
                     <span class="cap-name">Stores &amp; Platforms</span>
-                    <span class="cap-detail">WordPress, Shopify, Stripe checkout, PHP and Node.js, domains, hosting and cPanel, SEO basics</span>
+                    <span class="cap-detail">WordPress, Shopify, Stripe checkout, PHP and Node.js, hosting, SEO basics</span>
                 </div>
                 <div class="cap-item">
                     <span class="cap-name">Brand &amp; Identity</span>
-                    <span class="cap-detail">Logos and brand kits, Adobe Creative Suite, Figma, color theory, trend research, mood boards</span>
+                    <span class="cap-detail">Logos and brand kits, Adobe Creative Suite, Figma, color theory, trend research</span>
                 </div>
                 <div class="cap-item">
                     <span class="cap-name">Print &amp; Apparel</span>
-                    <span class="cap-detail">Apparel graphics, screen printing, packaging, large-scale printing, production coordination</span>
+                    <span class="cap-detail">Apparel graphics, screen printing, packaging, large-scale printing, production</span>
                 </div>
                 <div class="cap-item">
                     <span class="cap-name">Photo &amp; Film</span>
-                    <span class="cap-detail">DSLR and product photography, studio lighting, videography, editing and post-production</span>
+                    <span class="cap-detail">DSLR and product photography, studio lighting, videography, editing</span>
                 </div>
                 <div class="cap-item">
                     <span class="cap-name">Sound &amp; Content</span>
-                    <span class="cap-detail">Audio mixing, sound design, music production, digital and social media content</span>
+                    <span class="cap-detail">Audio mixing, sound design, music production, digital and social content</span>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Panel 3 — Work -->
-    <section class="panel panel-right">
-        <p class="panel-label">Work I'm Proud Of</p>
-        <div class="work-list">
-            <div class="work-item">
-                <span class="work-name">Balenciaga</span>
-                <p class="work-detail">I created concept ads and lookbook designs for their 2021 fashion year — completely unsolicited. The brand acknowledged the work directly.</p>
-            </div>
-            <div class="work-item">
-                <span class="work-name">With Love</span>
-                <p class="work-detail">Built a fully trademarked clothing brand entirely from scratch. The name, the identity, the online store, every piece of content — all me, from the ground up.</p>
-            </div>
-            <div class="work-item">
-                <span class="work-name">NYC Streetwear</span>
-                <p class="work-detail">Designed a full capsule of tees, sweatpants and zip-up hoodies for an established NYC streetwear brand, and limited-edition event tees for another's flagship store. Those designs made it to the final product.</p>
-            </div>
-            <div class="work-item">
-                <span class="work-name">Cookie's Kids</span>
-                <p class="work-detail">Became a one-person creative department for a multi-location NYC retail brand — billboards, web banners, 250+ printed signs a week, logos, photo editing. All of it.</p>
+    <section class="panel">
+        <div class="col">
+            <p class="panel-label">Work I'm Proud Of</p>
+            <div class="work-list">
+                <div class="work-item">
+                    <span class="work-name">Balenciaga</span>
+                    <p class="work-detail">I created concept ads and lookbook designs for their 2021 fashion year, completely unsolicited. The brand acknowledged the work directly.</p>
+                </div>
+                <div class="work-item">
+                    <span class="work-name">With Love</span>
+                    <p class="work-detail">Built a fully trademarked clothing brand from scratch. The name, the identity, the online store, every piece of content: all me, from the ground up.</p>
+                </div>
+                <div class="work-item">
+                    <span class="work-name">NYC Streetwear</span>
+                    <p class="work-detail">Designed a full capsule of tees, sweatpants and zip-up hoodies for an established NYC streetwear brand, and limited-edition event tees for another's flagship store. Those designs made it to the final product.</p>
+                </div>
+                <div class="work-item">
+                    <span class="work-name">Cookie's Kids</span>
+                    <p class="work-detail">Became a one-person creative department for a multi-location NYC retail brand: billboards, web banners, 250+ printed signs a week, logos, photo editing. All of it.</p>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Panel 4 — Sites -->
-    <section class="panel panel-left">
-        <p class="panel-label">Sites I've Built</p>
-        <div class="work-list site-list">
-            <div class="work-item">
-                <a class="work-name" href="https://www.madewith-luv.com/" target="_blank" rel="noopener">With Love</a>
-                <p class="work-detail">My clothing brand's online store: product pages, size guides, a cart and Stripe checkout.</p>
-            </div>
-            <div class="work-item">
-                <a class="work-name" href="https://www.madewith-luv.com/serenade/" target="_blank" rel="noopener">Serenade</a>
-                <p class="work-detail">A fine-dining restaurant site with a candlelit home page, menus and reservations.</p>
-            </div>
-            <div class="work-item">
-                <a class="work-name" href="https://www.madewith-luv.com/brightlane/" target="_blank" rel="noopener">Brightlane Homes</a>
-                <p class="work-detail">A real estate agency site with home search, listings, galleries and viewing requests.</p>
-            </div>
-            <div class="work-item">
-                <a class="work-name" href="https://www.madewith-luv.com/ashwood/" target="_blank" rel="noopener">Ashwood</a>
-                <p class="work-detail">An art and history museum site with a searchable collection and timed-ticket checkout.</p>
+    <section class="panel">
+        <div class="col">
+            <p class="panel-label">Sites I've Built</p>
+            <div class="work-list site-list">
+                <div class="work-item">
+                    <a class="work-name" href="https://www.madewith-luv.com/" target="_blank" rel="noopener">With Love</a>
+                    <p class="work-detail">My clothing brand's online store: product pages, size guides, a cart and Stripe checkout.</p>
+                </div>
+                <div class="work-item">
+                    <a class="work-name" href="https://www.madewith-luv.com/serenade/" target="_blank" rel="noopener">Serenade</a>
+                    <p class="work-detail">A fine-dining restaurant site with a candlelit home page, menus and reservations.</p>
+                </div>
+                <div class="work-item">
+                    <a class="work-name" href="https://www.madewith-luv.com/brightlane/" target="_blank" rel="noopener">Brightlane Homes</a>
+                    <p class="work-detail">A real estate agency site with home search, listings, galleries and viewing requests.</p>
+                </div>
+                <div class="work-item">
+                    <a class="work-name" href="https://www.madewith-luv.com/ashwood/" target="_blank" rel="noopener">Ashwood</a>
+                    <p class="work-detail">An art and history museum site with a searchable collection and timed-ticket checkout.</p>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Panel 5 — Education -->
     <section class="panel">
-        <p class="panel-label">Education</p>
-        <div class="edu-wrap">
+        <div class="col">
+            <p class="panel-label">Education</p>
             <p class="edu-school">Hunter College, New York</p>
             <p class="edu-degree">Bachelor of Arts &nbsp;&middot;&nbsp; 2015 – 2020</p>
-            <p class="edu-note">I studied film production, digital design, and sound. Most of what I know came from doing the work — but school gave me the foundation to understand why it works.</p>
+            <p class="edu-note">I studied film production, digital design, and sound. Most of what I know came from doing the work, but school gave me the foundation to understand why it works.</p>
         </div>
     </section>
 
     <!-- Panel 6 — Work with me. A profile link with no address stays hidden. -->
     <section class="panel">
-        <p class="panel-label">Work With Me</p>
-        <div class="hire-wrap">
+        <div class="col">
+            <p class="panel-label">Work With Me</p>
             <p class="hire-head">Have a project in mind?</p>
             <p class="hire-note">Websites, online stores, brand identity and creative direction. Tell me what you're building.</p>
             <a class="hero-email" href="mailto:barrioscharles97@gmail.com">barrioscharles97@gmail.com</a>
@@ -642,6 +486,202 @@ a.work-name:hover { color: #fff; }
 </div>
 
 <script src="PortfolioGallery.js"></script>
+
+<!-- ── The watercolour: each video frame is repainted on the graphics card ── -->
+<script>
+(function () {
+    var video = document.getElementById('bgVideo');
+    var canvas = document.getElementById('paint');
+    var gl = null;
+    try { gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'low-power' }); } catch (e) {}
+    if (!gl) { document.body.classList.add('no-paint'); return; }
+
+    var VERT = 'attribute vec2 p; void main(){ gl_Position = vec4(p, 0.0, 1.0); }';
+    var FRAG = [
+    '#ifdef GL_FRAGMENT_PRECISION_HIGH',
+    'precision highp float;',
+    '#else',
+    'precision mediump float;',
+    '#endif',
+    'uniform sampler2D uTex;',
+    'uniform vec2  uRes;',       // canvas size in pixels
+    'uniform float uVidAspect;', // video width / height
+    'uniform float uTime;',
+    'uniform float uReveal;',    // 0 = bare paper, 1 = fully painted
+    'uniform float uSide;',      // 1 = paint thins out toward the right (desktop), 0 = even wash (phones)
+    'uniform float uWash;',      // strength of the even wash on phones
+    'uniform float uFocus;',     // which part of the video stays in view when it is cropped (0 left, 1 right)
+
+    'float hash(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }',
+    'float noise(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f);',
+    '  return mix(mix(hash(i), hash(i+vec2(1.,0.)), f.x), mix(hash(i+vec2(0.,1.)), hash(i+vec2(1.,1.)), f.x), f.y); }',
+    'float fbm(vec2 p){ float a = 0.5, s = 0.0; for (int i = 0; i < 4; i++){ s += a*noise(p); p = p*2.03 + 11.7; a *= 0.5; } return s; }',
+
+    // the video laid over the screen like object-fit: cover
+    'vec2 cover(vec2 uv){',
+    '  float sa = uRes.x / uRes.y;',
+    '  vec2 v = uv;',
+    '  if (sa > uVidAspect) { float k = uVidAspect / sa; v.y = (uv.y - 0.5) * k + 0.5; }',
+    '  else { float k = sa / uVidAspect; v.x = uv.x * k + (1.0 - k) * uFocus; }',
+    '  return vec2(v.x, 1.0 - v.y);',
+    '}',
+    'float lum(vec2 uv){ return dot(texture2D(uTex, cover(uv)).rgb, vec3(0.299, 0.587, 0.114)); }',
+
+    'void main(){',
+    '  vec2 uv = gl_FragCoord.xy / uRes;',
+    '  float asp = uRes.x / uRes.y;',
+    '  vec2 p = vec2(uv.x * asp, uv.y);',
+    '  float t = uTime;',
+
+    // wet paper pulls the picture around a little: edges bleed and wander
+    '  vec2 warp = vec2(fbm(p*3.1 + vec2(t*0.035, 0.0)), fbm(p*3.1 + vec2(7.3, -t*0.03))) - 0.5;',
+    '  vec2 wuv = uv + warp * vec2(0.03 / asp, 0.03);',
+
+    // a soft brush: average the tone over a small disc, and over a wider one
+    '  float near = 0.0, far = 0.0;',
+    '  for (int i = 0; i < 10; i++){',
+    '    float fi = float(i);',
+    '    float a = fi * 2.39996;',
+    '    float r = sqrt((fi + 0.5) / 10.0);',
+    '    vec2 d = vec2(cos(a), sin(a)) * r * vec2(1.0 / asp, 1.0);',
+    '    near += lum(wuv + d * 0.007);',
+    '    if (i < 6) far += lum(wuv + d * 0.03);',
+    '  }',
+    '  near /= 10.0; far /= 6.0;',
+    '  float tone = clamp((near - 0.06) * 1.25, 0.0, 1.0);',
+    '  tone = pow(tone, 0.85);',
+
+    // flatten the tone into a few washes, with soft steps between them
+    '  float steps = 5.0;',
+    '  float x = tone * steps + (noise(p*7.0) - 0.5) * 0.5;',
+    '  float f = fract(x);',
+    '  float q = (floor(x) + smoothstep(0.3, 0.7, f)) / steps;',
+    '  float density = clamp(1.0 - q, 0.0, 1.0);',
+    // pigment pools where a wash ends, and along strong edges
+    '  density += (1.0 - abs(2.0 * smoothstep(0.3, 0.7, f) - 1.0)) * 0.10;',
+    '  density += clamp(abs(near - far) * 1.6, 0.0, 0.25);',
+
+    // paper: fibres and tooth
+    '  vec2 px = gl_FragCoord.xy;',
+    '  float tooth = noise(px * 0.9) * 0.6 + noise(px * 0.35) * 0.4;',
+    '  float fibre = fbm(vec2(p.x * 40.0, p.y * 9.0));',
+    '  vec3 paper = vec3(0.957, 0.937, 0.890) * (0.965 + 0.05 * tooth) * (0.985 + 0.03 * fibre);',
+    // pigment settles into the paper tooth
+    '  density *= 0.80 + 0.40 * tooth;',
+
+    // the stains that form the picture: blots that spread from a few points
+    '  float grow = uReveal * 1.9 - 0.12;',
+    '  float field = 9.0;',
+    '  field = min(field, distance(p, vec2(0.30*asp, 0.56)));',
+    '  field = min(field, distance(p, vec2(0.14*asp, 0.26)) + 0.18);',
+    '  field = min(field, distance(p, vec2(0.52*asp, 0.78)) + 0.26);',
+    '  field = min(field, distance(p, vec2(0.60*asp, 0.24)) + 0.38);',
+    '  field = min(field, distance(p, vec2(0.05*asp, 0.85)) + 0.34);',
+    '  field += (fbm(p*2.6 + 3.0) - 0.5) * 0.55 + (fbm(p*11.0) - 0.5) * 0.10;',
+    '  float edge = grow - field;',
+    '  float mask = smoothstep(0.0, 0.16, edge);',
+    // the wet rim of a spreading stain is darker, and dries as the painting settles
+    '  float rim = smoothstep(0.0, 0.05, edge) * (1.0 - smoothstep(0.05, 0.20, edge));',
+    '  density += rim * 0.30 * (1.0 - smoothstep(0.85, 1.0, uReveal));',
+
+    // leave the right side of the sheet nearly bare for the text
+    '  float sideFade = 1.0 - smoothstep(0.33, 0.53, uv.x + (fbm(p*2.2 + 20.0) - 0.5) * 0.20);',
+    // on phones the wash is pale behind the text and fuller toward the foot of the sheet
+    '  float phoneFade = mix(uWash * 1.9, uWash, smoothstep(0.08, 0.5, uv.y));',
+    '  float fade = mix(phoneFade, max(sideFade, 0.04), uSide);',
+    // and the top edge stays bare so the name in the bar reads clearly
+    '  fade *= 1.0 - 0.9 * smoothstep(0.86, 0.95, uv.y + (fbm(p*4.0 + 50.0) - 0.5) * 0.06);',
+
+    // pigments: ochre in the lights, sienna or a grey green in the middle, indigo in the shadows
+    '  float hueN = fbm(p*1.3 + vec2(40.0, t*0.01));',
+    '  vec3 light  = vec3(0.86, 0.70, 0.44);',
+    '  vec3 mid    = mix(vec3(0.66, 0.33, 0.20), vec3(0.30, 0.46, 0.45), smoothstep(0.35, 0.65, hueN));',
+    '  vec3 shadow = mix(vec3(0.12, 0.16, 0.30), vec3(0.20, 0.13, 0.22), smoothstep(0.4, 0.7, fbm(p*1.7 + 9.0)));',
+    '  float dn = clamp(density, 0.0, 1.0);',
+    '  vec3 pig = mix(light, mid, smoothstep(0.18, 0.5, dn));',
+    '  pig = mix(pig, shadow, smoothstep(0.5, 0.88, dn));',
+
+    '  float amount = clamp(dn * 1.12, 0.0, 1.0) * mask * fade;',
+    '  vec3 col = paper * mix(vec3(1.0), pig, amount);',
+    '  gl_FragColor = vec4(col, 1.0);',
+    '}'
+    ].join('\n');
+
+    function compile(type, src) {
+        var s = gl.createShader(type);
+        gl.shaderSource(s, src); gl.compileShader(s);
+        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.error(gl.getShaderInfoLog(s)); return null; }
+        return s;
+    }
+    var vs = compile(gl.VERTEX_SHADER, VERT), fs = compile(gl.FRAGMENT_SHADER, FRAG);
+    var prog = gl.createProgram();
+    if (!vs || !fs) { document.body.classList.add('no-paint'); return; }
+    gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { document.body.classList.add('no-paint'); return; }
+    gl.useProgram(prog);
+
+    var buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+    var loc = gl.getAttribLocation(prog, 'p');
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+    var tex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, 1, 1, 0, gl.RGB, gl.UNSIGNED_BYTE, new Uint8Array([244, 239, 227]));
+
+    var U = {};
+    ['uTex', 'uRes', 'uVidAspect', 'uTime', 'uReveal', 'uSide', 'uWash', 'uFocus'].forEach(function (n) { U[n] = gl.getUniformLocation(prog, n); });
+    gl.uniform1i(U.uTex, 0);
+
+    var phone = false;
+    function resize() {
+        phone = window.innerWidth <= 768;
+        // painted a little under screen size: softer, and far lighter on the device
+        var scale = Math.min(1, 1000 / Math.max(window.innerWidth, window.innerHeight)) * (phone ? 0.8 : 0.9);
+        canvas.width  = Math.max(2, Math.round(window.innerWidth  * scale));
+        canvas.height = Math.max(2, Math.round(window.innerHeight * scale));
+        gl.viewport(0, 0, canvas.width, canvas.height);
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var REVEAL_MS = calm ? 1 : 9000;
+    var revealStart = null, last = 0, hasFrame = false;
+
+    function frame(now) {
+        requestAnimationFrame(frame);
+        if (document.hidden || now - last < 40) return;       // about 24 pictures a second, like the video
+        last = now;
+        if (video.readyState >= 2 && video.videoWidth) {
+            try {
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, video);
+                hasFrame = true;
+            } catch (e) { document.body.classList.add('no-paint'); return; }
+        }
+        if (hasFrame && revealStart === null) revealStart = now;
+        var r = revealStart === null ? 0 : Math.min(1, (now - revealStart) / REVEAL_MS);
+        r = 1 - Math.pow(1 - r, 1.5);                          // fast at first, settling slowly
+        gl.uniform2f(U.uRes, canvas.width, canvas.height);
+        gl.uniform1f(U.uVidAspect, video.videoWidth ? video.videoWidth / video.videoHeight : 16 / 9);
+        gl.uniform1f(U.uTime, calm ? 0 : now / 1000);
+        gl.uniform1f(U.uReveal, r);
+        gl.uniform1f(U.uSide, phone ? 0 : 1);
+        gl.uniform1f(U.uWash, 0.26);
+        gl.uniform1f(U.uFocus, 0.22);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    }
+    requestAnimationFrame(frame);
+    video.play().catch(function () {});
+}());
+</script>
+
 <script>
 (function () {
 
@@ -676,7 +716,7 @@ a.work-name:hover { color: #fff; }
 
     container.addEventListener('scroll', function () {
         if (scrolling) return;
-        var idx = Math.round(container.scrollTop / window.innerHeight);
+        var idx = Math.round(container.scrollTop / container.clientHeight);
         if (idx !== current) { current = idx; updateUI(); }
     });
 
@@ -697,15 +737,10 @@ a.work-name:hover { color: #fff; }
         if (Math.abs(diff) > 40) goTo(diff > 0 ? current + 1 : current - 1);
     }, { passive: true });
 
-    /* Nav hint — fade out after 3s or on hover */
-    var navHint = document.getElementById('navHint');
-    var hintTimer = setTimeout(function () {
-        navHint.classList.add('hidden');
-    }, 3000);
-    document.querySelector('.nav-hover-zone').addEventListener('mouseenter', function () {
-        clearTimeout(hintTimer);
-        navHint.classList.add('hidden');
-    }, { once: true });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowDown' || e.key === 'PageDown') goTo(current + 1);
+        if (e.key === 'ArrowUp' || e.key === 'PageUp') goTo(current - 1);
+    });
 
     /* Profile links with no address stay hidden */
     var hireLinks = document.getElementById('hireLinks');
