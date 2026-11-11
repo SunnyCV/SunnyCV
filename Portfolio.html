@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Portfolio</title>
+<title>Charles Barrios | Portfolio</title>
 <style>
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -12,8 +12,9 @@ html, body {
     margin: 0; padding: 0;
     width: 100%; height: 100%;
     overflow: hidden;
-    background: #000;
+    background: #fff;                 /* the page opens white, then crumbles to dark */
 }
+body.dark { background: #000; }
 
 /* ── Background video ── */
 #bgVideo {
@@ -28,6 +29,62 @@ html, body {
 }
 #bgVideo.visible { opacity: 1; }
 
+/* ── Static: one canvas above the video. It paints the opening crumble,
+      then stays on as the camera-static filter ── */
+#static {
+    position: fixed;
+    inset: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* scanlines, a slow rolling band and a vignette, like a camcorder viewfinder */
+#lines {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+    background:
+        radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%),
+        repeating-linear-gradient(0deg, rgba(0,0,0,0.22) 0 1px, rgba(0,0,0,0) 1px 3px);
+}
+#lines.on { opacity: 1; }
+#lines::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: 22%;
+    background: linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,0.035), rgba(255,255,255,0));
+    animation: roll 7s linear infinite;
+}
+@keyframes roll {
+    from { transform: translateY(-110%); }
+    to   { transform: translateY(520%); }
+}
+
+/* ── Loading bar ── */
+#loader {
+    position: fixed;
+    left: 50%; top: 50%;
+    width: min(220px, 52vw);
+    height: 2px;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.12);
+    z-index: 4;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+#loaderFill {
+    width: 100%; height: 100%;
+    background: #000;
+    transform-origin: left center;
+    transform: scaleX(0);
+}
+#loader.done { opacity: 0; }
+
 /* ── Screens (intro + menu share the same full-screen layer) ── */
 .screen {
     position: fixed;
@@ -36,7 +93,7 @@ html, body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    z-index: 1;
+    z-index: 2;
     transition: opacity 0.9s ease;
 }
 .screen.hidden {
@@ -47,14 +104,16 @@ html, body {
 /* ── Intro ── */
 #introScreen { cursor: pointer; }
 
-/* Logo is a fixed overlay so it can animate independently of the intro screen */
+/* Logo is a fixed overlay so it can animate independently of the intro screen.
+   It is built from stacked copies of the PNG so it can shimmer and glitch. */
 #portfolioLogo {
     position: fixed;
     left: 50%;
     top: 50%;
     height: 72px;
-    width: auto;
-    z-index: 2;
+    aspect-ratio: 2100 / 308;
+    max-width: 86vw;
+    z-index: 3;
     pointer-events: none;
     user-select: none;
     opacity: 0;
@@ -73,6 +132,28 @@ html, body {
     transform: translateX(-50%);
     height: 34px;
 }
+#portfolioLogo .lg {
+    position: absolute;
+    inset: 0;
+    -webkit-mask: url("PORTFOLIO/portfolio logo inv.png") center / contain no-repeat;
+            mask: url("PORTFOLIO/portfolio logo inv.png") center / contain no-repeat;
+    will-change: transform, opacity, clip-path;
+}
+#portfolioLogo .lg-main  { background: #fff; }
+#portfolioLogo .lg-red   { background: #ff2a4f; mix-blend-mode: screen; opacity: 0; }
+#portfolioLogo .lg-cyan  { background: #19e6ff; mix-blend-mode: screen; opacity: 0; }
+#portfolioLogo .lg-slice { background: #fff; opacity: 0; }
+/* a soft band of light that crosses the logo now and then */
+#portfolioLogo .lg-sheen {
+    background: linear-gradient(100deg, rgba(255,255,255,0) 40%, rgba(170,240,255,0.95) 50%, rgba(255,255,255,0) 60%) 0 0 / 300% 100% no-repeat;
+    mix-blend-mode: screen;
+    opacity: 0.55;
+    animation: sheen 6.5s ease-in-out infinite;
+}
+@keyframes sheen {
+    0%, 62% { background-position: 130% 0; }
+    100%    { background-position: -60% 0; }
+}
 
 /* Placeholder that reserves the logo's vertical space so "click to enter"
    stays correctly positioned below it */
@@ -88,33 +169,70 @@ html, body {
     font-size: 10px;
     letter-spacing: 5px;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.6);
     opacity: 0;
     transition: opacity 0.7s ease;
     pointer-events: none;
     user-select: none;
 }
-.intro-enter.show { opacity: 1; }
+.intro-enter.show { opacity: 1; animation: enterPulse 2.6s ease-in-out 0.7s infinite; }
+@keyframes enterPulse { 50% { opacity: 0.55; } }
 
 /* ── Menu ── */
 .menu-btn {
+    position: relative;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 6px;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.55);
+    color: rgba(255,255,255,0.6);
     text-decoration: none;
     padding: 15px 52px;
     display: block;
     transition: color 0.25s ease, letter-spacing 0.25s ease;
     user-select: none;
     -webkit-user-select: none;
+    text-shadow: 0 0 12px rgba(0,0,0,0.55);
 }
 .menu-btn:hover,
 .menu-btn.active {
     color: #fff;
     letter-spacing: 8px;
+}
+/* red and cyan copies of the word that flicker out of register on hover */
+.menu-btn::before,
+.menu-btn::after {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    padding: inherit;
+    opacity: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    text-shadow: none;
+}
+.menu-btn::before { color: #ff2a4f; }
+.menu-btn::after  { color: #19e6ff; }
+.menu-btn:hover::before, .menu-btn.active::before { animation: mgA 2.8s steps(1) infinite; }
+.menu-btn:hover::after,  .menu-btn.active::after  { animation: mgB 2.8s steps(1) infinite; }
+@keyframes mgA {
+    0%   { opacity: 0.9; transform: translateX(-3px); clip-path: inset(0 0 55% 0); }
+    3%   { opacity: 0.9; transform: translateX(2px);  clip-path: inset(40% 0 0 0); }
+    6%   { opacity: 0.8; transform: translateX(-1px); clip-path: inset(0); }
+    9%   { opacity: 0; }
+    61%  { opacity: 0.7; transform: translateX(-2px); clip-path: inset(30% 0 30% 0); }
+    64%  { opacity: 0; }
+    100% { opacity: 0; }
+}
+@keyframes mgB {
+    0%   { opacity: 0.9; transform: translateX(3px);  clip-path: inset(45% 0 0 0); }
+    3%   { opacity: 0.9; transform: translateX(-2px); clip-path: inset(0 0 50% 0); }
+    6%   { opacity: 0.8; transform: translateX(1px);  clip-path: inset(0); }
+    9%   { opacity: 0; }
+    61%  { opacity: 0.7; transform: translateX(2px);  clip-path: inset(30% 0 30% 0); }
+    64%  { opacity: 0; }
+    100% { opacity: 0; }
 }
 
 /* ── Mobile ── */
@@ -127,6 +245,11 @@ html, body {
     .menu-btn:hover, .menu-btn.active { letter-spacing: 5px; }
 }
 
+@media (prefers-reduced-motion: reduce) {
+    #lines::after, #portfolioLogo .lg-sheen, .intro-enter.show,
+    .menu-btn::before, .menu-btn::after { animation: none !important; }
+}
+
 </style>
 </head>
 <body>
@@ -134,8 +257,22 @@ html, body {
 <!-- Background video — fill in data-video on each .menu-btn to hook up -->
 <video id="bgVideo" autoplay muted loop playsinline></video>
 
+<!-- Static canvas (opening crumble, then the camera-static filter) and scanlines -->
+<canvas id="static" aria-hidden="true"></canvas>
+<div id="lines" aria-hidden="true"></div>
+
+<!-- Loading bar -->
+<div id="loader" role="progressbar" aria-label="Loading"><div id="loaderFill"></div></div>
+
 <!-- Logo: fixed overlay, animates from center to top on enter -->
-<img id="portfolioLogo" src="PORTFOLIO/portfolio logo inv.png" alt="Portfolio">
+<div id="portfolioLogo" role="img" aria-label="Charles Barrios">
+    <div class="lg lg-red"></div>
+    <div class="lg lg-cyan"></div>
+    <div class="lg lg-main"></div>
+    <div class="lg lg-sheen"></div>
+    <div class="lg lg-slice"></div>
+    <div class="lg lg-slice"></div>
+</div>
 
 <!-- Intro screen -->
 <div id="introScreen" class="screen">
@@ -145,11 +282,11 @@ html, body {
 
 <!-- Menu screen -->
 <div id="menuScreen" class="screen hidden">
-    <a class="menu-btn" href="Videos.html"  data-video="PORTFOLIO/Videos.mp4">Videos</a>
-    <a class="menu-btn" href="Designs.html" data-video="PORTFOLIO/Designs.mp4">Designs</a>
-    <a class="menu-btn" href="Photos.html"  data-video="PORTFOLIO/Photos.mp4">Photos</a>
-    <a class="menu-btn" href="Music.html"   data-video="PORTFOLIO/Music.mp4">Music</a>
-    <a class="menu-btn" href="Info.html"    data-video="">About</a>
+    <a class="menu-btn" href="Videos.html"  data-text="Videos"  data-video="PORTFOLIO/Videos.mp4">Videos</a>
+    <a class="menu-btn" href="Designs.html" data-text="Designs" data-video="PORTFOLIO/Designs.mp4">Designs</a>
+    <a class="menu-btn" href="Photos.html"  data-text="Photos"  data-video="PORTFOLIO/Photos.mp4">Photos</a>
+    <a class="menu-btn" href="Music.html"   data-text="Music"   data-video="PORTFOLIO/Music.mp4">Music</a>
+    <a class="menu-btn" href="Info.html"    data-text="About"   data-video="">About</a>
 </div>
 
 <script>
@@ -160,27 +297,305 @@ html, body {
     var introEnter    = document.getElementById('introEnter');
     var menuScreen  = document.getElementById('menuScreen');
     var bgVideo     = document.getElementById('bgVideo');
+    var loader      = document.getElementById('loader');
+    var loaderFill  = document.getElementById('loaderFill');
+    var lines       = document.getElementById('lines');
+    var canvas      = document.getElementById('static');
+    var ctx         = canvas.getContext('2d');
     var menuBtns    = Array.prototype.slice.call(
                           document.querySelectorAll('.menu-btn'));
 
     var isMobile = ('ontouchstart' in window || navigator.maxTouchPoints > 0);
-    var entered  = false;
+    var calm     = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var entered  = false;     // the visitor has clicked through to the menu
+    var ready    = false;     // the opening has finished and the logo is waiting
     var fadeOutTimer = null;
     var activeBtn = null;
 
     if (isMobile) introEnter.textContent = 'Tap to enter';
 
-    /* ── Intro animation ── */
-    setTimeout(function () { portfolioLogo.classList.add('show'); }, 400);
-    setTimeout(function () { introEnter.classList.add('show'); }, 1500);
+    /* ════════ Static ════════ */
 
-    introScreen.addEventListener('click', function () {
+    var REST = 0.20;          // dark static behind the menu
+    var OVER_VIDEO = 0.15;    // camera static over a playing video (between light and medium)
+    var PALETTE = ['#00e5ff', '#ff2bd6', '#ffe600', '#ff3030', '#2bff5a', '#3b4bff', '#ffffff', '#111111'];
+
+    var W = 0, H = 0;
+    var tilesGrey = [], tilesColour = [];
+    var mode = 'white';       // white → crumble → rest
+    var level = REST, target = REST, burst = 0;
+    var crumbleStart = 0, CRUMBLE_MS = calm ? 900 : 2700;
+    var cells = null, cols = 0, rows = 0, cellW = 0, cellH = 0;
+    var lastDraw = 0;
+
+    function makeTile(colour) {
+        var c = document.createElement('canvas');
+        c.width = c.height = 256;
+        var x = c.getContext('2d'), img = x.createImageData(256, 256), d = img.data;
+        for (var i = 0; i < d.length; i += 4) {
+            if (colour) {
+                d[i] = Math.random() * 255; d[i + 1] = Math.random() * 255; d[i + 2] = Math.random() * 255;
+            } else {
+                d[i] = d[i + 1] = d[i + 2] = Math.random() < 0.5 ? 0 : 255;
+            }
+            d[i + 3] = Math.random() * 255;
+        }
+        x.putImageData(img, 0, 0);
+        return c;
+    }
+    for (var t = 0; t < 4; t++) { tilesGrey.push(makeTile(false)); tilesColour.push(makeTile(true)); }
+
+    function resize() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+        buildCells();
+    }
+
+    /* each cell of the white page gets a moment at which it breaks away;
+       neighbours share part of that moment so the page crumbles in clumps */
+    function buildCells() {
+        var size = Math.max(26, Math.round(Math.max(W, H) / 30));
+        cols = Math.ceil(W / size); rows = Math.ceil(H / size);
+        cellW = W / cols; cellH = H / rows;
+        var coarse = {};
+        function clump(cx, cy) {
+            var k = cx + ',' + cy;
+            if (coarse[k] == null) coarse[k] = Math.random();
+            return coarse[k];
+        }
+        cells = new Float32Array(cols * rows);
+        for (var y = 0; y < rows; y++) for (var x = 0; x < cols; x++) {
+            var c = clump(Math.floor(x / 4), Math.floor(y / 3));
+            cells[y * cols + x] = 0.12 + 0.66 * (0.55 * c + 0.45 * Math.random());
+        }
+    }
+
+    function noise(tiles, alpha) {
+        if (alpha <= 0.002) return;
+        var tile = tiles[(Math.random() * tiles.length) | 0];
+        var ox = (Math.random() * 256) | 0, oy = (Math.random() * 256) | 0;
+        ctx.globalAlpha = Math.min(1, alpha);
+        for (var y = -oy; y < H; y += 256)
+            for (var x = -ox; x < W; x += 256) ctx.drawImage(tile, x, y);
+        ctx.globalAlpha = 1;
+    }
+
+    /* horizontal bands of the picture slip sideways */
+    function tears(n, reach) {
+        for (var i = 0; i < n; i++) {
+            var y = (Math.random() * H) | 0, h = 2 + ((Math.random() * H * 0.07) | 0);
+            var dx = ((Math.random() - 0.5) * reach) | 0;
+            ctx.drawImage(canvas, 0, y, W, h, dx, y, W, h);
+        }
+    }
+
+    function drawCrumble(p) {
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, W, H);
+        var edge = 0.07;
+        for (var y = 0; y < rows; y++) for (var x = 0; x < cols; x++) {
+            var th = cells[y * cols + x];
+            if (p < th - edge) continue;                       // still white paper
+            if (p < th) {                                      // breaking: a flash of colour
+                ctx.fillStyle = PALETTE[(Math.random() * PALETTE.length) | 0];
+            } else {
+                ctx.fillStyle = '#000';                        // gone dark
+            }
+            ctx.fillRect(Math.floor(x * cellW), Math.floor(y * cellH), Math.ceil(cellW), Math.ceil(cellH));
+        }
+        var mid = Math.sin(Math.PI * Math.min(1, p));          // strongest halfway through
+        // stray colour bars across the whole page
+        var bars = Math.round(mid * (calm ? 3 : 14));
+        for (var i = 0; i < bars; i++) {
+            ctx.globalAlpha = 0.55 + Math.random() * 0.4;
+            ctx.fillStyle = PALETTE[(Math.random() * PALETTE.length) | 0];
+            var bw = cellW * (1 + ((Math.random() * 9) | 0)), bh = cellH * (Math.random() < 0.7 ? 0.5 : 1);
+            ctx.fillRect(Math.floor(Math.random() * cols) * cellW, Math.floor(Math.random() * rows * 2) * cellH / 2, bw, bh);
+        }
+        ctx.globalAlpha = 1;
+        noise(tilesColour, 0.5 * mid);
+        noise(tilesGrey, REST + 0.25 * mid);
+        if (!calm) tears(Math.round(mid * 7), W * 0.12);
+    }
+
+    function drawRest() {
+        ctx.clearRect(0, 0, W, H);
+        level += (target - level) * 0.12;
+        var a = level + burst * 0.75;
+        noise(tilesGrey, a);
+        if (burst > 0.02) {
+            noise(tilesColour, burst * 0.35);
+            tears(Math.round(burst * 6), W * 0.1);
+            burst *= 0.86;
+        } else burst = 0;
+    }
+
+    function frame(now) {
+        requestAnimationFrame(frame);
+        if (now - lastDraw < 38) return;                       // about 26 pictures a second
+        lastDraw = now;
+        if (mode === 'crumble') {
+            var p = (now - crumbleStart) / CRUMBLE_MS;
+            if (p >= 1) { mode = 'rest'; document.body.classList.add('dark'); drawRest(); return; }
+            if (!logoShown && p > 0.58) revealLogo();
+            drawCrumble(p);
+        } else if (mode === 'rest') {
+            drawRest();
+        }
+    }
+
+    /* ════════ Logo shimmer ════════ */
+
+    var lgRed = portfolioLogo.querySelector('.lg-red'), lgCyan = portfolioLogo.querySelector('.lg-cyan');
+    var lgSlices = Array.prototype.slice.call(portfolioLogo.querySelectorAll('.lg-slice'));
+    var logoShown = false;
+
+    /* a short run of glitch frames: colour fringes and slipped slices */
+    function glitchLogo(strength, frames) {
+        var n = 0;
+        (function step() {
+            if (n++ >= frames) {
+                lgRed.style.opacity = lgCyan.style.opacity = 0;
+                lgSlices.forEach(function (s) { s.style.opacity = 0; });
+                return;
+            }
+            var w = portfolioLogo.offsetWidth, k = strength * w;
+            var dx = (0.004 + Math.random() * 0.01) * k;
+            lgRed.style.opacity = lgCyan.style.opacity = 0.85;
+            lgRed.style.transform  = 'translateX(' + (-dx).toFixed(1) + 'px)';
+            lgCyan.style.transform = 'translateX(' + dx.toFixed(1) + 'px)';
+            lgSlices.forEach(function (s) {
+                if (Math.random() < 0.3) { s.style.opacity = 0; return; }
+                var top = Math.random() * 78, hgt = 8 + Math.random() * 22;
+                s.style.opacity = 1;
+                s.style.clipPath = 'inset(' + top.toFixed(0) + '% 0 ' + Math.max(0, 100 - top - hgt).toFixed(0) + '% 0)';
+                s.style.transform = 'translateX(' + ((Math.random() - 0.5) * 0.05 * k).toFixed(1) + 'px)';
+            });
+            setTimeout(step, 55);
+        }());
+    }
+
+    function shimmerLoop() {
+        if (!calm) glitchLogo(entered ? 0.7 : 1, 2 + ((Math.random() * 3) | 0));
+        setTimeout(shimmerLoop, 2200 + Math.random() * 3600);
+    }
+
+    function revealLogo() {
+        logoShown = true;
+        portfolioLogo.classList.add('show');
+        if (!calm) glitchLogo(2.2, 9);
+        setTimeout(function () {
+            introEnter.classList.add('show');
+            ready = true;
+            lines.classList.add('on');
+            shimmerLoop();
+        }, 1300);
+    }
+
+    /* ════════ Sound: a soft static burst on entering, then a quiet hiss ════════ */
+
+    var actx = null, hissGain = null;
+    function startSound() {
+        try {
+            var AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) return;
+            actx = new AC();
+            var len = actx.sampleRate * 2, buf = actx.createBuffer(1, len, actx.sampleRate), ch = buf.getChannelData(0);
+            for (var i = 0; i < len; i++) ch[i] = Math.random() * 2 - 1;
+            var now = actx.currentTime;
+
+            // the burst: about half a second, kept well below full volume
+            var b = actx.createBufferSource(); b.buffer = buf;
+            var bf = actx.createBiquadFilter(); bf.type = 'bandpass'; bf.frequency.value = 2600; bf.Q.value = 0.5;
+            var bg = actx.createGain();
+            bg.gain.setValueAtTime(0.0001, now);
+            bg.gain.exponentialRampToValueAtTime(0.11, now + 0.03);
+            bg.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
+            b.connect(bf); bf.connect(bg); bg.connect(actx.destination);
+            b.start(now); b.stop(now + 0.65);
+
+            // the hiss: barely there, like a camera left running
+            var h = actx.createBufferSource(); h.buffer = buf; h.loop = true;
+            var hf = actx.createBiquadFilter(); hf.type = 'highpass'; hf.frequency.value = 3200;
+            hissGain = actx.createGain();
+            hissGain.gain.setValueAtTime(0.0001, now);
+            hissGain.gain.linearRampToValueAtTime(0.012, now + 0.9);
+            h.connect(hf); hf.connect(hissGain); hissGain.connect(actx.destination);
+            h.start(now);
+        } catch (e) {}
+    }
+    document.addEventListener('visibilitychange', function () {
+        if (!actx) return;
+        if (document.hidden) actx.suspend(); else actx.resume();
+    });
+
+    /* ════════ Opening: loading bar → crumble → logo ════════ */
+
+    function enterMenu(withSound) {
         if (entered) return;
         entered = true;
+        try { sessionStorage.setItem('cbEntered', '1'); } catch (e) {}
+        if (withSound) startSound();
+        burst = 1;                                              // the screen cuts to static, then settles dark
         introScreen.classList.add('hidden');
         portfolioLogo.classList.add('at-top');
         menuScreen.classList.remove('hidden');
+        if (!calm) glitchLogo(1.6, 6);
+    }
+
+    introScreen.addEventListener('click', function () {
+        if (!ready) return;
+        enterMenu(true);
     });
+
+    function startCrumble() {
+        loader.classList.add('done');
+        setTimeout(function () {
+            crumbleStart = performance.now();
+            mode = 'crumble';
+        }, 260);
+    }
+
+    /* the bar follows the real loading of the logo, with a minimum time so it can be seen */
+    function runLoader(done) {
+        var loaded = false, shown = 0, t0 = performance.now(), MIN = 1500;
+        var img = new Image();
+        img.onload = img.onerror = function () { loaded = true; };
+        img.src = 'PORTFOLIO/portfolio logo inv.png';
+        (function tick(now) {
+            var time = Math.min(1, (now - t0) / MIN);
+            var goal = loaded ? time : Math.min(0.9, time);
+            shown += (goal - shown) * 0.2;
+            if (loaded && time >= 1 && shown > 0.985) {
+                loaderFill.style.transform = 'scaleX(1)';
+                setTimeout(done, 220);
+                return;
+            }
+            loaderFill.style.transform = 'scaleX(' + shown.toFixed(3) + ')';
+            requestAnimationFrame(tick);
+        }(t0));
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+    requestAnimationFrame(frame);
+
+    /* coming back from a section in the same visit goes straight to the menu;
+       add ?intro to the address to see the opening again */
+    var seen = false;
+    try { seen = sessionStorage.getItem('cbEntered') === '1'; } catch (e) {}
+    if (seen && !/[?&]intro\b/.test(location.search)) {
+        loader.style.display = 'none';
+        document.body.classList.add('dark');
+        mode = 'rest';
+        logoShown = ready = true;
+        portfolioLogo.classList.add('show');
+        lines.classList.add('on');
+        enterMenu(false);
+        shimmerLoop();
+    } else {
+        runLoader(startCrumble);
+    }
 
     /* ── Video helpers ── */
     function showVideo(src) {
@@ -190,12 +605,15 @@ html, body {
             bgVideo.src = src;
             bgVideo.dataset.current = src;
             bgVideo.play().catch(function () {});
+            burst = Math.max(burst, 0.45);                      // a flick of static as the channel changes
         }
         bgVideo.classList.add('visible');
+        target = OVER_VIDEO;
     }
 
     function hideVideo() {
         bgVideo.classList.remove('visible');
+        target = REST;
         // Wait for the CSS fade before stopping playback
         fadeOutTimer = setTimeout(function () {
             bgVideo.pause();
