@@ -291,6 +291,67 @@ nav .active { color: #fff !important; opacity: 1 !important; }
     font-style: italic;
 }
 
+/* ── Sites list ── */
+a.work-name { text-decoration: none; transition: color 0.25s; }
+a.work-name::after { content: ' \2197'; font-family: Arial, sans-serif; }
+a.work-name:hover { color: #fff; }
+.site-list .work-name { width: 150px; }
+
+/* ── Work with me ── */
+.hire-wrap {
+    max-width: 600px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+.hire-head {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: clamp(22px, 3vw, 34px);
+    font-weight: 900;
+    color: white;
+    line-height: 1.2;
+    margin: 0;
+}
+.hire-note {
+    font-family: Arial, sans-serif;
+    font-size: clamp(14px, 1.4vw, 16px);
+    font-weight: 600;
+    color: rgba(255,255,255,0.92);
+    line-height: 1.7;
+    margin: 0 0 8px;
+}
+.hire-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px 14px;
+    margin-top: 18px;
+}
+.hire-label {
+    width: 100%;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+}
+.hire-link {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 11px 20px;
+    transition: border-color 0.2s, background 0.2s;
+}
+.hire-link:hover { border-color: #cc3300; background: rgba(204,51,0,0.18); }
+
 /* ── Panel navigation dots ── */
 .panel-nav {
     position: fixed;
@@ -372,9 +433,17 @@ nav .active { color: #fff !important; opacity: 1 !important; }
 @media (max-width: 768px) {
     .panel { padding: 68px 24px 50px; justify-content: flex-start; padding-top: 100px; }
     .panel.panel-left { padding-left: 24px; padding-right: 24px; }
-    .cap-grid { grid-template-columns: 1fr; gap: 14px; }
+    .cap-grid { grid-template-columns: 1fr 1fr; gap: 12px 14px; }
+    .cap-intro { font-size: 13px; line-height: 1.6; margin-bottom: 18px; }
+    .cap-item { padding-left: 10px; }
+    .cap-name { font-size: 11px; }
+    .cap-detail { font-size: 11.5px; line-height: 1.45; }
+    .work-list { text-align: left; gap: 16px; }
     .work-item { flex-direction: column; gap: 6px; }
-    .work-name { width: auto; }
+    .work-name, .site-list .work-name { width: auto; }
+    .work-detail { font-size: 13px; line-height: 1.5; }
+    .panel-label { margin-bottom: 16px; }
+    .panel { padding-top: 76px !important; }
     .panel-nav { right: 14px; }
     .panel-arrow.up { bottom: 24px; left: calc(50% - 30px); transform: translateX(-50%); }
     .panel-arrow.down { bottom: 24px; left: calc(50% + 30px); transform: translateX(-50%); }
@@ -442,6 +511,8 @@ nav .active { color: #fff !important; opacity: 1 !important; }
     <div class="panel-dot" data-index="1"></div>
     <div class="panel-dot" data-index="2"></div>
     <div class="panel-dot" data-index="3"></div>
+    <div class="panel-dot" data-index="4"></div>
+    <div class="panel-dot" data-index="5"></div>
 </nav>
 
 <!-- Bottom arrows -->
@@ -456,7 +527,7 @@ nav .active { color: #fff !important; opacity: 1 !important; }
         <div class="hero-content">
             <p class="hero-eyebrow">Charles Barrios</p>
             <p class="hero-quote">"I create things that look exactly how they're supposed to feel — and I've been doing it long enough to know when something's right."</p>
-            <p class="hero-sub">Graphic Designer &nbsp;&middot;&nbsp; Brand Identity &nbsp;&middot;&nbsp; Creative Director</p>
+            <p class="hero-sub">Web Designer &amp; Developer &nbsp;&middot;&nbsp; Graphic Designer &nbsp;&middot;&nbsp; Creative Director</p>
             <a class="hero-email" href="mailto:barrioscharles97@gmail.com">barrioscharles97@gmail.com</a>
             <a class="hero-brand" href="https://madewith-luv.com" target="_blank" rel="noopener">My Clothing Website</a>
         </div>
@@ -466,23 +537,31 @@ nav .active { color: #fff !important; opacity: 1 !important; }
     <section class="panel panel-left">
         <p class="panel-label">What I Can Do</p>
         <div class="cap-wrap">
-            <p class="cap-intro">My range is wide. I can take a brand from nothing — logo, identity, website, content, the whole thing — and build it into something that feels alive. I work across print, digital, apparel, photography, video, and sound. I research trends, consult on direction, and handle production from concept to final file.</p>
+            <p class="cap-intro">I design brands and build the websites they live on. I can take a business from nothing, with its logo, identity, website, online store and content, and make it feel alive. I work across web, print, apparel, photography, video and sound, from the first concept to the final file or the live site.</p>
             <div class="cap-grid">
                 <div class="cap-item">
+                    <span class="cap-name">Web Design &amp; Development</span>
+                    <span class="cap-detail">UI/UX design, responsive custom-coded sites in HTML, CSS and JavaScript, motion and interactive pages</span>
+                </div>
+                <div class="cap-item">
+                    <span class="cap-name">Stores &amp; Platforms</span>
+                    <span class="cap-detail">WordPress, Shopify, Stripe checkout, PHP and Node.js, domains, hosting and cPanel, SEO basics</span>
+                </div>
+                <div class="cap-item">
                     <span class="cap-name">Brand &amp; Identity</span>
-                    <span class="cap-detail">Adobe Creative Suite, Figma, UI/UX, color theory, trend research, mood board creation</span>
+                    <span class="cap-detail">Logos and brand kits, Adobe Creative Suite, Figma, color theory, trend research, mood boards</span>
                 </div>
                 <div class="cap-item">
                     <span class="cap-name">Print &amp; Apparel</span>
-                    <span class="cap-detail">Large-scale industrial printing, screen printing, apparel graphics, production coordination</span>
+                    <span class="cap-detail">Apparel graphics, screen printing, packaging, large-scale printing, production coordination</span>
                 </div>
                 <div class="cap-item">
                     <span class="cap-name">Photo &amp; Film</span>
-                    <span class="cap-detail">DSLR photography, studio lighting, videography, editing &amp; post-production workflows</span>
+                    <span class="cap-detail">DSLR and product photography, studio lighting, videography, editing and post-production</span>
                 </div>
                 <div class="cap-item">
-                    <span class="cap-name">Sound &amp; Web</span>
-                    <span class="cap-detail">Audio mixing, sound design, web design &amp; coding, digital &amp; social media content</span>
+                    <span class="cap-name">Sound &amp; Content</span>
+                    <span class="cap-detail">Audio mixing, sound design, music production, digital and social media content</span>
                 </div>
             </div>
         </div>
@@ -498,11 +577,11 @@ nav .active { color: #fff !important; opacity: 1 !important; }
             </div>
             <div class="work-item">
                 <span class="work-name">With Love</span>
-                <p class="work-detail">Built a fully trademarked clothing brand entirely from scratch. The name, the identity, the website, every piece of content — all me, from the ground up.</p>
+                <p class="work-detail">Built a fully trademarked clothing brand entirely from scratch. The name, the identity, the online store, every piece of content — all me, from the ground up.</p>
             </div>
             <div class="work-item">
-                <span class="work-name">MISHKA &amp; ALIFE</span>
-                <p class="work-detail">Designed a full capsule for MISHKA — tees, sweatpants, zip-up hoodies. For ALIFE, I designed limited-edition event tees for their flagship store using their box logo and stencil prints. Those designs made it to the final product.</p>
+                <span class="work-name">NYC Streetwear</span>
+                <p class="work-detail">Designed a full capsule of tees, sweatpants and zip-up hoodies for an established NYC streetwear brand, and limited-edition event tees for another's flagship store. Those designs made it to the final product.</p>
             </div>
             <div class="work-item">
                 <span class="work-name">Cookie's Kids</span>
@@ -511,13 +590,56 @@ nav .active { color: #fff !important; opacity: 1 !important; }
         </div>
     </section>
 
-    <!-- Panel 4 — Education -->
+    <!-- Panel 4 — Sites -->
+    <section class="panel panel-left">
+        <p class="panel-label">Sites I've Built</p>
+        <div class="work-list site-list">
+            <div class="work-item">
+                <a class="work-name" href="https://www.madewith-luv.com/" target="_blank" rel="noopener">With Love</a>
+                <p class="work-detail">My clothing brand's online store: product pages, size guides, a cart and Stripe checkout.</p>
+            </div>
+            <div class="work-item">
+                <a class="work-name" href="https://www.madewith-luv.com/serenade/" target="_blank" rel="noopener">Serenade</a>
+                <p class="work-detail">A fine-dining restaurant site with a candlelit home page, menus and reservations.</p>
+            </div>
+            <div class="work-item">
+                <a class="work-name" href="https://www.madewith-luv.com/brightlane/" target="_blank" rel="noopener">Brightlane Homes</a>
+                <p class="work-detail">A real estate agency site with home search, listings, galleries and viewing requests.</p>
+            </div>
+            <div class="work-item">
+                <a class="work-name" href="https://www.madewith-luv.com/ashwood/" target="_blank" rel="noopener">Ashwood</a>
+                <p class="work-detail">An art and history museum site with a searchable collection and timed-ticket checkout.</p>
+            </div>
+            <div class="work-item">
+                <a class="work-name" href="https://www.madewith-luv.com/chaos-matters/" target="_blank" rel="noopener">Chaos Matters</a>
+                <p class="work-detail">An interactive art exhibit made of animation, sound and live graphics. In progress.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Panel 5 — Education -->
     <section class="panel">
         <p class="panel-label">Education</p>
         <div class="edu-wrap">
             <p class="edu-school">Hunter College, New York</p>
             <p class="edu-degree">Bachelor of Arts &nbsp;&middot;&nbsp; 2015 – 2020</p>
             <p class="edu-note">I studied film production, digital design, and sound. Most of what I know came from doing the work — but school gave me the foundation to understand why it works.</p>
+        </div>
+    </section>
+
+    <!-- Panel 6 — Work with me. Fill in each profile address below; a link with no address stays hidden. -->
+    <section class="panel">
+        <p class="panel-label">Work With Me</p>
+        <div class="hire-wrap">
+            <p class="hire-head">Have a project in mind?</p>
+            <p class="hire-note">Websites, online stores, brand identity and creative direction. Tell me what you're building.</p>
+            <a class="hero-email" href="mailto:barrioscharles97@gmail.com">barrioscharles97@gmail.com</a>
+            <div class="hire-links" id="hireLinks">
+                <span class="hire-label">Or hire me on</span>
+                <a class="hire-link" href="" target="_blank" rel="noopener">Upwork</a>
+                <a class="hire-link" href="" target="_blank" rel="noopener">Fiverr</a>
+                <a class="hire-link" href="" target="_blank" rel="noopener">Freelancer</a>
+            </div>
         </div>
     </section>
 
@@ -588,6 +710,14 @@ nav .active { color: #fff !important; opacity: 1 !important; }
         clearTimeout(hintTimer);
         navHint.classList.add('hidden');
     }, { once: true });
+
+    /* Profile links with no address stay hidden */
+    var hireLinks = document.getElementById('hireLinks');
+    var shown = 0;
+    Array.prototype.forEach.call(hireLinks.querySelectorAll('.hire-link'), function (a) {
+        if (a.getAttribute('href')) shown++; else a.style.display = 'none';
+    });
+    if (!shown) hireLinks.style.display = 'none';
 
     updateUI();
 }());
