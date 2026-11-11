@@ -178,3 +178,18 @@ body.dark-room #pfBar.pf-light {
 @media (prefers-reduced-motion: reduce) {
     #pfBar.open #pfMenu, #pfMenu a:hover::before, #pfMenu a:hover::after { animation: none; }
 }
+
+/* ── Drawn icons (play, pause, stop, skip, arrows) used in place of text symbols,
+      which phones swap for emoji. They take the size and colour of the text around them. ── */
+.ic {
+    display: inline-block;
+    width: 1em; height: 1em;
+    fill: currentColor;
+    vertical-align: -0.14em;
+    flex-shrink: 0;
+    pointer-events: none;
+}
+.ic-flip { transform: scaleX(-1); }
+.ic-up   { transform: rotate(-90deg); }
+.ic-down { transform: rotate(90deg); }
+.wg-present-btn .ic { margin-right: 0.45em; font-size: 0.9em; }
