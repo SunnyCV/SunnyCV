@@ -161,6 +161,13 @@ body.dark-room #pfBar.pf-light {
     100% { opacity: 0; }
 }
 
+/* ── Desktop: a larger logo, with a taller bar so it has room to breathe ── */
+@media (min-width: 769px) {
+    #pfBar  { height: 50px; }
+    #pfLogo { height: 34px; }
+    nav:not(.panel-nav) { min-height: 50px; }
+}
+
 /* ── Phones: the bar matches the old 48px header ── */
 @media (max-width: 768px) {
     #pfBar  { height: 48px; }
