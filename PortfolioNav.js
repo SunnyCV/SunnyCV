@@ -52,6 +52,22 @@
         if (e.key === 'Escape') setOpen(false);
     });
 
+    /* ── Give the menu button a backing once the page scrolls under it ── */
+    function onScroll(e) {
+        var y = window.scrollY || 0;
+        var t = e && e.target;
+        var inner = (t && t !== document && t.nodeType === 1) ? t.scrollTop : 0;
+        if (inner) y = Math.max(y, inner);
+        bar.classList.toggle('pf-scrolled', y > 8);
+        // pages that scroll an inner panel instead of the page (About): the logo leaves with the first panel
+        if (t && t !== document && t.nodeType === 1 && t.scrollHeight > t.clientHeight + 40 && t.clientHeight > window.innerHeight * 0.6) {
+            logoEl.style.marginTop = (-inner) + 'px';
+        }
+    }
+    var logoEl = bar.querySelector('#pfLogo');
+    window.addEventListener('scroll', onScroll, { passive: true });
+    document.addEventListener('scroll', onScroll, { passive: true, capture: true });
+
     /* ── Logo: a quick glitch snap every ten seconds ── */
     var logo = bar.querySelector('#pfLogo');
     var red = logo.querySelector('.lg-red'), cyan = logo.querySelector('.lg-cyan');

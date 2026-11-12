@@ -193,3 +193,28 @@ body.dark-room #pfBar.pf-light {
 .ic-up   { transform: rotate(-90deg); }
 .ic-down { transform: rotate(90deg); }
 .wg-present-btn .ic { margin-right: 0.45em; font-size: 0.9em; }
+
+/* ── Scrolling: the bar and logo stay at the top of the page and scroll away with it;
+      only the menu button and its box follow the visitor down ── */
+#pfBar { position: absolute; }
+.mobile-header { position: absolute !important; }
+#pfBurger {
+    position: fixed;
+    top: 4px; transform: none;
+    border-radius: 50%;
+    transition: background-color 0.25s, box-shadow 0.25s;
+}
+#pfMenu { position: fixed; top: 40px; margin-top: 0; }
+/* once the page has scrolled, the button gets a backing so it reads over any picture */
+#pfBar.pf-scrolled #pfBurger {
+    background: var(--pf-box);
+    box-shadow: 0 1px 6px rgba(0,0,0,0.25), 0 0 0 1px var(--pf-line);
+}
+@media (min-width: 769px) {
+    #pfBurger { top: 9px; }
+    #pfMenu { top: 46px; }
+}
+@media (max-width: 768px) {
+    #pfBurger { top: 8px; }
+    #pfMenu { top: 46px; }
+}
