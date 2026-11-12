@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hot n' Trendy | The internet's hottest finds, updated daily</title>
+<meta name="description" content="The trendiest products across TikTok, Instagram, YouTube and more, updated daily, with dupes for anything that's sold out.">
+<meta name="theme-color" content="#f6f7f9">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Unbounded:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Icons and the heat-haze filter -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+        <filter id="heatHaze" x="-10%" y="-10%" width="120%" height="120%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.012 0.06" numOctaves="2" seed="3">
+                <animate attributeName="baseFrequency" dur="3s" values="0.012 0.06;0.014 0.09;0.012 0.06" repeatCount="indefinite"/>
+            </feTurbulence>
+            <feDisplacementMap in="SourceGraphic" scale="7"/>
+        </filter>
+    </defs>
+    <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12.6 2.3c.4 2.6-.6 4.4-2 6-1.5 1.7-3.1 3.4-3.1 6.2A5.5 5.5 0 0 0 13 20c3 0 5.5-2.4 5.5-5.6 0-2.3-1-3.9-2.2-5.2.1 1.4-.3 2.6-1.3 3.4.2-3.8-1.1-7.6-2.4-10.3zM12 21.5c-1.7 0-3-1.3-3-3 0-1.6 1-2.5 2-3.6.2 1 .8 1.6 1.6 2 .3-1 .2-2 .1-2.9 1.3 1 2.3 2.3 2.3 4.2 0 1.8-1.3 3.3-3 3.3z"/></symbol>
+    <symbol id="i-frost" viewBox="0 0 24 24"><path d="M11 2h2v4.2l2.3-2.3 1.4 1.4L13 9v2h2l3.7-3.7 1.4 1.4L17.8 11H22v2h-4.2l2.3 2.3-1.4 1.4L15 13h-2v2l3.7 3.7-1.4 1.4-2.3-2.3V22h-2v-4.2l-2.3 2.3-1.4-1.4L11 15v-2H9l-3.7 3.7-1.4-1.4L6.2 13H2v-2h4.2L3.9 8.7l1.4-1.4L9 11h2V9L7.3 5.3l1.4-1.4L11 6.2z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><path d="M10.5 3a7.5 7.5 0 0 1 5.9 12.1l4.8 4.8-1.4 1.4-4.8-4.8A7.5 7.5 0 1 1 10.5 3zm0 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11z"/></symbol>
+    <symbol id="i-bag" viewBox="0 0 24 24"><path d="M7 7V6a5 5 0 0 1 10 0v1h3l-1 14H5L4 7zm2 0h6V6a3 3 0 0 0-6 0zm-2.9 2 .8 10h10.2l.8-10z"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 4l7 8h-4.5v8h-5v-8H5z"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 11h11.2l-4.6-4.6L13 5l7 7-7 7-1.4-1.4 4.6-4.6H5z"/></symbol>
+</svg>
+
+<!-- Live ticker -->
+<div class="ticker" aria-label="Trending right now">
+    <div class="ticker-label"><span class="live-dot"></span>Live</div>
+    <div class="ticker-track" id="ticker"></div>
+</div>
+
+<!-- Header -->
+<header class="site-head">
+    <div class="wrap head-row">
+        <a class="wm" href="index.html" aria-label="Hot n' Trendy, home"><span class="hot">Hot</span><span class="n">n'</span><span class="trendy">Trendy</span></a>
+        <nav class="nav" id="nav" aria-label="Main">
+            <a class="hot-link" href="#hot">Hot now</a>
+            <a class="cool-link" href="#cool">Still cool</a>
+            <a href="#dupes">Dupes</a>
+            <a href="#resell">Resell</a>
+            <a href="brand.html">Brand</a>
+        </nav>
+        <div class="head-tools">
+            <label class="search"><svg class="icon"><use href="#i-search"/></svg><span class="sr-only">Search</span><input type="search" id="q" placeholder="Search the heat…"></label>
+            <button class="icon-btn" aria-label="Saved items"><svg class="icon"><use href="#i-bag"/></svg></button>
+            <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false"><svg class="icon"><use href="#i-menu"/></svg></button>
+        </div>
+    </div>
+</header>
+
+<main>
+
+<!-- Cover: this week's issue -->
+<section class="cover-band">
+    <div class="wrap cover-grid">
+        <article class="cover" id="cover">
+            <div class="cover-top">
+                <span><b>Issue 01</b> · Week of Nov 16</span>
+                <span>Updated daily · Free</span>
+            </div>
+            <h1 class="wm"><span class="hot">Hot</span><span class="n">n'</span><span class="trendy">Trendy</span></h1>
+            <div class="cover-art" id="coverArt"></div>
+
+            <div class="cover-lines">
+                <div class="cover-line">
+                    <span class="kicker hot">Sold out everywhere</span>
+                    <p>The lip oil that broke TikTok, and the <em>$9 dupe</em> that's just as glossy</p>
+                </div>
+                <div class="cover-line">
+                    <span class="kicker cool">Keep it cool</span>
+                    <p>Digicams are back: flash photos, <em>under $70</em></p>
+                </div>
+                <div class="cover-line">
+                    <span class="kicker plain">Resell report</span>
+                    <p>The sneaker going for <em>57% over</em> retail</p>
+                </div>
+            </div>
+
+            <div class="cover-cta">
+                <a class="btn hot" href="#hot"><svg class="icon"><use href="#i-flame"/></svg>Shop the heat</a>
+                <a class="btn cool" href="#dupes"><svg class="icon"><use href="#i-frost"/></svg>Find dupes</a>
+            </div>
+
+            <div class="flare" aria-hidden="true"></div>
+            <div class="price-sticker" aria-hidden="true"><div><small>Dupe from</small><strong>$9</strong><s>was $24</s></div></div>
+            <div class="barcode" aria-hidden="true"><i></i><span>0 01 HNT<br>2026 · 11</span></div>
+        </article>
+
+        <aside class="heat-index" aria-labelledby="hiTitle">
+            <div class="panel-head">
+                <h2 id="hiTitle"><span class="hot-text">Heat index</span></h2>
+                <span class="stamp" id="hiStamp">Updated 2h ago</span>
+            </div>
+            <ol class="hi-list" id="heatIndex"></ol>
+            <a class="btn" href="#hot" style="margin-top:18px">See all hot<svg class="icon"><use href="#i-arrow"/></svg></a>
+        </aside>
+    </div>
+</section>
+
+<!-- Hot now -->
+<section class="section" id="hot">
+    <div class="wrap">
+        <div class="sec-head reveal">
+            <div>
+                <div class="sec-kicker"><svg class="icon" style="color:var(--flame)"><use href="#i-flame"/></svg>Heating up across the internet</div>
+                <h2 class="sec-title"><span class="hot-text">Hot</span> right <span class="serif">now</span></h2>
+            </div>
+        </div>
+        <div class="filter-row reveal">
+            <div class="filters" id="pfFilters" aria-label="Filter by platform"></div>
+            <div class="filters" id="catFilters" aria-label="Filter by category"></div>
+        </div>
+        <div class="grid" id="hotGrid"></div>
+        <div class="more-row"><button class="btn" id="moreBtn" hidden>Show all the heat</button></div>
+    </div>
+</section>
+
+<!-- Collage -->
+<section class="collage-band" aria-labelledby="feedTitle">
+    <div class="wrap">
+        <div class="sec-head reveal">
+            <div>
+                <div class="sec-kicker">The moodboard</div>
+                <h2 class="sec-title" id="feedTitle">Seen on <span class="serif">your</span> feed</h2>
+            </div>
+        </div>
+        <div class="collage reveal" id="collage"></div>
+    </div>
+</section>
+
+<!-- Dupes -->
+<section class="dupes-band" id="dupes" aria-labelledby="dupesTitle">
+    <div class="wrap">
+        <div class="sec-head reveal">
+            <div>
+                <div class="sec-kicker"><svg class="icon" style="color:var(--ice)"><use href="#i-frost"/></svg>Sold out? Too pricey? Keep it cool</div>
+                <h2 class="sec-title" id="dupesTitle"><span class="cool-text">Dupes</span> <span class="serif">that pass</span></h2>
+            </div>
+            <a class="btn cool" href="#dupes">All dupes<svg class="icon"><use href="#i-arrow"/></svg></a>
+        </div>
+        <div class="dupe-grid" id="dupeGrid"></div>
+    </div>
+</section>
+
+<!-- Still cool + resell -->
+<section class="section" id="cool">
+    <div class="wrap split">
+        <div class="board reveal">
+            <div class="sec-kicker"><svg class="icon" style="color:var(--ice)"><use href="#i-frost"/></svg>Staying power</div>
+            <h3>Still <span class="cool-text">cool</span></h3>
+            <p class="sub">Not just a moment: the finds that keep trending week after week.</p>
+            <div class="rows" id="coolRows"></div>
+        </div>
+        <div class="board reveal" id="resell">
+            <div class="sec-kicker"><svg class="icon" style="color:#16a36a"><use href="#i-up"/></svg>For resellers</div>
+            <h3>Resell <span class="hot-text">report</span></h3>
+            <p class="sub">Store price against what it's listing for on resale sites. A wide gap means demand.</p>
+            <div class="rows" id="resellRows"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter -->
+<section class="wrap">
+    <div class="signup reveal">
+        <div>
+            <h2>Get the heat <span class="serif">before</span> it sells out</h2>
+            <p>One email a week: the hottest finds, the best dupes and what's about to blow up.</p>
+        </div>
+        <form onsubmit="event.preventDefault(); this.querySelector('button').textContent='You\'re in';">
+            <label class="sr-only" for="email">Email address</label>
+            <input id="email" type="email" placeholder="your@email.com" required>
+            <button class="btn hot" type="submit"><svg class="icon"><use href="#i-flame"/></svg>Subscribe</button>
+        </form>
+    </div>
+</section>
+
+</main>
+
+<footer class="site-foot">
+    <div class="wrap">
+        <div class="foot-row">
+            <a class="wm" href="index.html"><span class="hot">Hot</span><span class="n">n'</span><span class="trendy">Trendy</span></a>
+            <div class="foot-links"><a href="#hot">Hot now</a><a href="#cool">Still cool</a><a href="#dupes">Dupes</a><a href="#resell">Resell</a><a href="brand.html">Brand</a></div>
+        </div>
+        <p class="disclosure">Hot n' Trendy may earn a commission when you buy through links on this site. Dupes are similar products sold under their own brands; we never list counterfeits. Prototype: all products, brands and figures shown are samples.</p>
+    </div>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/art.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

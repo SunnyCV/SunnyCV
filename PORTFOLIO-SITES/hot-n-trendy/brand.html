@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brand Board | Hot n' Trendy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Unbounded:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+.bb { padding: 40px 0 80px; }
+.bb-hero {
+    position: relative; overflow: hidden;
+    border-radius: 28px; padding: 70px 40px;
+    background:
+        radial-gradient(500px 320px at 20% 110%, rgba(255,61,139,0.35), transparent 70%),
+        radial-gradient(500px 320px at 85% -10%, rgba(41,227,255,0.35), transparent 70%),
+        linear-gradient(160deg, #ffffff, #e2e7ec);
+    box-shadow: 0 1px 0 #fff inset, 0 30px 60px -30px rgba(20,23,28,0.45);
+    text-align: center; container-type: inline-size;
+}
+.bb-hero .wm { font-size: 10.5cqw; justify-content: center; }
+.bb-hero p { margin: 22px 0 0; font-family: var(--serif); font-style: italic; font-size: clamp(20px, 2.6vw, 32px); }
+.bb-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; margin-top: 22px; }
+.bb-card { border-radius: 22px; background: #fff; border: 1px solid var(--line); box-shadow: var(--shadow); padding: 24px; }
+.bb-card h2 { margin: 0 0 16px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-2); font-weight: 700; }
+.wm-dark { border-radius: 18px; padding: 34px 20px; display: grid; place-items: center; background: linear-gradient(160deg, #1b1f26, #0b0d10); }
+.wm-dark .wm { font-size: 44px; }
+.wm-small { display: flex; gap: 22px; align-items: center; justify-content: center; padding: 22px 0 0; flex-wrap: wrap; }
+.mark {
+    width: 64px; height: 64px; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(160deg, #1b1f26, #0b0d10);
+    font-family: var(--display); font-weight: 900; font-size: 22px; letter-spacing: -0.04em;
+}
+.mark span { background: var(--chrome); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.mark .h { filter: drop-shadow(0 0 4px rgba(255,106,61,0.9)); }
+.mark .t { filter: drop-shadow(0 0 4px rgba(41,227,255,0.9)); }
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 12px; }
+.sw { border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: #fff; }
+.sw i { display: block; height: 78px; }
+.sw div { padding: 9px 10px; font-family: var(--mono); font-size: 11px; line-height: 1.35; }
+.sw b { display: block; font-family: var(--sans); font-size: 13px; }
+.grad-bar { height: 54px; border-radius: 14px; margin-bottom: 10px; display: flex; align-items: flex-end; padding: 8px 12px; font-family: var(--mono); font-size: 11px; font-weight: 700; }
+.type-spec { display: grid; gap: 18px; }
+.type-spec .t1 { font-family: var(--display); font-weight: 900; font-size: 44px; line-height: 0.95; text-transform: uppercase; letter-spacing: -0.03em; }
+.type-spec .t2 { font-family: var(--serif); font-style: italic; font-size: 34px; line-height: 1; }
+.type-spec .t3 { font-family: var(--sans); font-size: 17px; }
+.type-spec .t4 { font-family: var(--mono); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
+.type-spec small { display: block; font-family: var(--mono); font-size: 11px; color: var(--steel); margin-top: 4px; letter-spacing: 0.06em; text-transform: none; font-style: normal; font-weight: 400; }
+.kit { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.rule-list { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 15px; }
+.rule-list b { font-weight: 700; }
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.duo > div { border-radius: 16px; padding: 18px; }
+.duo .h { background: linear-gradient(160deg, #fff4ef, #ffe6ef); border: 1px solid rgba(255,106,61,0.35); }
+.duo .c { background: linear-gradient(160deg, #eefcff, #f1ebff); border: 1px solid rgba(41,227,255,0.4); }
+.duo h3 { margin: 0 0 8px; font-family: var(--display); font-size: 18px; text-transform: uppercase; }
+.duo p { margin: 0; font-size: 14px; color: var(--ink-2); }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12.6 2.3c.4 2.6-.6 4.4-2 6-1.5 1.7-3.1 3.4-3.1 6.2A5.5 5.5 0 0 0 13 20c3 0 5.5-2.4 5.5-5.6 0-2.3-1-3.9-2.2-5.2.1 1.4-.3 2.6-1.3 3.4.2-3.8-1.1-7.6-2.4-10.3zM12 21.5c-1.7 0-3-1.3-3-3 0-1.6 1-2.5 2-3.6.2 1 .8 1.6 1.6 2 .3-1 .2-2 .1-2.9 1.3 1 2.3 2.3 2.3 4.2 0 1.8-1.3 3.3-3 3.3z"/></symbol>
+    <symbol id="i-frost" viewBox="0 0 24 24"><path d="M11 2h2v4.2l2.3-2.3 1.4 1.4L13 9v2h2l3.7-3.7 1.4 1.4L17.8 11H22v2h-4.2l2.3 2.3-1.4 1.4L15 13h-2v2l3.7 3.7-1.4 1.4-2.3-2.3V22h-2v-4.2l-2.3 2.3-1.4-1.4L11 15v-2H9l-3.7 3.7-1.4-1.4L6.2 13H2v-2h4.2L3.9 8.7l1.4-1.4L9 11h2V9L7.3 5.3l1.4-1.4L11 6.2z"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 11h11.2l-4.6-4.6L13 5l7 7-7 7-1.4-1.4 4.6-4.6H5z"/></symbol>
+</svg>
+
+<header class="site-head">
+    <div class="wrap head-row">
+        <a class="wm" href="index.html" aria-label="Hot n' Trendy, home"><span class="hot">Hot</span><span class="n">n'</span><span class="trendy">Trendy</span></a>
+        <div class="head-tools"><a class="btn" href="index.html">Back to the store<svg class="icon"><use href="#i-arrow"/></svg></a></div>
+    </div>
+</header>
+
+<main class="wrap bb">
+    <section class="bb-hero">
+        <div class="sec-kicker" style="justify-content:center">Brand board · v1</div>
+        <h1 class="wm" style="margin-top:18px"><span class="hot">Hot</span><span class="n">n'</span><span class="trendy">Trendy</span></h1>
+        <p>A Y2K cyber shopping magazine: chrome and neon on glossy silver pages.</p>
+    </section>
+
+    <div class="bb-row">
+        <section class="bb-card">
+            <h2>Wordmark on dark</h2>
+            <div class="wm-dark"><span class="wm"><span class="hot">Hot</span><span class="n">n'</span><span class="trendy">Trendy</span></span></div>
+            <div class="wm-small">
+                <div class="mark" title="App icon"><span class="h">H</span><span class="t">T</span></div>
+                <span class="wm" style="font-size:22px"><span class="hot">Hot</span><span class="n">n'</span><span class="trendy">Trendy</span></span>
+            </div>
+        </section>
+        <section class="bb-card">
+            <h2>Hot and cool, one system</h2>
+            <div class="duo">
+                <div class="h"><h3 class="hot-text">Hot</h3><p>Flames and heat. What's blowing up right now: heat meters, hot prices, sold-out alerts.</p></div>
+                <div class="c"><h3 class="cool-text">Trendy</h3><p>Frost and ice. What stays cool: staying power, frost meters, and every dupe.</p></div>
+            </div>
+            <div style="display:grid;gap:12px;margin-top:18px">
+                <div class="meter heat"><svg class="icon"><use href="#i-flame"/></svg><span class="bar"><i style="width:94%"></i></span><span>94</span></div>
+                <div class="meter frost"><svg class="icon"><use href="#i-frost"/></svg><span class="bar"><i style="width:81%"></i></span><span>81</span></div>
+            </div>
+        </section>
+    </div>
+
+    <section class="bb-card" style="margin-top:22px">
+        <h2>Colour</h2>
+        <div class="bb-row" style="margin-top:0;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">
+            <div class="grad-bar" style="background:var(--chrome);color:var(--ink)">Chrome · logo, buttons, frames</div>
+            <div class="grad-bar" style="background:var(--hot-grad);color:#fff">Hot · amber → flame → hot pink</div>
+            <div class="grad-bar" style="background:var(--cool-grad);color:var(--ink)">Cool · mint → ice → violet</div>
+        </div>
+        <div class="swatches" style="margin-top:12px">
+            <div class="sw"><i style="background:#f6f7f9"></i><div><b>Paper</b>#F6F7F9</div></div>
+            <div class="sw"><i style="background:#c3cad3"></i><div><b>Silver</b>#C3CAD3</div></div>
+            <div class="sw"><i style="background:#8a939e"></i><div><b>Steel</b>#8A939E</div></div>
+            <div class="sw"><i style="background:#14171c"></i><div><b>Ink</b>#14171C</div></div>
+            <div class="sw"><i style="background:#ffb347"></i><div><b>Amber</b>#FFB347</div></div>
+            <div class="sw"><i style="background:#ff6a3d"></i><div><b>Flame</b>#FF6A3D</div></div>
+            <div class="sw"><i style="background:#ff3d8b"></i><div><b>Hot pink</b>#FF3D8B</div></div>
+            <div class="sw"><i style="background:#2bff9a"></i><div><b>Mint</b>#2BFF9A</div></div>
+            <div class="sw"><i style="background:#29e3ff"></i><div><b>Ice</b>#29E3FF</div></div>
+            <div class="sw"><i style="background:#8b5cff"></i><div><b>Violet</b>#8B5CFF</div></div>
+        </div>
+    </section>
+
+    <div class="bb-row">
+        <section class="bb-card">
+            <h2>Type</h2>
+            <div class="type-spec">
+                <div class="t1">Heat index<small>Unbounded · Black · headlines and the wordmark</small></div>
+                <div class="t2">and the $9 dupe that's just as glossy<small>Instrument Serif Italic · magazine cover lines</small></div>
+                <div class="t3">The finds everyone's buying this week, updated daily.<small>Space Grotesk · body and interface</small></div>
+                <div class="t4">48.2M views · +310%<small>Space Mono · numbers, tickers, labels</small></div>
+            </div>
+        </section>
+        <section class="bb-card">
+            <h2>Kit of parts</h2>
+            <div class="kit">
+                <a class="btn hot" href="#"><svg class="icon"><use href="#i-flame"/></svg>Shop the heat</a>
+                <a class="btn cool" href="#"><svg class="icon"><use href="#i-frost"/></svg>Find dupes</a>
+                <a class="btn dark" href="#">Subscribe</a>
+            </div>
+            <div class="kit" style="margin-top:16px">
+                <span class="kicker hot">Sold out everywhere</span>
+                <span class="kicker cool">Keep it cool</span>
+                <span class="kicker plain">Resell report</span>
+                <span class="status out">Sold out</span>
+                <span class="status low">Low stock</span>
+            </div>
+            <div class="kit" style="margin-top:16px">
+                <span class="pf tiktok">TT</span><span class="pf instagram">IG</span><span class="pf youtube">YT</span><span class="pf pinterest">PN</span><span class="pf x">X</span><span class="pf reddit">RD</span>
+                <span class="stat save">Save 63%</span><span class="stat match">92% match</span>
+                <a class="dupe-link" href="#"><svg class="icon"><use href="#i-frost"/></svg>Dupes from $9</a>
+            </div>
+        </section>
+    </div>
+
+    <section class="bb-card" style="margin-top:22px">
+        <h2>Rules</h2>
+        <ul class="rule-list">
+            <li><b>Neon is an accent, never a background.</b> Pages stay silver and white; colour lands on badges, meters, prices and glows.</li>
+            <li><b>Hot is warm, Trendy is cool.</b> Flame colours only for heat and urgency; ice colours only for staying power and dupes.</li>
+            <li><b>Magazine for features, clean cards for shopping.</b> Cover layouts and collages set the mood; product grids stay tidy and easy to compare.</li>
+            <li><b>Motion stays smooth.</b> Shimmer, sparkle and shine on hover; nothing that slows a phone down.</li>
+            <li><b>Dupes, never fakes.</b> Only products sold under their own brand, labelled "similar to".</li>
+        </ul>
+    </section>
+</main>
+</body>
+</html>
