@@ -1250,8 +1250,9 @@ body.dark-room .dsgn-floor-line {
     .dsgn-laptop-wrap { zoom: 0.66; }
     .dsgn-beam-wrap { width: 280px; }
     .proj-perspective { zoom: 0.66; }
-    .dsgn-table-top { width: 95%; }
-    .dsgn-table-legs-row { width: 90%; }
+    /* wider than the two devices, so neither sits at the edge */
+    .dsgn-table-top { width: calc(100% + 36px); max-width: 94vw; }
+    .dsgn-table-legs-row { width: 96%; }
 }
 
 </style>

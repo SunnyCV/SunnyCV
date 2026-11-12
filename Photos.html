@@ -1181,24 +1181,33 @@ body.presentation-active .cam-page { display: flex; }
 }
 .lb-close:hover { color: #fff; }
 
+/* Arrows sit on a dark disc with a light ring, the same as on the Designs page */
 .lb-nav {
     position: fixed;
     top: 50%; transform: translateY(-50%);
-    background: rgba(0,0,0,0.45);
+    width: 46px; height: 46px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(12,12,12,0.72);
+    border: 1px solid rgba(255,255,255,0.55);
+    border-radius: 50%;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.45);
     color: #fff;
-    border: none;
-    font-size: 30px;
-    padding: 14px 18px;
     cursor: pointer;
-    border-radius: 4px;
-    transition: background 0.18s;
+    transition: background 0.2s, border-color 0.2s, opacity 0.2s;
     z-index: 2001;
-    line-height: 1;
     user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
-.lb-nav:hover { background: rgba(0,0,0,0.78); }
+.lb-nav svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.lb-nav:hover { background: rgba(0,0,0,0.92); border-color: #fff; }
+.lb-nav:disabled { opacity: 0.25; cursor: default; }
 .lb-prev { left: 14px; }
 .lb-next { right: 14px; }
+@media (max-width: 700px) {
+    .lb-nav { width: 40px; height: 40px; }
+    .lb-prev { left: 8px; }
+    .lb-next { right: 8px; }
+}
 
 .lb-counter {
     position: fixed;
@@ -1424,9 +1433,9 @@ body.presentation-active .cam-page { display: flex; }
 <!-- Full-screen lightbox -->
 <div id="photoLightbox" class="photo-lightbox">
     <button class="lb-close" id="lbClose">&#x2715;</button>
-    <button class="lb-nav lb-prev" id="lbPrev">&#8592;</button>
+    <button class="lb-nav lb-prev" id="lbPrev" aria-label="Previous"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
     <img class="lb-img" id="lbImg" src="" alt="">
-    <button class="lb-nav lb-next" id="lbNext">&#8594;</button>
+    <button class="lb-nav lb-next" id="lbNext" aria-label="Next"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
     <div class="lb-counter" id="lbCounter"></div>
 </div>
 
