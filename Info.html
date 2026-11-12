@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link rel="stylesheet" type="text/css" href="PortfolioGallery.css">
-<link rel="stylesheet" type="text/css" href="PortfolioNav.css?v=20261112">
+<link rel="stylesheet" type="text/css" href="PortfolioNav.css?v=20261113">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -228,6 +228,8 @@ a.work-name:hover { color: var(--ink); }
     line-height: 1.6;
 }
 .edu-note { font-style: italic; }
+.edu-grid { margin-top: 24px; }
+.edu-close { font-family: var(--text); font-size: 16.5px; line-height: 1.5; color: var(--ink-soft); margin-top: 22px; }
 
 /* ── Panel 6 — Work with me ── */
 .hire-note { margin: 14px 0 22px; }
@@ -327,7 +329,11 @@ a.work-name:hover { color: var(--ink); }
     .work-item { padding-top: 8px; gap: 2px; }
     .work-name { font-size: 19px; }
     .work-detail { font-size: 15px; line-height: 1.4; }
-    .edu-school, .hire-head { margin-top: 4vh; }
+    .edu-school, .hire-head { margin-top: 2vh; }
+    .edu-degree { margin: 6px 0 12px; font-size: 13px; }
+    .edu-note { font-size: 15.5px; line-height: 1.45; }
+    .edu-grid { margin-top: 14px; }
+    .edu-close { font-size: 14px; margin-top: 12px; line-height: 1.4; }
     .panel-nav { right: 13px; }
     .panel-arrow { right: 34px; bottom: 20px; }
 }
@@ -432,8 +438,8 @@ a.work-name:hover { color: var(--ink); }
                     <p class="work-detail">Designed a full capsule of tees, sweatpants and zip-up hoodies for an established NYC streetwear brand, and limited-edition event tees for another's flagship store. Those designs made it to the final product.</p>
                 </div>
                 <div class="work-item">
-                    <span class="work-name">Cookie's Kids</span>
-                    <p class="work-detail">Became a one-person creative department for a multi-location NYC retail brand: billboards, web banners, 250+ printed signs a week, logos, photo editing. All of it.</p>
+                    <span class="work-name">Multimedia Design</span>
+                    <p class="work-detail">Since 2019 I've worked across music, fashion, retail and digital media: brand identities, packaging, email campaigns, lookbooks and social content, plus photo and video for creators. For one multi-location NYC retailer I became the whole creative department, producing 250+ printed pieces and 500+ product photos a week, and campaigns that ran on billboards and transit across the city.</p>
                 </div>
             </div>
         </div>
@@ -470,7 +476,26 @@ a.work-name:hover { color: var(--ink); }
             <p class="panel-label">Education</p>
             <p class="edu-school">Hunter College, New York</p>
             <p class="edu-degree">Bachelor of Arts &nbsp;&middot;&nbsp; 2015 – 2020</p>
-            <p class="edu-note">I studied film production, digital design, and sound. Most of what I know came from doing the work, but school gave me the foundation to understand why it works.</p>
+            <p class="edu-note">School is where design became a discipline for me, not just instinct. I learned to make work that looks right and works right for the people using it.</p>
+            <div class="cap-grid edu-grid">
+                <div class="cap-item">
+                    <span class="cap-name">Digital Design</span>
+                    <span class="cap-detail">Layout, typography and colour as one system, and composing for screens of every size</span>
+                </div>
+                <div class="cap-item">
+                    <span class="cap-name">Usability &amp; UI/UX</span>
+                    <span class="cap-detail">Designing around how people actually read, navigate and decide, learned through hands-on projects</span>
+                </div>
+                <div class="cap-item">
+                    <span class="cap-name">Film Production</span>
+                    <span class="cap-detail">Storytelling, pacing and framing: how to hold attention and move someone through a piece</span>
+                </div>
+                <div class="cap-item">
+                    <span class="cap-name">Sound Design</span>
+                    <span class="cap-detail">Mood and rhythm built with sound, the sense I bring to motion, video and interactive work</span>
+                </div>
+            </div>
+            <p class="edu-close">All of it in the Adobe Creative Suite, and all of it still shapes how I work: every site, brand and campaign starts with the person on the other side of the screen.</p>
         </div>
     </section>
 
@@ -760,6 +785,6 @@ a.work-name:hover { color: var(--ink); }
     updateUI();
 }());
 </script>
-<script src="PortfolioNav.js?v=20261112"></script>
+<script src="PortfolioNav.js?v=20261113"></script>
 </body>
 </html>

@@ -62,6 +62,9 @@
         // pages that scroll an inner panel instead of the page (About): the logo leaves with the first panel
         if (t && t !== document && t.nodeType === 1 && t.scrollHeight > t.clientHeight + 40 && t.clientHeight > window.innerHeight * 0.6) {
             logoEl.style.marginTop = (-inner) + 'px';
+            // the old header strip (its background and bottom line) leaves with the logo
+            var strip = document.querySelector('.mobile-header');
+            if (strip) strip.style.transform = 'translateY(' + (-inner) + 'px)';
         }
     }
     var logoEl = bar.querySelector('#pfLogo');
