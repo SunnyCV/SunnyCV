@@ -54,20 +54,20 @@ float fbm3(vec3 p) { return (0.5 * noise3(p) + 0.25 * noise3(p * 2.03 + 1.7) + 0
 mat2 rot(float a) { float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
 
 /* ---------------- light in water ---------------- */
-const vec3 ABS = vec3(0.115, 0.042, 0.026);           // red goes first, then green; blue travels furthest
+const vec3 ABS = vec3(0.042, 0.02, 0.015);           // red goes first, then green; blue travels furthest
 const vec3 SUN = vec3(0.32, 0.92, 0.22);               // towards the sun (normalised below)
-vec3 sunAt(float y) { return exp(min(y, 0.0) * vec3(0.05, 0.019, 0.012)); }   // daylight left at depth y
+vec3 sunAt(float y) { return exp(min(y, 0.0) * vec3(0.015, 0.0085, 0.0065)) * 1.3; }   // dreamier than real water: warm light reaches the reef   // daylight left at depth y
 vec3 waterTint(float y) {
-    float k = exp(min(y, 0.0) * 0.016);
-    vec3 deep = vec3(0.004, 0.02, 0.05), mid = vec3(0.02, 0.17, 0.30), shallow = vec3(0.10, 0.50, 0.58);
+    float k = exp(min(y, 0.0) * 0.012);
+    vec3 deep = vec3(0.004, 0.02, 0.08), mid = vec3(0.015, 0.16, 0.42), shallow = vec3(0.10, 0.58, 0.72);
     return mix(deep, mix(mid, shallow, k * k), k);
 }
 // bright, shifting lines of light thrown by the waves above
 float caustic(vec2 q, float t) {
     float a = noise3(vec3(q * 0.42, t * 0.35)), b = noise3(vec3(q * 0.42 * 1.31 + 5.0, t * 0.29 + 3.0));
-    float l = 1.0 - smoothstep(0.0, 0.07, abs(a - b));
+    float l = 1.0 - smoothstep(0.0, 0.035, abs(a - b));
     float c = noise3(vec3(q * 0.9 + 9.0, t * 0.5)), d = noise3(vec3(q * 0.9 * 1.27 + 2.0, t * 0.43 + 7.0));
-    return l * 0.7 + (1.0 - smoothstep(0.0, 0.06, abs(c - d))) * 0.45;
+    return l * 0.55 + (1.0 - smoothstep(0.0, 0.03, abs(c - d))) * 0.35;
 }
 
 /* ---------------- the seabed ---------------- */
@@ -128,7 +128,8 @@ vec3 ocean(vec3 ro, vec3 rd, vec2 uv) {
 
     // the water itself, brighter looking up toward the light
     float up = rd.y * 0.5 + 0.5;
-    vec3 bgW = waterTint(ro.y + rd.y * 25.0) * (0.55 + 0.9 * up * up) * mix(vec3(1.0), sunAt(ro.y), 0.5);
+    vec3 bgW = waterTint(ro.y + rd.y * 25.0) * (0.5 + 1.1 * up * up) * mix(vec3(1.0), sunAt(ro.y), 0.4);
+    bgW += vec3(0.25, 0.55, 0.5) * pow(max(dot(rd, L), 0.0), 6.0) * sunAt(ro.y) * 0.6;          // the glow toward the sun
 
     // seabed: march the height field
     float tHit = TMAX, kind = 0.0;
@@ -150,8 +151,8 @@ vec3 ocean(vec3 ro, vec3 rd, vec2 uv) {
     float kelpT = 1e9; vec3 kelpN = vec3(0.0); float kelpH = 0.0, kelpY = 0.0;
     for (int i = 0; i < 12; i++) {
         vec3 hh = hash33(vec3(cell, 3.0) + uSeed * 7.0);
-        float forest = smoothstep(0.42, 0.62, noise3(vec3(cell * 0.11, 2.0)));
-        if (hh.x < forest * 0.85) {
+        float forest = smoothstep(0.58, 0.74, noise3(vec3(cell * 0.07, 2.0)));
+        if (hh.x < forest * 0.7) {
             vec2 c = (cell + 0.2 + 0.6 * hh.yz) * KC;
             float base = sharedFloor(c) - 1.0, height = 14.0 + 22.0 * hh.y;
             for (int k = 0; k < 2; k++) {               // a second pass corrects for the sway at the height we hit
@@ -160,7 +161,7 @@ vec3 ocean(vec3 ro, vec3 rd, vec2 uv) {
                 float rel = clamp((yG - base) / height, 0.0, 1.0);
                 vec2 sway = vec2(sin(t * 0.7 + hh.z * 9.0 + yG * 0.18), cos(t * 0.55 + hh.y * 7.0 + yG * 0.14)) * 1.1 * rel;
                 o2 -= sway;
-                float r = 0.28 + 0.38 * smoothstep(0.1, 0.35, rel) * (0.6 + 0.4 * sin(yG * 1.7 + hh.x * 20.0));
+                float r = 0.12 + 0.24 * smoothstep(0.05, 0.3, rel) * (0.55 + 0.45 * sin(yG * 1.9 + hh.x * 20.0));
                 float a = dot(rd.xz, rd.xz), b = dot(o2, rd.xz), cc = dot(o2, o2) - r * r;
                 float disc = b * b - a * cc;
                 if (disc < 0.0) { kelpY = -1e4; break; }
@@ -216,16 +217,30 @@ vec3 ocean(vec3 ro, vec3 rd, vec2 uv) {
             vec3 sand = mix(vec3(0.62, 0.55, 0.42), vec3(0.78, 0.70, 0.55), n2);
             vec3 rock = mix(vec3(0.24, 0.24, 0.26), vec3(0.36, 0.33, 0.30), n3);
             base = mix(sand, rock, smoothstep(0.55, 0.7, n1) * smoothstep(0.75, 0.4, N.y));
-            float reef = smoothstep(0.52, 0.66, noise3(vec3(p.xz * 0.035, 6.0))) * smoothstep(-75.0, -25.0, p.y);
-            float blob = smoothstep(0.45, 0.75, n2 + n3 * 0.5);
-            vec3 coral = mix(mix(vec3(0.95, 0.35, 0.45), vec3(1.0, 0.62, 0.25), n3), mix(vec3(0.55, 0.35, 0.85), vec3(0.2, 0.8, 0.75), n1), step(0.5, hash(floor(p.xz * 0.6))));
-            base = mix(base, coral, reef * blob);
+            float reef = smoothstep(0.40, 0.58, noise3(vec3(p.xz * 0.045, 6.0))) * smoothstep(-85.0, -30.0, p.y);
+            float blob = smoothstep(0.55, 0.72, noise3(vec3(p.xz * 0.7, 2.0)) + n3 * 0.25);
+            // each clump of coral takes one colour from the reef's palette, blended softly at the edges
+            float c1 = noise3(vec3(p.xz * 0.28, 8.0)), c2 = noise3(vec3(p.xz * 0.28 + 31.0, 5.0));
+            vec3 pinkC = mix(vec3(1.0, 0.36, 0.46), vec3(1.0, 0.58, 0.36), n3);
+            vec3 violetC = mix(vec3(0.6, 0.38, 0.95), vec3(0.88, 0.5, 0.9), n1);
+            vec3 tealC = mix(vec3(0.2, 0.82, 0.72), vec3(0.45, 0.9, 0.55), n3);
+            vec3 goldC = mix(vec3(1.0, 0.8, 0.32), vec3(1.0, 0.55, 0.22), n1);
+            vec3 coral = mix(mix(pinkC, violetC, smoothstep(0.42, 0.58, c1)), mix(goldC, tealC, smoothstep(0.42, 0.58, c1)), smoothstep(0.45, 0.6, c2));
+            coral *= 1.55;
+            float cm = reef * blob;
+            base = mix(base, coral, cm);
+            if (cm > 0.05) {
+                float knob = noise3(vec3(p.xz * 3.5, p.y * 3.5));
+                N = normalize(N + vec3(knob - 0.5, 0.0, noise3(vec3(p.zx * 3.5, 7.0)) - 0.5) * 1.4 * cm);
+                base *= 0.75 + 0.5 * knob;
+            }
             float grass = smoothstep(0.55, 0.7, noise3(vec3(p.xz * 0.06, 12.0))) * (1.0 - reef) * smoothstep(0.85, 0.95, N.y);
             base = mix(base, mix(vec3(0.15, 0.38, 0.12), vec3(0.32, 0.48, 0.16), n3), grass * smoothstep(0.35, 0.7, n2));
             base *= 0.85 + 0.3 * n3;
         } else if (kind < 2.5) {
-            N = kelpN;
-            base = mix(vec3(0.28, 0.36, 0.08), vec3(0.45, 0.38, 0.1), kelpH) * (0.75 + 0.5 * noise3(p * vec3(1.0, 3.0, 1.0)));
+            N = normalize(kelpN + vec3(0.0, 0.6, 0.0));
+            float vein = noise3(p * vec3(1.5, 4.0, 1.5));
+            base = mix(vec3(0.35, 0.42, 0.08), vec3(0.62, 0.48, 0.12), kelpH) * (0.7 + 0.6 * vein);
         } else {
             vec3 lp = (p - objP) / objS;
             lp.xz = rot(objQ.z) * lp.xz; lp.xy = rot(objQ.w) * lp.xy;
@@ -245,8 +260,8 @@ vec3 ocean(vec3 ro, vec3 rd, vec2 uv) {
         float diff = max(dot(N, L), 0.0) * 0.8 + 0.25 * (N.y * 0.5 + 0.5);
         vec2 cq = p.xz + L.xz / L.y * (-p.y);
         float cau = caustic(cq, t) * smoothstep(-95.0, -8.0, p.y) * max(N.y, 0.0);
-        vec3 lit = base * sunAt(p.y) * (diff * 1.2 + cau * 1.6) + base * waterTint(p.y) * 0.35;
-        if (kind > 1.5 && kind < 2.5) lit += vec3(0.4, 0.55, 0.1) * pow(max(dot(rd, L), 0.0), 3.0) * sunAt(p.y) * 0.6;   // light through the blades
+        vec3 lit = base * sunAt(p.y) * (diff * 1.15 + cau * 1.3) + base * waterTint(p.y) * 0.5;
+        if (kind > 1.5 && kind < 2.5) lit += base * vec3(1.1, 1.2, 0.5) * (0.35 + 0.9 * pow(max(dot(rd, L), 0.0), 2.0)) * sunAt(p.y) * 0.8;   // light glowing through the blades   // light through the blades
         // the water between us and it
         vec3 tr = exp(-ABS * tHit * (1.0 + 0.6 * smoothstep(-20.0, -140.0, ro.y)));
         col = lit * tr + bgW * (1.0 - tr);
@@ -262,7 +277,7 @@ vec3 ocean(vec3 ro, vec3 rd, vec2 uv) {
             float cw = rd.y + (wv.x + wv.y) * 0.12;
             float window = smoothstep(0.62, 0.72, cw);
             vec3 sky = mix(vec3(0.55, 0.85, 0.95), vec3(1.0, 0.98, 0.9), pow(max(dot(normalize(rd + vec3(wv.x, 0.0, wv.y) * 0.25), L), 0.0), 24.0));
-            vec3 mirror = waterTint(-8.0) * (0.6 + 0.6 * caustic(sp * 0.6, t));
+            vec3 mirror = waterTint(-8.0) * (0.7 + 0.35 * caustic(sp * 0.6, t));
             vec3 sc = mix(mirror, sky * 1.6, window);
             vec3 tr = exp(-ABS * ts);
             col = sc * tr + col * 0.15 * (1.0 - tr) + bgW * (1.0 - tr) * 0.85;
@@ -274,31 +289,35 @@ vec3 ocean(vec3 ro, vec3 rd, vec2 uv) {
         float shafts = 0.0;
         float lim = min(tHit, 46.0);
         for (int i = 0; i < 7; i++) {
-            float s = (float(i) + hash(uv * uRes + float(i))) / 7.0 * lim;
+            float s = (float(i) + 0.5) / 7.0 * lim;
             vec3 q = ro + rd * s;
             vec2 sq2 = q.xz + L.xz / L.y * (-q.y);
             float beam = smoothstep(0.35, 0.85, noise3(vec3(sq2 * 0.09, t * 0.08)) * 0.7 + noise3(vec3(sq2 * 0.23, t * 0.15 + 4.0)) * 0.5);
             shafts += beam * exp(min(q.y, 0.0) * 0.03) * exp(-s * 0.03);
         }
-        col += vec3(0.55, 0.85, 0.9) * shafts / 7.0 * (0.25 + 0.75 * pow(max(dot(rd, L), 0.0), 2.0)) * 0.55;
+        col += vec3(0.6, 0.9, 0.92) * shafts / 7.0 * (0.3 + 0.9 * pow(max(dot(rd, L), 0.0), 2.0)) * 0.9;
     }
 
     // schools of fish in the nearest cells, each a sleek little body turning together
     {
-        const float FC = 16.0;
+        const float FC = 12.0;
         vec3 fc0 = floor(ro / FC - 0.5);
         for (int x = 0; x <= 1; x++)
         for (int y = 0; y <= 1; y++)
         for (int z = 0; z <= 1; z++) {
             vec3 id = fc0 + vec3(float(x), float(y), float(z));
             vec3 h = hash33(id * 1.3 + uSeed * 3.0);
-            if (h.x < 0.35) continue;
+            if (h.x < 0.3) continue;
             vec3 cen = (id + 0.5) * FC + (h - 0.5) * 5.0;
             if (cen.y > -2.0 || cen.y < sharedFloor(cen.xz) + 3.0) continue;
+            { vec3 oc = ro - cen; float b = dot(oc, rd), c = dot(oc, oc) - 36.0; if (b * b - c < 0.0 || -b - sqrt(max(b * b - c, 0.0)) > tHit) continue; }
             float spd = 0.25 + 0.2 * h.y, ph = h.z * 6.28;
-            vec3 tint = mix(mix(vec3(1.0, 0.82, 0.25), vec3(0.25, 0.6, 1.0), step(0.5, h.y)), vec3(1.0, 0.45, 0.25), step(0.8, h.z));
-            float silver = step(h.y, 0.4);
-            for (int f = 0; f < 6; f++) {
+            // a few kinds of fish: silver shoals, yellow tangs, blue chromis, orange clownish ones with white bands
+            float kindF = floor(h.y * 4.0);
+            vec3 back = kindF < 1.0 ? vec3(0.25, 0.38, 0.5) : kindF < 2.0 ? vec3(1.0, 0.82, 0.18) : kindF < 3.0 ? vec3(0.18, 0.45, 1.0) : vec3(1.0, 0.45, 0.12);
+            vec3 belly = kindF < 1.0 ? vec3(0.85, 0.9, 0.95) : mix(back, vec3(1.0), 0.35);
+            float scale = kindF < 1.0 ? 0.75 : 1.0 + 0.4 * h.x;
+            for (int f = 0; f < 7; f++) {
                 float ff = float(f);
                 vec3 o = hash33(id + ff * 17.3) - 0.5;
                 float a = t * spd + ph + ff * 0.35 + o.x * 2.0;
@@ -307,20 +326,34 @@ vec3 ocean(vec3 ro, vec3 rd, vec2 uv) {
                 vec3 fw = normalize(vec3(-sin(a), 0.1 * cos(a * 1.7), cos(a)));
                 vec3 fr = normalize(cross(vec3(0.0, 1.0, 0.0), fw)), fu = cross(fw, fr);
                 vec3 oc = ro - fp;
-                vec3 sz = vec3(0.16, 0.12, 0.42) * (0.7 + 0.6 * h.x);
-                vec3 lo = vec3(dot(oc, fr), dot(oc, fu), dot(oc, fw)) / sz;
-                vec3 ld = vec3(dot(rd, fr), dot(rd, fu), dot(rd, fw)) / sz;
-                float A2 = dot(ld, ld), B = dot(lo, ld), C = dot(lo, lo) - 1.0, D = B * B - A2 * C;
-                if (D < 0.0) continue;
-                float th = (-B - sqrt(D)) / A2;
-                if (th < 0.0 || th > tHit) continue;
-                vec3 ln = normalize(lo + ld * th);
-                vec3 body = mix(tint, vec3(0.85, 0.9, 0.95), silver) * (0.55 + 0.5 * ln.y);
-                body += vec3(0.9) * pow(max(ln.y, 0.0), 6.0) * 0.4 * silver;                 // a flash off silver scales
-                body *= sunAt(fp.y) * 1.1 + waterTint(fp.y) * 0.5;
-                vec3 tr = exp(-ABS * th);
-                col = mix(col, body * tr + bgW * (1.0 - tr), 0.95);
-                tHit = th;
+                vec3 lo0 = vec3(dot(oc, fr), dot(oc, fu), dot(oc, fw)), ld0 = vec3(dot(rd, fr), dot(rd, fu), dot(rd, fw));
+                float wag = sin(t * 9.0 + ff * 1.7 + h.z * 6.0);
+                float best = 1e9; vec3 bn = vec3(0.0); float part = 0.0;
+                for (int k = 0; k < 3; k++) {
+                    vec3 sz = (k == 0 ? vec3(0.10, 0.15, 0.36) : vec3(0.012, 0.03, 0.12)) * scale;
+                    vec3 off = k == 0 ? vec3(wag * 0.02, 0.0, 0.0) : vec3(wag * 0.08 * scale, (k == 1 ? 0.07 : -0.07) * scale, -0.43 * scale);
+                    vec3 lo = lo0 - off, ld = ld0;
+                    if (k > 0) {                                     // each lobe angles away from the other
+                        float ang = k == 1 ? 0.65 : -0.65;
+                        lo.yz = rot(ang) * lo.yz; ld.yz = rot(ang) * ld.yz;
+                    }
+                    lo /= sz; ld /= sz;
+                    float A2 = dot(ld, ld), B = dot(lo, ld), C = dot(lo, lo) - 1.0, D = B * B - A2 * C;
+                    if (D < 0.0) continue;
+                    float th = (-B - sqrt(D)) / A2;
+                    if (th > 0.0 && th < best) { best = th; bn = normalize(lo + ld * th); part = float(k); }
+                }
+                if (best > tHit) continue;
+                float stripe = kindF > 2.5 ? step(0.82, fract((lo0.z + ld0.z * best) / scale * 3.2 + 0.3)) : 0.0;
+                vec3 bodyC = mix(belly, back, smoothstep(-0.3, 0.5, bn.y));
+                bodyC = mix(bodyC, vec3(1.0), stripe);
+                if (part > 0.5) bodyC = back * 0.9;
+                vec3 body = bodyC * (0.45 + 0.6 * max(bn.y, 0.0) + 0.2 * abs(bn.x));
+                body += vec3(1.0) * pow(max(bn.y, 0.0), 8.0) * (kindF < 1.0 ? 0.6 : 0.25);     // the flash of scales in the light
+                body *= sunAt(fp.y) * 1.05 + waterTint(fp.y) * 0.45;
+                vec3 tr = exp(-ABS * best);
+                col = body * tr + bgW * (1.0 - tr);
+                tHit = best;
             }
         }
     }
@@ -790,5 +823,5 @@ void main() {
         addEventListener('resize', () => { if (S) resize(); });
     }
 
-    return { init, warm, setQuality, get ready() { return ready; }, start, step, rewind, stop, K, get active() { return !!S; }, get ok() { return ok; } };
+    return { _cam: cam, init, warm, setQuality, get ready() { return ready; }, start, step, rewind, stop, K, get active() { return !!S; }, get ok() { return ok; } };
 })();

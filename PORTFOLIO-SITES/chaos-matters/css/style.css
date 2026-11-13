@@ -413,6 +413,8 @@ body.titled #title, body.titled .t-ghost { display: block; }
 body.swallow .t-ghost, body.space-on .t-ghost { display: none; }
 /* once swallowed, the title and rooms are part of the black hole's picture */
 body.swallow #title, body.swallow #menu { visibility: hidden; }
+/* the home page's film grain belongs to the home page; the rooms draw their own */
+body.swallow #grain { display: none; }
 .t-layer {
     position: absolute; inset: 0;
     padding-top: var(--pad);
