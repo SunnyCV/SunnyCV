@@ -398,7 +398,11 @@
         homeRate = 1;
         title.pos = [0.5, 0.5]; title.vel = [0, 0]; title.hist = [];
         body.classList.remove('swallow');
-        if (titleEls.box) titleEls.box.style.filter = '';
+        if (titleEls.box) {
+            titleEls.box.style.filter = titleEls.box.style.opacity = titleEls.box.style.transform = '';
+            titleEls.lastGlitch = -1;
+        }
+        hot = -1; hotAmt = 0;
         roomsOn = false;
         menu.classList.remove('on');
         rooms.forEach(r => {
@@ -519,7 +523,7 @@
         let swallowed = false;
         if (Space.active) {
             const o = Space.step(dt);
-            homeRate = 1 - o.calm;
+            if (Space.active) homeRate = 1 - o.calm;      // after the rewind has ended the show, returnHome has already set it back
             swallowed = o.t >= Space.K.form;
             if (swallowed && !o.consumed) suckRooms(o);
             if (o.t > Space.K.bang + 2.2 && !spaceMusicOn) { spaceMusicOn = true; Sound.spaceMusic(); }
@@ -536,6 +540,7 @@
             if (R.u >= A.bars + 1.4 && !c.melt) { c.melt = true; Sound.melt(2.8); }
             if (R.u >= A.title && !c.title) { c.title = true; Sound.glitch(9, 1.2); }
             if (R.u >= A.rooms && !roomsOn) revealRooms(R.u);
+            if (R.u >= A.done) { impactAt = clock - R.u; returning = null; }
         }
 
         if ((clock >= T.impact || phase === 'home' || phase === 'space') && phase !== 'film' && !swallowed) {
