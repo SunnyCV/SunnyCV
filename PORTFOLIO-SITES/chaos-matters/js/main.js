@@ -7,7 +7,7 @@
 
 (() => {
     const ROOMS = [
-        'Space', '???', '???', '???', '???', '???', '???', '???'      // rooms 2–8 are kept secret until they're built
+        'Space', 'Atlantis', '???', '???', '???', '???', '???', '???'      // rooms 3–8 are kept secret until they're built
     ];
 
     // the score, in seconds from the moment the loading bar finishes
@@ -40,7 +40,9 @@
 
     // SPACE: the home page winds down (homeRate → 0) while the black hole takes it
     let homeRate = 1, shaderT = 0, returning = null, spaceMusicOn = false;
-    const rewindBtn = $('#rewind'), osd = $('#osd'), spaceCanvas = $('#space'), grainEl = $('#grain');
+    let Room = null, roomMusic = null;          // the room that's open (Space or Ocean) and how to start its music
+    const rewindBtn = $('#rewind'), osd = $('#osd'), spaceCanvas = $('#space'), oceanCanvas = $('#ocean'), grainEl = $('#grain');
+    const inRoom = () => !!(Room && Room.active);
     const fpsEl = /[?&]fps/.test(location.search) ? $('#fps') : null;   // ?fps shows a live frame counter
 
     const title = { pos: [0.5, 0.5], vel: [0, 0], size: [0.5, 0.2], aspect: 0.5, drag: false, grab: [0, 0], hist: [] };
@@ -108,6 +110,7 @@
         glScale = px > budget ? dpr * Math.sqrt(budget / px) : dpr;
         Screen.resize(glScale);
         Space.setQuality(perf.q);
+        Ocean.setQuality(perf.q);
     }
     function adapt(raw) {
         if (RENDER || pinQ) return;
@@ -174,7 +177,7 @@
         if (Math.abs(titleEls.size - title.size[0] * innerWidth) > 0.5) styleTitle();
         const show = amt > 0;
         body.classList.toggle('titled', show);
-        if (!show || Space.active) return;     // inside SPACE the black hole moves it
+        if (!show || inRoom()) return;     // inside a room the room has taken it
         place(titleEls.box, title.pos);
         place(titleEls.g1, g1);
         place(titleEls.g2, g2);
@@ -267,6 +270,7 @@
             a.addEventListener('click', e => {
                 e.preventDefault();
                 if (i === 0) { enterSpace(room); return; }
+                if (i === 1) { enterOcean(room); return; }
                 Sound.select();
                 ripple = [room.x / innerWidth, 1 - room.y / innerHeight, 0];
                 showToast(`Room ${String(i + 1).padStart(2, '0')} is still being dreamed up.`);
@@ -352,6 +356,7 @@
         Sound.calm(Space.K.calm);
         perf.hold = 1;
         spaceMusicOn = false;
+        Room = Space; roomMusic = () => Sound.spaceMusic();
         Space.start({
             hole: [room.x / innerWidth, 1 - room.y / innerHeight],
             frameSource: composeFrame,
@@ -440,6 +445,34 @@
         if ('letterSpacing' in x) x.letterSpacing = '0px';
     }
 
+    /* ---------- ATLANTIS: the screen floods, everything floats, then drowns, and the ocean takes you down ---------- */
+    function enterOcean(room) {
+        if (phase !== 'home' || !Ocean.ok) {
+            if (!Ocean.ok) showToast('Atlantis needs WebGL, which this browser has turned off.');
+            return;
+        }
+        phase = 'space';
+        hot = -1;
+        rooms.forEach(r => r.li.classList.remove('hot'));
+        body.classList.add('space-on');
+        body.style.cursor = '';
+        Sound.select();
+        Sound.calm(Ocean.K.calm);
+        perf.hold = 1;
+        spaceMusicOn = false;
+        Room = Ocean; roomMusic = () => Sound.oceanMusic();
+        Ocean.start({
+            frameSource: composeFrame,
+            onSwallow() {
+                Sound.flood(Ocean.K.flood[1] - Ocean.K.flood[0]);
+                body.classList.add('swallow');
+            },
+            onConsumed() { menu.classList.remove('on'); },
+            onUnder() { perf.hold = 1; body.classList.add('cosmos'); },
+            onReturn: returnHome,
+        });
+    }
+
     // the rooms spiral into the hole one by one, stretched and dimmed as they fall
     function suckRooms(o) {
         const hx = o.hole[0] * innerWidth, hy = (1 - o.hole[1]) * innerHeight;
@@ -470,13 +503,16 @@
         osd.classList.add('on');
         Sound.rewind();
         Sound.spaceStop(0.4);
-        Space.rewind();
+        Sound.oceanStop(0.4);
+        if (Room) Room.rewind();
     }
 
     // the tape drops back to the broadcast: static, the colour bars, then the menu builds itself again
     function returnHome() {
-        Space.stop();
+        if (Room) Room.stop();
+        Room = null;
         Sound.spaceStop(0.1);
+        Sound.oceanStop(0.1);
         osd.classList.remove('on');
         body.classList.remove('space-on', 'cosmos', 'exploring');
         rewindBtn.hidden = true;
@@ -607,13 +643,14 @@
         }
 
         let swallowed = false;
-        if (Space.active) {
-            const o = Space.step(dt);
-            if (Space.active) homeRate = 1 - o.calm;      // after the rewind has ended the show, returnHome has already set it back
-            swallowed = o.t >= Space.K.form;
+        if (inRoom()) {
+            const R = Room, o = R.step(dt);
+            if (R.active) homeRate = 1 - o.calm;      // after the rewind has ended the show, returnHome has already set it back
+            swallowed = o.swallowed != null ? o.swallowed : o.t >= Space.K.form;
 
-            if (o.t > Space.K.bang + 2.2 && !spaceMusicOn) { spaceMusicOn = true; Sound.spaceMusic(); }
-            if (o.explore && Space.active && rewindBtn.hidden && !osd.classList.contains('on')) { rewindBtn.hidden = false; body.classList.add('exploring'); }
+            const musicNow = o.music != null ? o.music : o.t > Space.K.bang + 2.2;
+            if (musicNow && !spaceMusicOn && roomMusic) { spaceMusicOn = true; roomMusic(); }
+            if (o.explore && inRoom() && rewindBtn.hidden && !osd.classList.contains('on')) { rewindBtn.hidden = false; body.classList.add('exploring'); }
             if (osd.classList.contains('on') && o.rew != null) osd.querySelector('.osd-time').textContent = tape(o.rew);
         }
 
@@ -641,7 +678,7 @@
             const psy = Math.pow(smooth(A.melt, A.done, u), 1.5);
             const tAmt = smooth(A.title, A.title + 2.2, u);
             if (tAmt > 0) moveTitle(u);
-            if (roomsOn && !Space.active) placeRooms(dt, u);
+            if (roomsOn && !inRoom()) placeRooms(dt, u);
 
             // stir the oil: the pointer pushes and tints it, the drifting title drags it along
             let field = null;
@@ -780,6 +817,7 @@
             intro.catch(() => {}),
             Screen.ready.then(() => Screen.warm()),
             Space.ready.then(() => Space.warm()),
+            Ocean.ready.then(() => Ocean.warm()),
         ]).then(() => { makeTitle(); pickGlScale(); ready = true; });
         // the bar stutters forward like something being pulled off a slow disk
         let shown = 0;
@@ -859,6 +897,7 @@
         skipBtn.addEventListener('click', jumpHome);
         rewindBtn.addEventListener('click', rewindSpace);
         Space.init(spaceCanvas);
+        Ocean.init(oceanCanvas);
 
         // the enter click turns the sound on; this is a fallback if the browser still held it back
         const unlock = () => { if (Sound.unlock()) Sound.whenRunning(soundCatchUp); };

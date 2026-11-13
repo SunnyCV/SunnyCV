@@ -549,6 +549,109 @@ const Sound = (() => {
         delete N.space;
     }
 
+    /* ATLANTIS: the flood rising, a muffled roar with gurgles and bubbles, darkening as it closes over */
+    function blip(at, f, loud) {
+        const o = osc('sine', f), g = gain(0, fxBus);
+        o.frequency.setValueAtTime(f, at);
+        o.frequency.exponentialRampToValueAtTime(f * (1.8 + Math.random()), at + 0.07);
+        g.gain.setValueAtTime(0, at);
+        g.gain.linearRampToValueAtTime(0.05 * loud, at + 0.008);
+        g.gain.exponentialRampToValueAtTime(0.0005, at + 0.09);
+        o.connect(g); o.start(at); o.stop(at + 0.1);
+    }
+    function flood(dur) {
+        if (!ok()) return;
+        const t = now();
+        const n = noise(), bp = filter('lowpass', 2200, 0.7), g = gain(0, fxBus);
+        bp.frequency.setValueAtTime(2400, t);
+        bp.frequency.exponentialRampToValueAtTime(260, t + dur);          // the roar is muffled as the water closes over
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.22, t + dur * 0.35);
+        g.gain.linearRampToValueAtTime(0.32, t + dur * 0.85);
+        g.gain.linearRampToValueAtTime(0.0, t + dur + 2.5);
+        const sw = gain(1); lfo(0.35, 0.35, sw.gain);
+        n.connect(bp).connect(sw).connect(g); n.start(t); n.stop(t + dur + 2.6);
+        const sub = osc('sine', 38), sg = gain(0, fxBus);
+        sg.gain.linearRampToValueAtTime(0.25, t + dur);
+        sg.gain.linearRampToValueAtTime(0, t + dur + 3);
+        sub.connect(sg); sub.start(t); sub.stop(t + dur + 3.1);
+        for (let i = 0; i < 46; i++) {                                     // gurgles and bubbles, thicker as it rises
+            const at = t + Math.pow(Math.random(), 0.7) * (dur + 1.5);
+            blip(at, 300 + Math.random() * 900, 0.4 + Math.random() * 0.8);
+        }
+    }
+
+    /* under the sea: a deep, slow hum, bubbles, whale song now and then, and a soft, dreamy score */
+    const TIDE = [
+        [130.8, 196.0, 246.9, 329.6, 392.0],    // Cmaj7
+        [110.0, 164.8, 220.0, 261.6, 329.6],    // Am9-ish
+        [87.3, 130.8, 174.6, 220.0, 329.6],     // Fmaj7
+        [98.0, 146.8, 196.0, 246.9, 293.7],     // G6/9
+    ];
+    function swell(freqs, at) {
+        freqs.forEach((fq, i) => {
+            const o = osc(i ? 'sine' : 'triangle', fq), g = gain(0);
+            g.connect(echoIn); g.connect(fxBus);
+            g.gain.setValueAtTime(0, at);
+            g.gain.linearRampToValueAtTime(0.026 - i * 0.003, at + 2.6 + i * 0.4);
+            g.gain.linearRampToValueAtTime(0, at + 9.5);
+            lfo(0.18 + i * 0.05, fq * 0.004, o.frequency);
+            o.connect(g); o.start(at); o.stop(at + 9.6);
+        });
+        // a slow, glassy melody note on top
+        const m = freqs[2 + Math.floor(Math.random() * 3)] * 2, mo = osc('sine', m), mg = gain(0);
+        mg.connect(echoIn);
+        mg.gain.setValueAtTime(0, at + 3);
+        mg.gain.linearRampToValueAtTime(0.02, at + 3.2);
+        mg.gain.exponentialRampToValueAtTime(0.0005, at + 7);
+        mo.connect(mg); mo.start(at + 3); mo.stop(at + 7.1);
+    }
+    function whale(at) {
+        const o = osc('sine', 180), g = gain(0), lp = filter('lowpass', 900);
+        g.connect(echoIn); g.connect(fxBus);
+        const f0 = 140 + Math.random() * 90;
+        o.frequency.setValueAtTime(f0, at);
+        o.frequency.linearRampToValueAtTime(f0 * 1.7, at + 1.6);
+        o.frequency.linearRampToValueAtTime(f0 * 1.25, at + 3.2);
+        o.frequency.linearRampToValueAtTime(f0 * 0.8, at + 4.4);
+        lfo(5.5, 6, o.frequency);
+        g.gain.setValueAtTime(0, at);
+        g.gain.linearRampToValueAtTime(0.06, at + 0.8);
+        g.gain.linearRampToValueAtTime(0.04, at + 3.2);
+        g.gain.linearRampToValueAtTime(0, at + 4.6);
+        o.connect(lp).connect(g); o.start(at); o.stop(at + 4.7);
+    }
+    function oceanMusic() {
+        if (!ok() || N.ocean) return;
+        const t = now();
+        const g = gain(0, fxBus), lp = filter('lowpass', 180);
+        const n = noise(); n.connect(lp); n.start(t);
+        const hum = osc('sine', 46); const hg = gain(0.5); hum.connect(hg).connect(lp); hum.start(t);
+        lp.connect(g);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.35, t + 5);
+        let bar = 0;
+        const play = () => {
+            const at = now() + 0.05;
+            swell(TIDE[bar % TIDE.length], at);
+            for (let i = 0; i < 5; i++) blip(at + Math.random() * 8, 400 + Math.random() * 700, 0.25 + Math.random() * 0.4);
+            if (bar % 3 === 1 && Math.random() < 0.8) whale(at + 1 + Math.random() * 3);
+            bar++;
+        };
+        play();
+        N.ocean = { g, n, hum, timer: setInterval(play, 8000) };
+    }
+    function oceanStop(fade = 0.6) {
+        if (!N.ocean) return;
+        clearInterval(N.ocean.timer);
+        if (ok()) {
+            N.ocean.g.gain.setTargetAtTime(0, now(), fade / 3);
+            const O = N.ocean;
+            setTimeout(() => { try { O.n.stop(); O.hum.stop(); } catch (e) { /* already stopped */ } }, fade * 2000 + 200);
+        }
+        delete N.ocean;
+    }
+
     /* the VHS rewind: the motor whines up, the tape slips, then drops */
     function rewind() {
         if (!ok()) return;
@@ -588,5 +691,5 @@ const Sound = (() => {
         if (ok()) master.gain.setTargetAtTime(m ? 0 : 0.9, now(), 0.05);
     }
 
-    return { init, tap, calm, hole, pulse, bang, spaceMusic, spaceStop, rewind, unlock, whenRunning, signalLoss, glitch, nature, cry, swoop, wingbeat, whistle, hush, boom, staticRush, tuneIn, melt, pad, hover, select, stopAll, setMuted, get muted() { return muted; } };
+    return { init, tap, calm, hole, pulse, bang, spaceMusic, spaceStop, flood, oceanMusic, oceanStop, rewind, unlock, whenRunning, signalLoss, glitch, nature, cry, swoop, wingbeat, whistle, hush, boom, staticRush, tuneIn, melt, pad, hover, select, stopAll, setMuted, get muted() { return muted; } };
 })();
