@@ -384,6 +384,8 @@ body.exploring #rewind { cursor: pointer; }
 }
 body.titled #title, body.titled .t-ghost { display: block; }
 body.swallow .t-ghost, body.space-on .t-ghost { display: none; }
+/* once swallowed, the title and rooms are part of the black hole's picture */
+body.swallow #title, body.swallow #menu { visibility: hidden; }
 .t-layer {
     position: absolute; inset: 0;
     padding-top: var(--pad);

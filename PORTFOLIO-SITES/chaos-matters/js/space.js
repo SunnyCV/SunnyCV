@@ -25,6 +25,7 @@ uniform vec2  uHole;          // black hole centre (uv)
 uniform float uRs;            // its shadow radius (screen heights)
 uniform float uPull;          // how far the page has been sucked in
 uniform float uSwirl;
+uniform float uSwirlV;        // how fast the swirl is turning (for the motion streaks)
 uniform float uDisk;          // accretion disk brightness
 uniform float uBall;          // 0..1 collapse into the seed
 uniform float uStrobe;        // the seed's pulse
@@ -71,19 +72,37 @@ vec3 blackHole(vec2 uv, vec2 A) {
     float Rs = uRs * (1.0 - uBall);
     // light bends around the hole: each pixel sees a point further out (Einstein lens)
     float src = r - (Rs * Rs * 2.2) / max(r, 1e-4);
-    // and the page spirals inward: we sample from further out as the pull grows
-    float rs = max(src, 0.0) * exp(uPull) + uPull * 0.02;
-    float aa = a + uSwirl / (max(src, 0.0) * 5.0 + 0.12);
-    vec2 sp = uHole + vec2(cos(aa), sin(aa)) * rs / A;
-    vec3 bg = vec3(0.0);
-    if (sp.x > 0.0 && sp.x < 1.0 && sp.y > 0.0 && sp.y < 1.0) {
-        float ca = 0.004 * uPull;
-        bg = vec3(texture2D(uFrame, sp + vec2(ca, 0.0)).r, texture2D(uFrame, sp).g, texture2D(uFrame, sp - vec2(ca, 0.0)).b);
-        // light climbing out of the well is reddened and dimmed
-        float well = smoothstep(Rs * 1.0, Rs * 3.5, r);
-        bg *= smoothstep(0.0, 0.06, min(sp.x, 1.0 - sp.x)) * smoothstep(0.0, 0.06, min(sp.y, 1.0 - sp.y));
-        bg *= mix(vec3(0.9, 0.35, 0.15), vec3(1.0), well) * (0.25 + 0.75 * well);
+    float sr = max(src, 0.0);
+    // the whole page is dragged in: we sample from further out as the pull grows
+    float rs = sr * exp(uPull) + uPull * 0.02;
+    // and it turns, much faster near the hole than at the edges, so it winds into spiral arms
+    float wind = 1.0 / (sr * 3.2 + 0.09) + 0.55;
+    float aa = a + uSwirl * wind;
+    // spiral ripples: the arms wobble as they're pulled, like water down a drain
+    aa += 0.35 * smoothstep(0.0, 1.5, uSwirl) * sin(log(sr + 0.02) * 9.0 - uSwirl * 1.7);
+    // motion streaks along the spin, longer where it turns fastest
+    float streak = clamp(uSwirlV * wind * 0.035, 0.0, 0.55);
+    vec3 bg = vec3(0.0), wsum = vec3(0.0);
+    for (int j = 0; j < 5; j++) {
+        float fj = float(j) / 4.0;
+        float ang = aa - streak * fj;
+        vec2 q = uHole + vec2(cos(ang), sin(ang)) * rs / A;
+        float inside = step(0.0, q.x) * step(q.x, 1.0) * step(0.0, q.y) * step(q.y, 1.0);
+        float w = (1.0 - 0.6 * fj) * inside;
+        float ca = 0.004 * uPull + streak * 0.01;
+        vec2 o = vec2(-sin(ang), cos(ang)) * ca;          // colour splits along the spin
+        bg += w * vec3(texture2D(uFrame, q + o).r, texture2D(uFrame, q).g, texture2D(uFrame, q - o).b);
+        wsum += w;
     }
+    bg = bg / max(wsum.x, 1e-3);
+    vec2 sp = uHole + vec2(cos(aa), sin(aa)) * rs / A;
+    // the frame's edges fade into the dark, and light climbing out of the well is reddened and dimmed
+    bg *= smoothstep(-0.02, 0.06, min(sp.x, 1.0 - sp.x)) * smoothstep(-0.02, 0.06, min(sp.y, 1.0 - sp.y));
+    float well = smoothstep(Rs * 1.0, Rs * 3.5, r);
+    bg *= mix(vec3(0.9, 0.35, 0.15), vec3(1.0), well) * (0.25 + 0.75 * well);
+    // the page darkens as it's swallowed, and the swirl glows faintly hot along its arms
+    bg *= 1.0 - 0.55 * smoothstep(0.6, 2.6, uPull) * smoothstep(0.5, 0.0, r);
+    bg += vec3(1.0, 0.5, 0.2) * streak * 0.25 * smoothstep(0.35, 0.0, r) * (0.5 + 0.5 * sin(aa * 3.0 + log(sr + 0.02) * 6.0));
     vec3 col = bg;
 
     // accretion disk, almost edge-on, with the lensed far side arching over and under the shadow
@@ -498,7 +517,7 @@ void main() {
     }
 
     function locate() {
-        ['uNoise', 'uFrame', 'uRes', 'uTime', 'uMode', 'uHole', 'uRs', 'uPull', 'uSwirl', 'uDisk', 'uBall', 'uStrobe', 'uBang',
+        ['uNoise', 'uFrame', 'uRes', 'uTime', 'uMode', 'uHole', 'uRs', 'uPull', 'uSwirl', 'uSwirlV', 'uDisk', 'uBall', 'uStrobe', 'uBang',
          'uCam', 'uRot', 'uSeed', 'uSpawn', 'uPl', 'uPq', 'uRing', 'uRingB', 'uMoon', 'uSun', 'uSunC', 'uRock', 'uAura', 'uVhs', 'uRoll', 'uStatic'].forEach(n => U[n] = gl.getUniformLocation(prog, n));
     }
 
@@ -574,15 +593,19 @@ void main() {
 
         if (!S.captured && t >= K.form) {
             S.captured = true;
-            capture(o.frameSource);
+            capture(typeof o.frameSource === 'function' ? o.frameSource() : o.frameSource);
             canvas.classList.add('on');
             o.onSwallow && o.onSwallow();
         }
         if (!S.captured) return out;
 
         const rs = 0.075 * smooth(K.form, K.grown, t);
-        const pull = 2.6 * Math.pow(smooth(K.form + 0.4, K.consumed, t), 1.7);
-        const swirl = 2.5 * smooth(K.form, K.consumed, t) + t * 0.15;
+        const pull = 3.1 * Math.pow(smooth(K.form + 0.25, K.consumed, t), 1.6);
+        // starts at zero so the swallowed picture matches the page exactly, then winds up hard
+        const sw = smooth(K.form, K.consumed, t);
+        const swirl = 9.0 * Math.pow(sw, 1.45) + 1.2 * Math.max(0, t - K.consumed);
+        S.swirlV = dt > 0 ? (swirl - (S.lastSwirl == null ? swirl : S.lastSwirl)) / dt : 0;
+        S.lastSwirl = swirl;
         const disk = smooth(K.form + 0.6, K.form + 3.5, t);
         const ball = smooth(K.ball[0], K.ball[1], t);
         // the seed beats faster and faster until it can't hold
@@ -633,7 +656,7 @@ void main() {
             }
         }
 
-        render({ t, rs, pull, swirl, disk, ball, strobe, bang: S.mode === 1 ? bang : -1, vhs, roll: S.roll, stat });
+        render({ t, rs, pull, swirl, swirlV: S.swirlV || 0, disk, ball, strobe, bang: S.mode === 1 ? bang : -1, vhs, roll: S.roll, stat });
         return out;
     }
 
@@ -718,6 +741,7 @@ void main() {
         gl.uniform1f(U.uRs, u.rs);
         gl.uniform1f(U.uPull, u.pull);
         gl.uniform1f(U.uSwirl, u.swirl);
+        gl.uniform1f(U.uSwirlV, u.swirlV || 0);
         gl.uniform1f(U.uDisk, u.disk);
         gl.uniform1f(U.uBall, u.ball);
         gl.uniform1f(U.uStrobe, u.strobe);

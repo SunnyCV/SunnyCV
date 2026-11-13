@@ -72,6 +72,7 @@
         return c;
     }
 
+    let staticTile = null;
     /* a tile of TV static that the room names are filled with when they glitch */
     function makeStatic() {
         const c = document.createElement('canvas');
@@ -83,6 +84,7 @@
             img.data[i + 3] = 255;
         }
         x.putImageData(img, 0, 0);
+        staticTile = c;
         document.documentElement.style.setProperty('--static', `url(${c.toDataURL()})`);
         // film grain for the dream: centred on mid-grey so the overlay blend only adds grit, never tints
         const g = document.createElement('canvas');
@@ -340,7 +342,7 @@
         spaceMusicOn = false;
         Space.start({
             hole: [room.x / innerWidth, 1 - room.y / innerHeight],
-            frameSource: glCanvas,
+            frameSource: composeFrame,
             onSwallow() {
                 Sound.hole(Space.K.bang - Space.K.form);
                 rooms.forEach(r => { r.sx = r.x; r.sy = r.y; });
@@ -352,6 +354,78 @@
             onBang() { Sound.bang(); body.classList.add('cosmos'); perf.hold = 1; },
             onReturn: returnHome,
         });
+    }
+
+    /* The moment the hole forms, the backdrop, the title and the room names are painted into one picture,
+       so the black hole bends and swirls the words together with everything else. */
+    function composeFrame() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const sc = Math.min(dpr, 2048 / Math.max(innerWidth, innerHeight));
+        const c = document.createElement('canvas');
+        c.width = Math.round(innerWidth * sc); c.height = Math.round(innerHeight * sc);
+        const x = c.getContext('2d');
+        x.drawImage(glCanvas, 0, 0, c.width, c.height);
+        x.scale(sc, sc);
+        try { drawTitleInto(x, sc); } catch (e) {}
+        try { drawRoomsInto(x); } catch (e) {}
+        return c;
+    }
+
+    function drawTitleInto(x, sc) {
+        if (!titleEls.box || !body.classList.contains('titled')) return;
+        const main = titleEls.box.querySelector('.t-main');
+        if (!main) return;
+        const cs = getComputedStyle(main), box = titleEls.box;
+        const fs = parseFloat(cs.fontSize), ls = parseFloat(cs.letterSpacing) || 0, pad = parseFloat(cs.paddingTop) || 0;
+        const W = box.offsetWidth, cx = title.pos[0] * innerWidth, top = (1 - title.pos[1]) * innerHeight - box.offsetHeight / 2;
+        const v = getComputedStyle(box), num = n => parseFloat(v.getPropertyValue(n)) || 0;
+        const fx = num('--fx'), rim = num('--rim'), sx = num('--sx'), sy = num('--sy');
+        const lines = ['CHAOS', 'MATTERS'], lh = fs * 0.86;
+        const font = `${cs.fontWeight} ${fs}px ${cs.fontFamily}`;
+        const setup = ctx => { ctx.font = font; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; if ('letterSpacing' in ctx) ctx.letterSpacing = ls + 'px'; };
+        const base = i => top + pad + lh * i + fs * 0.78;
+        const each = (ctx, dx, fn) => lines.forEach((t, i) => fn(t, cx + dx, base(i)));
+        setup(x);
+        // dark rim and drop shadow
+        x.fillStyle = 'rgba(0,0,0,0.45)'; each(x, sx, (t, X, Y) => x.fillText(t, X, Y + sy));
+        x.strokeStyle = 'rgba(0,0,0,0.72)'; x.lineWidth = rim * 2; x.lineJoin = 'round';
+        each(x, 0, (t, X, Y) => x.strokeText(t, X, Y));
+        x.fillStyle = 'rgba(0,0,0,0.72)'; each(x, 0, (t, X, Y) => x.fillText(t, X, Y));
+        // the colour fringes
+        x.fillStyle = '#ffe01a'; each(x, fx * 0.8, (t, X, Y) => x.fillText(t, X, Y));
+        x.fillStyle = '#ff2a1a'; each(x, fx * 1.3, (t, X, Y) => x.fillText(t, X, Y));
+        x.fillStyle = '#1ae8ff'; each(x, -fx * 0.8, (t, X, Y) => x.fillText(t, X, Y));
+        x.fillStyle = '#1a46ff'; each(x, -fx * 1.3, (t, X, Y) => x.fillText(t, X, Y));
+        // the letters, made of static with a light veil and scanlines
+        const t = document.createElement('canvas');
+        t.width = Math.ceil(innerWidth * sc); t.height = Math.ceil(innerHeight * sc);
+        const y = t.getContext('2d'); y.scale(sc, sc); setup(y);
+        y.fillStyle = staticTile ? y.createPattern(staticTile, 'repeat') : '#cfcfcf';
+        each(y, 0, (s, X, Y) => y.fillText(s, X, Y));
+        y.globalCompositeOperation = 'source-atop';
+        y.fillStyle = 'rgba(255,255,255,0.34)'; y.fillRect(0, 0, innerWidth, innerHeight);
+        y.fillStyle = 'rgba(0,0,0,0.16)';
+        for (let yy = Math.floor(top); yy < top + box.offsetHeight; yy += 3) y.fillRect(cx - W, yy, W * 2, 1);
+        x.save(); x.setTransform(1, 0, 0, 1, 0, 0); x.drawImage(t, 0, 0); x.restore();
+    }
+
+    function drawRoomsInto(x) {
+        if (!roomsOn) return;
+        rooms.forEach(r => {
+            if (!r.li.classList.contains('in')) return;
+            [r.li.querySelector('.m-num'), r.label].forEach(el => {
+                if (!el) return;
+                const cs = getComputedStyle(el), b = el.getBoundingClientRect();
+                x.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+                if ('letterSpacing' in x) x.letterSpacing = cs.letterSpacing === 'normal' ? '0px' : cs.letterSpacing;
+                x.textAlign = 'center'; x.textBaseline = 'middle';
+                x.shadowColor = 'rgba(0,0,0,0.75)'; x.shadowBlur = 12; x.shadowOffsetY = 2;
+                x.fillStyle = cs.color; x.globalAlpha = parseFloat(cs.opacity) || 1;
+                x.fillText(el.textContent, b.left + b.width / 2, b.top + b.height / 2);
+                x.shadowColor = 'transparent'; x.globalAlpha = 1;
+            });
+        });
+        if ('letterSpacing' in x) x.letterSpacing = '0px';
     }
 
     // the rooms spiral into the hole one by one, stretched and dimmed as they fall
@@ -525,7 +599,7 @@
             const o = Space.step(dt);
             if (Space.active) homeRate = 1 - o.calm;      // after the rewind has ended the show, returnHome has already set it back
             swallowed = o.t >= Space.K.form;
-            if (swallowed && !o.consumed) suckRooms(o);
+
             if (o.t > Space.K.bang + 2.2 && !spaceMusicOn) { spaceMusicOn = true; Sound.spaceMusic(); }
             if (o.explore && Space.active && rewindBtn.hidden && !osd.classList.contains('on')) { rewindBtn.hidden = false; body.classList.add('exploring'); }
             if (osd.classList.contains('on') && o.rew != null) osd.querySelector('.osd-time').textContent = tape(o.rew);
