@@ -7,8 +7,7 @@
 
 (() => {
     const ROOMS = [
-        'Space', 'Teeth of the Moon', 'Static Lullaby', 'Inside the Inkwell',
-        'Seventeen Suns', 'The Weight of Feathers', 'Echoes for Rent', 'Paper Thunder'
+        'Space', '???', '???', '???', '???', '???', '???', '???'      // rooms 2–8 are kept secret until they're built
     ];
 
     // the score, in seconds from the moment the loading bar finishes
@@ -270,9 +269,22 @@
                 if (i === 0) { enterSpace(room); return; }
                 Sound.select();
                 ripple = [room.x / innerWidth, 1 - room.y / innerHeight, 0];
-                showToast(`Room ${String(i + 1).padStart(2, '0')} · “${name}” is still being dreamed up.`);
+                showToast(`Room ${String(i + 1).padStart(2, '0')} is still being dreamed up.`);
             });
         });
+        // the one open room glitches every 8 seconds, like the logo on the portfolio
+        const space = rooms[0];
+        if (space && !reduced) {
+            const snap = () => {
+                const l = space.label;
+                if (document.hidden || !space.li.classList.contains('in') || space.li.classList.contains('hot') || phase === 'space') return;
+                l.classList.remove('snap');
+                void l.offsetWidth;               // restart the animation
+                l.classList.add('snap');
+                setTimeout(() => l.classList.remove('snap'), 420);
+            };
+            setInterval(snap, 8000);
+        }
     }
 
     function measureRooms() {
