@@ -163,9 +163,14 @@ vec3 starField(vec3 rd) {
         vec3 o = (h - 0.5) * 0.7;
         float d = length(f - o);
         float on = step(0.8 - float(i) * 0.05, h.x);
-        float tw = 0.75 + 0.25 * sin(uTime * (1.0 + h.z * 3.0) + h.y * 40.0);
+        float tw = 0.82 + 0.18 * sin(uTime * (1.0 + h.z * 3.0) + h.y * 40.0);
         vec3 c = mix(vec3(0.65, 0.78, 1.0), vec3(1.0, 0.82, 0.6), h.y);
-        col += c * on * tw * (exp(-d * d * (260.0 + float(i) * 200.0)) * (3.0 - float(i) * 0.7) + exp(-d * d * 40.0) * 0.08);
+        // a star is never drawn smaller than about a pixel; when it's widened, it's dimmed to keep the same light
+        float k0 = 260.0 + float(i) * 200.0;
+        float px = sc / (1.25 * uRes.y);                        // one pixel, measured in star cells
+        float k = min(k0, 1.0 / max(px * px * 0.8, 1e-6));
+        // widened stars fade faster than their size grows, so the faintest drop out instead of becoming a grain
+        col += c * on * tw * (exp(-d * d * k) * (3.0 - float(i) * 0.7) * pow(k / k0, 1.25) + exp(-d * d * 40.0) * 0.08);
     }
     return col;
 }
@@ -198,7 +203,7 @@ vec3 galaxies(vec3 rd) {
         float arms = 0.5 + 0.5 * cos(2.0 * th - log(r + 0.02) * 4.5 + fi * 2.0);
         float disk = exp(-r * 3.2) * (0.25 + 0.75 * pow(arms, 2.0) * smoothstep(0.03, 0.25, r));
         float core = exp(-r * r * 90.0);
-        vec3 armCol = mix(vec3(0.55, 0.65, 1.0), vec3(1.0, 0.45, 0.7), step(0.8, hash(floor(q * 900.0))) * arms);
+        vec3 armCol = mix(vec3(0.55, 0.65, 1.0), vec3(1.0, 0.45, 0.7), smoothstep(0.55, 0.85, noise3(vec3(q * 140.0, fi))) * arms);
         col += armCol * disk * 0.9 + vec3(1.0, 0.85, 0.6) * core * 1.4;
     }
     return col;
@@ -280,7 +285,7 @@ vec3 universe(vec3 ro, vec3 rd, vec2 uv, vec2 A) {
         vec3 atm = mix(vec3(0.35, 0.6, 1.0), vec3(1.0, 0.55, 0.35), Q.z);
         if (tc > 0.0) {
             float dm = length(oc - rd * tc);
-            glow += atm * exp(-max(dm - R, 0.0) / (R * 0.08)) * step(R, dm) * 0.25 * (1.0 - smoothstep(55.0, 85.0, tc)) * near;
+            glow += atm * exp(-max(dm - R, 0.0) / (R * 0.08)) * step(R, dm) * 0.25 * (1.0 - smoothstep(85.0, 130.0, tc)) * near;
         }
         vec4 RG = uRing[i];
         if (RG.w > 0.5) {
@@ -294,7 +299,7 @@ vec3 universe(vec3 ro, vec3 rd, vec2 uv, vec2 A) {
                     float bands = 0.5 + 0.5 * sin(rr * 40.0 + RB.x * 9.0) * sin(rr * 13.0);
                     float a = (0.25 + 0.6 * bands) * smoothstep(1.35, 1.45, rr) * (1.0 - smoothstep(2.25, 2.4, rr));
                     vec3 rc = mix(vec3(0.85, 0.75, 0.6), vec3(0.6, 0.65, 0.8), RB.y) * (0.35 + 0.9 * max(dot(n, L) * sign(-dn), 0.15));
-                    ringT = tp; ringCol = vec4(rc, a * (1.0 - smoothstep(55.0, 85.0, tp)) * near);
+                    ringT = tp; ringCol = vec4(rc, a * (1.0 - smoothstep(85.0, 130.0, tp)) * near);
                 }
             }
         }
@@ -310,7 +315,7 @@ vec3 universe(vec3 ro, vec3 rd, vec2 uv, vec2 A) {
         vec3 oc = P.xyz - ro; float tc = dot(oc, rd);
         if (tc > 0.0) {
             float dm = length(oc - rd * tc);
-            glow += mix(vec3(1.0, 0.8, 0.5), vec3(0.75, 0.85, 1.0), uSunC[i].x) * (P.w * P.w / (dm * dm + P.w * 0.3)) * 0.12 * (1.0 - smoothstep(60.0, 90.0, tc));
+            glow += mix(vec3(1.0, 0.8, 0.5), vec3(0.75, 0.85, 1.0), uSunC[i].x) * (P.w * P.w / (dm * dm + P.w * 0.3)) * 0.12 * (1.0 - smoothstep(90.0, 135.0, tc));
             float t = sphereHit(ro, rd, P.xyz, P.w);
             if (t > 0.0 && t < tHit) { tHit = t; hitKind = 3.0; hitC = P.xyz; hitR = P.w; hitH = vec3(0.0, 0.0, uSunC[i].x); hitFade = 1.0; }
         }
@@ -319,7 +324,7 @@ vec3 universe(vec3 ro, vec3 rd, vec2 uv, vec2 A) {
         vec4 P = uRock[i];
         if (P.w <= 0.0) continue;
         float t = sphereHit(ro, rd, P.xyz, P.w);
-        if (t > 0.0 && t < tHit) { tHit = t; hitKind = 4.0; hitC = P.xyz; hitR = P.w; hitH = fract(P.xyz * 0.37); hitFade = 1.0 - smoothstep(10.0, 16.0, t); }
+        if (t > 0.0 && t < tHit) { tHit = t; hitKind = 4.0; hitC = P.xyz; hitR = P.w; hitH = fract(P.xyz * 0.37); hitFade = 1.0 - smoothstep(15.0, 24.0, t); }
     }
 
     // drifting stardust: parallax specks in a fine grid around us
@@ -333,7 +338,8 @@ vec3 universe(vec3 ro, vec3 rd, vec2 uv, vec2 A) {
         vec3 op = (id + 0.2 + 0.6 * h) * S - ro;
         float tp = dot(op, rd);
         float dm2 = dot(op, op) - tp * tp;
-        glow += mix(vec3(0.7, 0.8, 1.0), vec3(1.0, 0.8, 0.6), h.y) * exp(-dm2 / sq(0.012 * max(tp, 0.2))) * 0.5 * (1.0 - smoothstep(8.0, 14.0, tp)) * step(0.2, tp);
+        float wpx = max(0.012, 1.2 / (1.25 * uRes.y));                 // at least a pixel or so wide
+        glow += mix(vec3(0.7, 0.8, 1.0), vec3(1.0, 0.8, 0.6), h.y) * exp(-dm2 / sq(wpx * max(tp, 0.2))) * 0.5 * (0.012 / wpx) * (1.0 - smoothstep(8.0, 14.0, tp)) * step(0.2, tp);
     }
 
     // shade whatever we hit, once
@@ -346,10 +352,10 @@ vec3 universe(vec3 ro, vec3 rd, vec2 uv, vec2 A) {
             vec3 atm = mix(vec3(0.35, 0.6, 1.0), vec3(1.0, 0.55, 0.35), hitH.z);
             float rim = pow(1.0 - max(dot(N, -rd), 0.0), 3.0);
             sc = planetSurface(N, hitH, hitType) * (diff * 1.25 + 0.05) + atm * rim * (0.25 + diff * 0.9);   // a little starlight on the night side
-            hitFade *= 1.0 - smoothstep(55.0, 85.0, tHit);
+            hitFade *= 1.0 - smoothstep(85.0, 130.0, tHit);
         } else if (hitKind < 2.5) {
             sc = planetSurface(N, hitH, 0.9) * (smoothstep(-0.05, 0.4, dot(N, L)) * 1.2 + 0.01);
-            hitFade *= 1.0 - smoothstep(55.0, 85.0, tHit);
+            hitFade *= 1.0 - smoothstep(85.0, 130.0, tHit);
         } else if (hitKind < 3.5) {
             vec3 suc = mix(vec3(1.0, 0.8, 0.5), vec3(0.75, 0.85, 1.0), hitH.z);
             sc = suc * (2.2 + 1.2 * fbm3(N * 8.0 + uTime * 0.05)) * (0.6 + 0.4 * pow(max(dot(N, -rd), 0.0), 0.5));
@@ -444,7 +450,7 @@ void main() {
     col = 1.0 - exp(-col * 1.25);
     col *= 1.0 - 0.35 * dot((vUv - 0.5) * A, (vUv - 0.5) * A);
     float grain = hash(floor(vUv * uRes) + fract(t * 7.0) * 91.0);
-    col += (grain - 0.5) * 0.025;
+    col += (grain - 0.5) * 0.008;
 
     if (uVhs > 0.0) {
         float scan = 0.85 + 0.15 * sin(vUv.y * uRes.y * 1.5);
@@ -551,7 +557,7 @@ void main() {
         // the black hole is cheap enough to draw sharp; the open universe costs more, so it gets a smaller budget.
         // Either way the page's frame-rate watch lowers 'quality' if a device can't keep up.
         const dpr = Math.min(devicePixelRatio || 1, 2);
-        const base = S && S.mode === 1 ? 1.1e6 : 1.8e6;
+        const base = S && S.mode === 1 ? 1.45e6 : 1.8e6;
         const budget = base * quality * quality, px = innerWidth * innerHeight * dpr * dpr;
         scale = px > budget ? dpr * Math.sqrt(budget / px) : dpr;
         const w = Math.round(innerWidth * scale), h = Math.round(innerHeight * scale);
@@ -676,7 +682,7 @@ void main() {
     function listBodies(t) {
         const C = 46, cx = Math.floor(cam.pos[0] / C), cy = Math.floor(cam.pos[1] / C), cz = Math.floor(cam.pos[2] / C);
         const planets = [], suns = [];
-        for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) for (let z = -1; z <= 1; z++) {
+        for (let x = -2; x <= 2; x++) for (let y = -2; y <= 2; y++) for (let z = -2; z <= 2; z++) {
             const ix = cx + x, iy = cy + y, iz = cz + z;
             const h = h3(ix, iy, iz, 0);
             if (h[0] >= 0.3 && h[0] <= 0.95) continue;
@@ -712,13 +718,14 @@ void main() {
         const SR = 7, sx = Math.floor(cam.pos[0] / SR), sy = Math.floor(cam.pos[1] / SR), sz = Math.floor(cam.pos[2] / SR);
         const belt = h3(Math.floor(sx / 12), Math.floor(sy / 12), Math.floor(sz / 12), 7)[0] > 0.55;
         if (belt) {
-            let n = 0;
-            for (let x = -1; x <= 1 && n < 8; x++) for (let y = -1; y <= 1 && n < 8; y++) for (let z = -1; z <= 1 && n < 8; z++) {
+            const rocks = [];
+            for (let x = -2; x <= 2; x++) for (let y = -2; y <= 2; y++) for (let z = -2; z <= 2; z++) {
                 const h = h3(sx + x, sy + y, sz + z, 9);
                 if (h[2] < 0.6) continue;
-                B.rock.set([(sx + x + 0.2 + 0.6 * h[0]) * SR, (sy + y + 0.2 + 0.6 * h[1]) * SR + 1.5, (sz + z + 0.2 + 0.6 * h[2]) * SR, 0.15 + 0.6 * h[0] * h[0]], n * 4);
-                n++;
+                const p = [(sx + x + 0.2 + 0.6 * h[0]) * SR, (sy + y + 0.2 + 0.6 * h[1]) * SR + 1.5, (sz + z + 0.2 + 0.6 * h[2]) * SR];
+                rocks.push({ p, r: 0.15 + 0.6 * h[0] * h[0], d: Math.hypot(p[0] - cam.pos[0], p[1] - cam.pos[1], p[2] - cam.pos[2]) });
             }
+            rocks.sort((a, b) => a.d - b.d).slice(0, 8).forEach((k, n) => B.rock.set([...k.p, k.r], n * 4));
         }
     }
 
