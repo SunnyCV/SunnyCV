@@ -548,9 +548,11 @@ void main() {
 
     function resize() {
         if (!ok) return;
-        // space is costly: render at a reduced size and let the browser scale it up smoothly
-        const dpr = Math.min(devicePixelRatio || 1, 1.5);
-        const budget = 0.6e6 * quality * quality, px = innerWidth * innerHeight * dpr * dpr;
+        // the black hole is cheap enough to draw sharp; the open universe costs more, so it gets a smaller budget.
+        // Either way the page's frame-rate watch lowers 'quality' if a device can't keep up.
+        const dpr = Math.min(devicePixelRatio || 1, 2);
+        const base = S && S.mode === 1 ? 1.1e6 : 1.8e6;
+        const budget = base * quality * quality, px = innerWidth * innerHeight * dpr * dpr;
         scale = px > budget ? dpr * Math.sqrt(budget / px) : dpr;
         const w = Math.round(innerWidth * scale), h = Math.round(innerHeight * scale);
         if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
@@ -617,7 +619,7 @@ void main() {
             if (Math.floor(S.strobePh) !== S.lastPulse) { S.lastPulse = Math.floor(S.strobePh); o.onPulse && o.onPulse(k); }
         }
         if (!S.consumed && t >= K.consumed) { S.consumed = true; o.onConsumed && o.onConsumed(); }
-        if (!S.banged && t >= K.bang) { S.banged = true; S.mode = 1; o.onBang && o.onBang(); }
+        if (!S.banged && t >= K.bang) { S.banged = true; S.mode = 1; resize(); o.onBang && o.onBang(); }
         out.rs = rs; out.consumed = S.consumed; out.explore = t >= K.explore;
         const bang = t - K.bang;
 

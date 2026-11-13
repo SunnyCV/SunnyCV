@@ -104,8 +104,8 @@
     const pinQ = (location.search.match(/[?&]q=([\d.]+)/) || [])[1];
     const perf = { q: pinQ ? +pinQ : 1, acc: 0, n: 0, good: 0, hold: 0 };
     function pickGlScale() {
-        const dpr = RENDER ? devicePixelRatio : Math.min(devicePixelRatio || 1, 1.5);
-        const budget = RENDER ? 1e9 : 4.2e6 * perf.q * perf.q, px = innerWidth * innerHeight * dpr * dpr;
+        const dpr = RENDER ? devicePixelRatio : Math.min(devicePixelRatio || 1, 2);
+        const budget = RENDER ? 1e9 : 5.0e6 * perf.q * perf.q, px = innerWidth * innerHeight * dpr * dpr;
         glScale = px > budget ? dpr * Math.sqrt(budget / px) : dpr;
         Screen.resize(glScale);
         Space.setQuality(perf.q);
