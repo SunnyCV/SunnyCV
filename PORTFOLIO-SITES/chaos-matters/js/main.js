@@ -259,6 +259,7 @@
             const room = { li, a, label, x: innerWidth / 2, y: innerHeight / 2, w: 0, h: 0 };
             rooms.push(room);
             const heat = on => {
+                if (phase === 'space') return;      // inside a room the menu stays exactly as it was clicked
                 li.classList.toggle('hot', on);
                 if (on) { hot = i; Sound.hover(i); Sound.glitch(2, 0.15); scramble(label, name, 380); }
                 else if (hot === i) hot = -1;
@@ -347,9 +348,8 @@
             if (!Space.ok) showToast('Space needs WebGL, which this browser has turned off.');
             return;
         }
+        const shot = composeFrame();   // the page exactly as it was at the click; the home freezes on it until the room takes it
         phase = 'space';
-        hot = -1;
-        rooms.forEach(r => r.li.classList.remove('hot'));
         body.classList.add('space-on');
         body.style.cursor = '';
         Sound.select();
@@ -359,7 +359,7 @@
         Room = Space; roomMusic = () => Sound.spaceMusic();
         Space.start({
             hole: [room.x / innerWidth, 1 - room.y / innerHeight],
-            frameSource: composeFrame,
+            frameSource: shot,
             onSwallow() {
                 Sound.hole(Space.K.bang - Space.K.form);
                 rooms.forEach(r => { r.sx = r.x; r.sy = r.y; });
@@ -436,10 +436,24 @@
                 x.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
                 if ('letterSpacing' in x) x.letterSpacing = cs.letterSpacing === 'normal' ? '0px' : cs.letterSpacing;
                 x.textAlign = 'center'; x.textBaseline = 'middle';
+                const txt = el.dataset.text || el.textContent, cx = b.left + b.width / 2, cy = b.top + b.height / 2;
+                if (el === r.label && r.li.classList.contains('hot')) {
+                    // the hovered look: colour tears either side, a white static-filled name, a magenta and cyan glow
+                    x.globalCompositeOperation = 'lighter';
+                    x.fillStyle = 'rgba(255,42,190,0.5)'; x.fillText(txt, cx - 2, cy);
+                    x.fillStyle = 'rgba(26,232,255,0.5)'; x.fillText(txt, cx + 2, cy);
+                    x.globalCompositeOperation = 'source-over';
+                    x.shadowColor = 'rgba(255,42,190,0.9)'; x.shadowBlur = 16;
+                    x.fillStyle = '#fff'; x.fillText(txt, cx, cy);
+                    x.shadowColor = 'rgba(26,232,255,0.9)'; x.shadowBlur = 28; x.fillText(txt, cx, cy);
+                    x.shadowColor = 'transparent';
+                    if (staticTile) { x.globalAlpha = 0.35; x.fillStyle = x.createPattern(staticTile, 'repeat'); x.fillText(txt, cx, cy); x.globalAlpha = 1; }
+                    return;
+                }
                 x.shadowColor = 'rgba(0,0,0,0.75)'; x.shadowBlur = 12; x.shadowOffsetY = 2;
                 x.fillStyle = cs.color; x.globalAlpha = parseFloat(cs.opacity) || 1;
-                x.fillText(el.textContent, b.left + b.width / 2, b.top + b.height / 2);
-                x.shadowColor = 'transparent'; x.globalAlpha = 1;
+                x.fillText(txt, cx, cy);
+                x.shadowColor = 'transparent'; x.shadowOffsetY = 0; x.globalAlpha = 1;
             });
         });
         if ('letterSpacing' in x) x.letterSpacing = '0px';
@@ -451,9 +465,8 @@
             if (!Ocean.ok) showToast('Atlantis needs WebGL, which this browser has turned off.');
             return;
         }
+        const shot = composeFrame();   // the page exactly as it was at the click; the home freezes on it until the room takes it
         phase = 'space';
-        hot = -1;
-        rooms.forEach(r => r.li.classList.remove('hot'));
         body.classList.add('space-on');
         body.style.cursor = '';
         Sound.select();
@@ -462,7 +475,7 @@
         spaceMusicOn = false;
         Room = Ocean; roomMusic = () => Sound.oceanMusic();
         Ocean.start({
-            frameSource: composeFrame,
+            frameSource: shot,
             onSwallow() {
                 Sound.flood(Ocean.K.flood[1] - Ocean.K.flood[0]);
                 body.classList.add('swallow');
@@ -528,7 +541,7 @@
         roomsOn = false;
         menu.classList.remove('on');
         rooms.forEach(r => {
-            r.li.classList.remove('in');
+            r.li.classList.remove('in', 'hot');
             r.li.style.opacity = r.li.style.filter = '';
             r.shown = false;
         });
@@ -666,7 +679,7 @@
             if (R.u >= A.done) { impactAt = clock - R.u; returning = null; }
         }
 
-        if ((clock >= T.impact || phase === 'home' || phase === 'space') && phase !== 'film' && !swallowed) {
+        if ((clock >= T.impact || phase === 'home' || phase === 'space') && phase !== 'film' && !swallowed && !inRoom()) {
             const u = returning ? returning.u : clock - impactAt;
             shaderT += dt * homeRate;
             mouse[0] += (pointer[0] - mouse[0]) * 0.08;

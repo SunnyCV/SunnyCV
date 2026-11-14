@@ -114,7 +114,8 @@ vec3 blackHole(vec2 uv, vec2 A) {
     float swirl = fbm3(vec3(rr / max(Rs, 1e-3) * 2.4, (atan(dp.y / tilt, dp.x) - spin) * 2.0, t * 0.3));
     float band = smoothstep(Rin, Rin * 1.25, rr) * (1.0 - smoothstep(Rout * 0.6, Rout, rr));
     float beam = 1.0 + 0.75 * dp.x / max(rr, 1e-4);                 // the side spinning toward us is brighter
-    float front = step(0.0, -dp.y) + step(Rs * 1.05, abs(dp.x));     // the far half hides behind the shadow
+    // the far half hides behind the shadow; the cut follows the shadow's circle so its edge stays perfectly round
+    float front = smoothstep(Rs * 0.04, -Rs * 0.04, dp.y) + smoothstep(Rs * 1.02, Rs * 1.22, r);
     vec3 hot = mix(vec3(1.0, 0.45, 0.12), vec3(1.0, 0.92, 0.75), smoothstep(Rout, Rin, rr));
     hot = mix(hot, hueShift(hot, 0.6 * sin(t * 0.3 + rr * 30.0)), 0.18);   // a breath of the page's colour
     float disk = band * (0.35 + 0.9 * swirl) * beam * min(front, 1.0);
